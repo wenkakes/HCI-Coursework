@@ -1,9 +1,7 @@
 package src.utils;
 
 /**
- * A simple representation of a point.
- * 
- * @author Michal
+ * A simple, immutable representation of a point.
  */
 public class Point {
     private final int x;
@@ -23,15 +21,6 @@ public class Point {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + x;
-        result = prime * result + y;
-        return result;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -45,5 +34,14 @@ public class Point {
         if (y != other.y)
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + x;
+        result = prime * result + y;
+        return result;
     }
 }

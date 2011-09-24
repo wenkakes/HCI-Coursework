@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -54,9 +53,7 @@ public class ImageLabeller {
                 // Here is the beginning of the toolbox code
                 final JPanel toolboxPanel = new JPanel();
 
-                AtomicReference<JPanel> toolBoxReferencePanel = new AtomicReference<JPanel>(
-                        toolboxPanel);
-                final LabelPanel labelPanel = new LabelPanel(toolBoxReferencePanel);
+                final LabelPanel labelPanel = new LabelPanel(toolboxPanel);
 
                 JButton newPolyButton = new JButton("Done");
                 newPolyButton.setMnemonic(KeyEvent.VK_N);
