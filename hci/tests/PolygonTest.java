@@ -12,93 +12,109 @@ import org.junit.Test;
 import src.Polygon;
 import src.utils.Point;
 
+/**
+ * Tests for the {@link Polygon} class.
+ */
 public class PolygonTest {
-	
-	public Polygon setupTest() {
-		String name = "TestPolygon";
-		
-		ArrayList<Point> points = setupPoints();
-		
-		Polygon polygon = new Polygon(name, points);
-		return polygon;
-		
-	}
 
-	private ArrayList<Point> setupPoints() {
-		Point pt1 = new Point(0, 0);
-		Point pt2 = new Point(0, 5);
-		Point pt3 = new Point(5, 5);
-		Point pt4 = new Point(5, 0);
-		
-		ArrayList<Point> points = new ArrayList<Point>();
-		
-		points.add(pt1);
-		points.add(pt2);
-		points.add(pt3);
-		points.add(pt4);
-		return points;
-	}
-	
 	@Test
-	public void testConstructPolygon() {
-
-		Polygon polygon = setupTest();
+	public void testPolygonConstruction() {
+		Polygon polygon = createTestPolygon();
+		
 		assertEquals("TestPolygon", polygon.getName());
-		assertEquals((List<Point>)setupPoints(), polygon.getPoints());
+		assertEquals(createTestPoints(), polygon.getPoints());
 	}
 	
 	@Test
 	public void testAddPoints() {
-
-		Polygon polygon = setupTest();
-		Point p = new Point(6,0);
-		polygon.addPoint(p);
+		Polygon polygon = createTestPolygon();
 		
-		ArrayList<Point> pointList = setupPoints();
-		pointList.add(p);
+		Point p1 = new Point(6,0);
+		Point p2 = new Point(3,2);
+		polygon.addPoint(p1);
+		polygon.addPoint(p2);
 		
-		assertEquals(pointList, polygon.getPoints());
+		// Grab another instance of the same base list and add the same points to it.
+		List<Point> pointList = createTestPoints();
+		pointList.add(p1);
+		pointList.add(p2);
 		
+		assertEquals(pointList, polygon.getPoints());		
 	}
 	
 	@Test
 	public void testDeletePoints() {
-	
-		Polygon polygon = setupTest();
-		Point p = new Point(6,0);
+		Polygon polygon = createTestPolygon();
 		polygon.removeLastPoint();
 		
-		ArrayList<Point> pointList = setupPoints();
+		// Grab another instance of the same base list and remove the last point from it.
+		List<Point> pointList = createTestPoints();
 		pointList.remove(pointList.size() - 1);
 		
 		assertEquals(pointList, polygon.getPoints());
-		
 	}
 	
 	@Test
 	public void testRedoPoints() {
-		Polygon polygon = setupTest();
+		Polygon polygon = createTestPolygon();
+		List<Point> pointList = createTestPoints();
+		
+		// Make sure that removing and redoing a point gets you back to the start.
 		polygon.removeLastPoint();
 		polygon.redoPoint();
-		
-		ArrayList<Point> pointList = setupPoints();
 		assertEquals(pointList, polygon.getPoints());
 		
+		// Make sure that redoing a point when there is nothing to redo is a NOP.
 		polygon.redoPoint();
+		assertEquals(pointList, polygon.getPoints());
+		
+		// Make sure that redo only re-adds one item.
+		polygon.removeLastPoint();
+		polygon.removeLastPoint();
+		polygon.redoPoint();
+		pointList.remove(pointList.size() - 1);
 		assertEquals(pointList, polygon.getPoints());
 	}
 	
 	@Test
 	public void testAbleToRedo() {
-		Polygon polygon = setupTest();
+		Polygon polygon = createTestPolygon();
+		
 		assertFalse(polygon.canRedo());
 		
 		polygon.removeLastPoint();
-		
 		assertTrue(polygon.canRedo());
 		
 		polygon.redoPoint();
-		
 		assertFalse(polygon.canRedo());
+	}
+	
+	/**
+	 * Creates a polygon for use in JUnit tests.
+	 */
+	private static Polygon createTestPolygon() {
+		String name = "TestPolygon";
+		List<Point> points = createTestPoints();
+		
+		return new Polygon(name, points);
+	}
+
+	/**
+	 * Creates a list of {@link Point}s for use in JUnit tests.
+	 * @return
+	 */
+	private static List<Point> createTestPoints() {
+		Point pt1 = new Point(0, 0);
+		Point pt2 = new Point(0, 5);
+		Point pt3 = new Point(5, 5);
+		Point pt4 = new Point(5, 0);
+		
+		List<Point> points = new ArrayList<Point>();
+		points.add(pt1);
+		points.add(pt2);
+		points.add(pt3);
+		points.add(pt4);
+		
+		return points;
 	}
 }
