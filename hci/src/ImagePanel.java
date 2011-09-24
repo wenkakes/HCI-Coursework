@@ -16,23 +16,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
-/**
- * Handles the editing of the image.
- * 
- * @author Michal
- */
 public class ImagePanel extends JPanel implements MouseListener {
-	
 	// JFrame is serializable, so we need some ID to avoid compiler warnings.
 	private static final long serialVersionUID = 1L;
 
 	// Image that is being worked on.
 	BufferedImage image = null;
-	
+
 	// List of the current polygons vertices.
 	ArrayList<Point> currentPolygon = null;
-	
+
 	// List of all completed polygons for the current image.
 	ArrayList<ArrayList<Point>> polygonsList = null;
 	
@@ -71,79 +64,66 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 	
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		
-		// Draw the image.
-		ShowImage();
+		g.drawImage(image, 0, 0, null);
+
+		Graphics2D graphics2D = (Graphics2D) g;
 		
-		// Draw on all the completed polygons.
-		for(ArrayList<Point> polygon : polygonsList) {
-			drawPolygon(polygon);
-			finishPolygon(polygon);
+		for (ArrayList<Point> polygon : polygonsList) {
+			drawPolygon(polygon, graphics2D);
+			finishPolygon(polygon, graphics2D);
 		}
 		
-		// Draw on the current polygon.
-		drawPolygon(currentPolygon);
+		drawPolygon(currentPolygon, graphics2D);
 	}
 
 	/**
-	 * Draws the image that is being edited.
+	 * Finishes editing the current polygon and starts on a new one.
 	 */
-	public void ShowImage() {
-		Graphics g = this.getGraphics();
-		
-		if (image != null) {
-			g.drawImage(image, 0, 0, null);
+	public void addNewPolygon() {
+		if (currentPolygon != null ) {
+			polygonsList.add(currentPolygon);
 		}
+		currentPolygon = new ArrayList<Point>();
+		
+		repaint();
 	}
 	
 	/**
 	 * Draws an unfinished polygon (i.e. with no line between the last and first vertices).
 	 * 
 	 * @param polygon the polygon to be drawn
+	 * @param graphics2d 
 	 */
-	public void drawPolygon(ArrayList<Point> polygon) {
-		Graphics2D g = (Graphics2D)this.getGraphics();
-		g.setColor(Color.GREEN);
+	public void drawPolygon(ArrayList<Point> polygon, Graphics2D graphics2d) {
+		graphics2d.setColor(Color.GREEN);
 		for(int i = 0; i < polygon.size(); i++) {
 			Point currentVertex = polygon.get(i);
 			if (i != 0) {
 				Point prevVertex = polygon.get(i - 1);
-				g.drawLine(prevVertex.getX(), prevVertex.getY(), currentVertex.getX(), currentVertex.getY());
+				graphics2d.drawLine(prevVertex.getX(), prevVertex.getY(), currentVertex.getX(), currentVertex.getY());
 			}
-			g.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
+			graphics2d.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
 		}
 	}
-	
+
 	/**
 	 * Draws the last stroke of a polygon (the line between the last and first vertices).
 	 * 
 	 * @param polygon the polygon to draw the final stroke for
+	 * @param graphics2d 
 	 */
-	public void finishPolygon(ArrayList<Point> polygon) {
+	public void finishPolygon(ArrayList<Point> polygon, Graphics2D graphics2d) {
 		// A polygon with less than 3 vertices is just a line or point and needs no finishing.
 		if (polygon.size() >= 3) {
 			Point firstVertex = polygon.get(0);
 			Point lastVertex = polygon.get(polygon.size() - 1);
-		
-			Graphics2D g = (Graphics2D)this.getGraphics();
-			g.setColor(Color.GREEN);
-			g.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(), lastVertex.getY());
+
+			graphics2d.setColor(Color.GREEN);
+			graphics2d.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(), lastVertex.getY());
 		}
-	}
-	
-	/**
-	 * Finishes editing the current polygon and starts on a new one.
-	 */
-	public void addNewPolygon() {
-		//finish the current polygon if any
-		if (currentPolygon != null ) {
-			finishPolygon(currentPolygon);
-			polygonsList.add(currentPolygon);
-		}
-		
-		currentPolygon = new ArrayList<Point>();
 	}
 
 	@Override
@@ -155,20 +135,10 @@ public class ImagePanel extends JPanel implements MouseListener {
 			return;
 		}
 		
-		Graphics2D g = (Graphics2D) this.getGraphics();
-		
-		// Left click adds a vertex to the current polygon.
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			g.setColor(Color.GREEN);
-			if (currentPolygon.size() != 0) {
-				Point lastVertex = currentPolygon.get(currentPolygon.size() - 1);
-				g.drawLine(lastVertex.getX(), lastVertex.getY(), x, y);
-			}
-			g.fillOval(x-5,y-5,10,10);
-			
 			currentPolygon.add(new Point(x,y));
-			System.out.println(x + " " + y);
-		} 
+			repaint();
+		}
 	}
 
 	@Override
@@ -180,7 +150,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent arg0) {
+	public void mousePressed(MouseEvent e) {
 	}
 
 	@Override
