@@ -10,7 +10,6 @@ import src.utils.Point;
  * undo/redo state.
  */
 public class Polygon {
-
     private String name;
     private ArrayList<Point> points;
     private int pointIndex;
@@ -22,6 +21,7 @@ public class Polygon {
     public Polygon(String name, List<Point> inputPoints) {
         this.name = name;
 
+        // Defensive-copy the input points.
         points = new ArrayList<Point>(inputPoints.size());
         for (Point point : inputPoints) {
             points.add(point);
@@ -41,8 +41,7 @@ public class Polygon {
     /**
      * Sets the name of the polygon.
      * 
-     * @param name
-     *            the new name for the polygon
+     * @param name the new name for the polygon
      */
     public void setName(String name) {
         this.name = name;
@@ -69,8 +68,7 @@ public class Polygon {
     /**
      * Adds a point to the polygon.
      * 
-     * @param point
-     *            the new point to add to the polygon
+     * @param point the new point to add to the polygon
      */
     public void addPoint(Point point) {
         // Adding a point deletes the 'redo' cache.
@@ -100,8 +98,9 @@ public class Polygon {
      * points to re-add, does nothing.
      */
     public void redoPoint() {
-        if (canRedo())
+        if (canRedo()) {
             pointIndex++;
+        }
     }
 
     /**
