@@ -1,8 +1,11 @@
 package src;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.Map.Entry;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,17 +35,22 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
     private static final long serialVersionUID = 1L;
 
     private final JButton addButton;
+    private final JButton editButton;
+    private final JButton loadButton;
     private final JButton deleteButton;
-    private final JPanel toolBox;
+    private final ToolboxPanel toolBox;
+    private final ImagePanel imagePanel;
 
     private final JList list;
+    private final JPanel labelListPane;
     private final DefaultListModel listModel;
     private final HashMap<String, Polygon> polygons;
 
-    public LabelPanel(JPanel toolBox) {
+    public LabelPanel(ToolboxPanel toolBox, ImagePanel imagePanel) {
         super(new BorderLayout());
 
         this.toolBox = toolBox;
+        this.imagePanel = imagePanel;
 
         listModel = new DefaultListModel();
         polygons = new HashMap<String, Polygon>();
@@ -53,11 +62,18 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
 
-        addButton = new JButton("Add New Polygon");
+        addButton = new JButton(new ImageIcon("hci/icons/add.png"));
         addButton.addActionListener(new AddListener());
         addButton.setEnabled(true);
 
-        deleteButton = new JButton("Delete Polygon");
+        editButton = new JButton(new ImageIcon("hci/icons/edit.png"));
+        editButton.addActionListener(new EditListener());
+        editButton.setEnabled(false);
+        
+        loadButton = new JButton("Load button");
+        loadButton.setEnabled(true);
+        
+        deleteButton = new JButton(new ImageIcon("hci/icons/delete.png"));
         deleteButton.addActionListener(new DeleteListener());
         deleteButton.setEnabled(false);
 
@@ -65,11 +81,29 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(addButton);
         buttonPane.add(Box.createHorizontalStrut(10));
+        buttonPane.add(editButton);
+        buttonPane.add(Box.createHorizontalStrut(10));
         buttonPane.add(deleteButton);
-
+       
+              
+        JPanel noLabelsPane = new JPanel();
+        noLabelsPane.add(new JLabel("<html>You don't seem to have any labels currently. <br /> Add or load some labels?</html>"));
+        noLabelsPane.add(loadButton);
+        
+        labelListPane = new JPanel(new CardLayout());
+        labelListPane.add(noLabelsPane, "NOLABELS");
+        labelListPane.add(listScrollPane, "HAVELABELS");
+                
         add(new JLabel("Current Labels"), BorderLayout.NORTH);
-        add(listScrollPane, BorderLayout.CENTER);
+        
+       
+        add(labelListPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
+        
+        CardLayout cl = (CardLayout)(labelListPane.getLayout());
+        cl.show(labelListPane, "NOLABELS");
+        
+        
     }
 
     @Override
@@ -121,40 +155,75 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         public void actionPerformed(ActionEvent e) {
             // Once a label is created, it can be edited via the tool box.
             toolBox.setVisible(true);
+            addButton.setEnabled(false);
+            imagePanel.setEditingPolygon(true);
+            
+            toolBox.addComponentListener(new ComponentListener() {
+            	@Override
+                public void componentHidden(ComponentEvent e) {
+                    
+            		// This checks that it's not already been hidden (to avoid naming multiple times)
+            		if (!imagePanel.currentlyEditingPolygon()) {
+            			return;
+            		}	
 
-            // TODO: Should not be able to hit new polygon when editing one.
+            		imagePanel.setEditingPolygon(false);
+                    
+                    String name = null;
+                    boolean hasName = false;
 
-            String name = null;
-            boolean hasName = false;
+                    while (!hasName) {
+                        JFrame frame = new JFrame();
+                        String message = "Label Name";
+                        name = JOptionPane.showInputDialog(frame, message);
 
-            while (!hasName) {
-                JFrame frame = new JFrame();
-                String message = "Label Name";
-                name = JOptionPane.showInputDialog(frame, message);
+                        if (name == null) {
+                        	addButton.setEnabled(true);
+                            return;
+                        }
 
-                if (name == null) {
-                    return;
+                        name = name.trim();
+
+                        if (listModel.contains(name)) {
+                            JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                        } else if (name.isEmpty()) {
+                            JOptionPane.showMessageDialog(new JFrame(), "Blank names are not allowed.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            hasName = true;
+                        }
+                    }
+
+                    Polygon newPolygon = new Polygon(name, toolBox.getLastPolygon().getPoints());
+
+                    listModel.addElement(name);
+                    polygons.put(name, newPolygon);
+
+                    addButton.setEnabled(true);
+                    editButton.setEnabled(true);
+                    deleteButton.setEnabled(true);
+                    CardLayout cl = (CardLayout)(labelListPane.getLayout());
+                    cl.show(labelListPane, "HAVELABELS");
+                	
+                }
+                
+                public void componentResized(ComponentEvent e) {
                 }
 
-                name = name.trim();
+				@Override
+				public void componentMoved(ComponentEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
 
-                if (listModel.contains(name)) {
-                    JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                } else if (name.isEmpty()) {
-                    JOptionPane.showMessageDialog(new JFrame(), "Blank names are not allowed.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    hasName = true;
-                }
-            }
+				@Override
+				public void componentShown(ComponentEvent arg0) {
+					imagePanel.setEditingPolygon(true);
+					
+				}
+            });
 
-            Polygon newPolygon = new Polygon(name);
-
-            listModel.addElement(name);
-            polygons.put(name, newPolygon);
-
-            deleteButton.setEnabled(true);
         }
 
         @Override
@@ -179,15 +248,68 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         public void actionPerformed(ActionEvent e) {
             int index = list.getSelectedIndex();
 
+            if (index == -1) {
+            	 JOptionPane.showMessageDialog(new JFrame(), "No label selected",
+                         "Error", JOptionPane.ERROR_MESSAGE);
+            	 return;
+            }
+            
             polygons.remove(listModel.get(index));
             listModel.remove(index);
 
             if (listModel.getSize() == 0) {
+            	editButton.setEnabled(false);
                 deleteButton.setEnabled(false);
+                CardLayout cl = (CardLayout)(labelListPane.getLayout());
+                cl.show(labelListPane, "NOLABELS");
             }
 
             // Make sure that the selected index is still within the list range.
             list.setSelectedIndex(Math.min(index, listModel.getSize() - 1));
+            imagePanel.polygonsList = new ArrayList<Polygon>(polygons.values());
+            imagePanel.repaint();
+        }
+    }
+    
+    class EditListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+            int index = list.getSelectedIndex();
+            if (index == -1) {
+           	 JOptionPane.showMessageDialog(new JFrame(), "No label selected",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+           	 return;
+           }
+            
+            String name = null;
+            String currentName = listModel.get(index).toString();
+
+            JFrame frame = new JFrame();
+            String message = "New Label Name:";
+            name = JOptionPane.showInputDialog(frame, message, currentName);
+
+            if (name == null) {
+                return;
+            }
+
+            name = name.trim();
+
+            if (listModel.contains(name)) {
+                JOptionPane.showMessageDialog(new JFrame(), "That name is already in use. The name was not changed.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+
+            } else if (name.isEmpty()) {
+                JOptionPane.showMessageDialog(new JFrame(), "Blank names are not allowed. The name was not changed.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+            	listModel.remove(index);
+            	listModel.add(index, name);
+            	
+            	Polygon selectedPolygon = polygons.remove(currentName);
+            	polygons.put(name, selectedPolygon);
+            }
         }
     }
 }

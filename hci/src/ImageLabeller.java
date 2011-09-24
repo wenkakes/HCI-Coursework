@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -43,17 +46,16 @@ public class ImageLabeller {
                 JPanel contentPane = new JPanel();
                 f.setContentPane(contentPane);
 
-                final ImagePanel imagePanel = new ImagePanel(imageName);
-
+                final ToolboxPanel toolboxPanel = new ToolboxPanel();
+                final ImagePanel imagePanel = new ImagePanel(imageName, toolboxPanel);
+                final LabelPanel labelPanel = new LabelPanel(toolboxPanel, imagePanel);
+                
                 JPanel sidePanel = new JPanel();
                 GridLayout sidePanelLayout = new GridLayout(2, 1);
                 sidePanelLayout.setVgap(20);
                 sidePanel.setLayout(sidePanelLayout);
 
                 // Here is the beginning of the toolbox code
-                final JPanel toolboxPanel = new JPanel();
-
-                final LabelPanel labelPanel = new LabelPanel(toolboxPanel);
 
                 JButton newPolyButton = new JButton("Done");
                 newPolyButton.setMnemonic(KeyEvent.VK_N);
@@ -64,6 +66,7 @@ public class ImageLabeller {
                     public void actionPerformed(ActionEvent e) {
                         imagePanel.addNewPolygon();
                         toolboxPanel.setVisible(false);
+                        
                     }
                 });
                 newPolyButton.setToolTipText("Finish editing polygon");
@@ -150,13 +153,13 @@ public class ImageLabeller {
                 JPanel somePanel = new JPanel();
                 somePanel.add(openButton);
                 somePanel.add(saveButton);
-                f.setSize(800,800);
                 f.add(somePanel, BorderLayout.NORTH);
                 f.add(containerPanel, BorderLayout.CENTER);
 
                 f.pack();
                 f.setVisible(true);
-            }
+            }          
+            
         });
     }
 }

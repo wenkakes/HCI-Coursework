@@ -34,6 +34,11 @@ public class ImagePanel extends JPanel implements MouseListener {
     // List of all completed polygons for the current image.
     ArrayList<Polygon> polygonsList = null;
 
+    ToolboxPanel toolboxPanel;
+    
+    // Are we editing a polygon?
+    boolean editingPolygon = false;
+    
     public ImagePanel() {
         currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
         polygonsList = new ArrayList<Polygon>();
@@ -49,9 +54,9 @@ public class ImagePanel extends JPanel implements MouseListener {
         addMouseListener(this);
     }
 
-    public ImagePanel(String imageName) {
+    public ImagePanel(String imageName, ToolboxPanel toolboxPanel) {
         this();
-
+        
         try {
             image = ImageIO.read(new File(imageName));
             if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
@@ -64,6 +69,9 @@ public class ImagePanel extends JPanel implements MouseListener {
                 image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
                 image.getGraphics().drawImage(scaledImage, 0, 0, this);
             }
+            
+            this.toolboxPanel = toolboxPanel;
+            
         } catch (IOException ioe) {
             // Do nothing - we just dont instantiate the window.
             // TODO(Stephen): Show an error message.
@@ -92,6 +100,8 @@ public class ImagePanel extends JPanel implements MouseListener {
     public void addNewPolygon() {
         if (currentPolygon != null) {
             polygonsList.add(currentPolygon);
+            toolboxPanel.setLastPolygon(currentPolygon);
+            
         }
         currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
 
@@ -106,7 +116,8 @@ public class ImagePanel extends JPanel implements MouseListener {
      * @param graphics2d
      */
     public void drawPolygon(Polygon polygon, Graphics2D graphics2d) {
-        List<Point> points = polygon.getPoints();
+        
+    	List<Point> points = polygon.getPoints();
         graphics2d.setColor(Color.GREEN);
         for (int i = 0; i < points.size(); i++) {
             Point currentVertex = points.get(i);
@@ -117,7 +128,7 @@ public class ImagePanel extends JPanel implements MouseListener {
             }
             graphics2d.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
         }
-    }
+    	}
 
     /**
      * Draws the last stroke of a polygon (the line between the last and first
@@ -151,10 +162,14 @@ public class ImagePanel extends JPanel implements MouseListener {
 
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (e.getClickCount() > 1) {
+            	toolboxPanel.setVisible(false);
                 addNewPolygon();
+                
             } else {
+            	if (editingPolygon) {
                 currentPolygon.addPoint(new Point(x, y));
                 repaint();
+            	}
             }
         }
     }
@@ -221,4 +236,13 @@ public class ImagePanel extends JPanel implements MouseListener {
         polygonsList.clear();
         repaint();
     }
+
+	public void setEditingPolygon(boolean b) {
+		editingPolygon = b;
+		
+	}
+
+	public boolean currentlyEditingPolygon() {
+		return editingPolygon;
+	}
 }
