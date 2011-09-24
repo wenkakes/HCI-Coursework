@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -36,24 +34,25 @@ public class ImageLabeller {
             @Override
             public void run() {
                 final JFrame f = new JFrame();
-                f.setLayout(new BorderLayout());  
+                f.setLayout(new BorderLayout());
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
                 JPanel contentPane = new JPanel();
                 f.setContentPane(contentPane);
 
                 final ImagePanel imagePanel = new ImagePanel(imageName);
-                f.add(imagePanel, BorderLayout.CENTER);
 
                 JPanel sidePanel = new JPanel();
-                GridLayout sidePanelLayout = new GridLayout(2,1);
+                GridLayout sidePanelLayout = new GridLayout(2, 1);
                 sidePanelLayout.setVgap(20);
                 sidePanel.setLayout(sidePanelLayout);
-                
+
                 // Here is the beginning of the toolbox code
                 final JPanel toolboxPanel = new JPanel();
 
-                final LabelPanel labelPanel = new LabelPanel();
+                AtomicReference<JPanel> toolBoxReferencePanel = new AtomicReference<JPanel>(
+                        toolboxPanel);
+                final LabelPanel labelPanel = new LabelPanel(toolBoxReferencePanel);
 
                 JButton newPolyButton = new JButton("Done");
                 newPolyButton.setMnemonic(KeyEvent.VK_N);
@@ -137,17 +136,17 @@ public class ImageLabeller {
                 toolboxPanel.add(cancelButton);
                 // Here is the end of the toolbox code
 
-               AtomicReference<JPanel> toolBoxReferencePanel = new AtomicReference<JPanel>(toolboxPanel);
-               LabelPanel labelPanel = new LabelPanel(toolBoxReferencePanel);  
-               
-               sidePanel.add(labelPanel);
-               sidePanel.add(toolboxPanel);
-               toolboxPanel.setVisible(false);
-                f.add(openButton);
-                f.add(saveButton);
+                sidePanel.add(labelPanel);
+                sidePanel.add(toolboxPanel);
+                toolboxPanel.setVisible(false);
 
+                JPanel somePanel = new JPanel();
+                somePanel.add(openButton);
+                somePanel.add(saveButton);
+                f.add(somePanel, BorderLayout.NORTH);
                 f.add(sidePanel, BorderLayout.EAST);
-                
+                f.add(imagePanel, BorderLayout.CENTER);
+
                 f.pack();
                 f.setVisible(true);
             }

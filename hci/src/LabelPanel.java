@@ -13,15 +13,13 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -41,9 +39,9 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
 
     public LabelPanel(AtomicReference<JPanel> toolboxPanel) {
         super(new BorderLayout());
-        
-        toolBox = toolboxPanel.get(); 
-        
+
+        toolBox = toolboxPanel.get();
+
         listModel = new DefaultListModel();
         polygons = new HashMap<String, Polygon>();
 
@@ -92,28 +90,28 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         // Required by ActionListener.
         public void actionPerformed(ActionEvent e) {
 
-        	toolBox.setVisible(true);
-        	
-        	String name = null;
-        	boolean hasName = false;
+            toolBox.setVisible(true);
 
-        	while (!hasName) {
-        		
-	            JFrame frame = new JFrame();
-	            String message = "Label Name";
-	            name = JOptionPane.showInputDialog(frame, message);
-	           
-	            if (name == null) {
-	              return;
-	              
-	            } else if (alreadyInList(name)) {
-	                JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.", 
-	                		"Error", JOptionPane.ERROR_MESSAGE);
-	                
-	            } else {
-	            	hasName = true;
-	            }
-        	}
+            String name = null;
+            boolean hasName = false;
+
+            while (!hasName) {
+
+                JFrame frame = new JFrame();
+                String message = "Label Name";
+                name = JOptionPane.showInputDialog(frame, message);
+
+                if (name == null) {
+                    return;
+
+                } else if (alreadyInList(name)) {
+                    JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+
+                } else {
+                    hasName = true;
+                }
+            }
 
             Polygon newPolygon = new Polygon(name, createTestPoints());
 
@@ -172,31 +170,21 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
      * invoked from the event-dispatching thread.
      */
     /*
-    private static void createAndShowGUI() {
-        // Create and set up the window.
-        JFrame frame = new JFrame("ListDemo");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Create and set up the content pane.
-        JComponent newContentPane = new LabelPanel();
-        newContentPane.setOpaque(true); // content panes must be opaque
-        frame.setContentPane(newContentPane);
-
-        // Display the window.
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        // Schedule a job for the event-dispatching thread:
-        // creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
-    */
+     * private static void createAndShowGUI() { // Create and set up the window.
+     * JFrame frame = new JFrame("ListDemo");
+     * frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+     * 
+     * // Create and set up the content pane. JComponent newContentPane = new
+     * LabelPanel(); newContentPane.setOpaque(true); // content panes must be
+     * opaque frame.setContentPane(newContentPane);
+     * 
+     * // Display the window. frame.pack(); frame.setVisible(true); }
+     * 
+     * public static void main(String[] args) { // Schedule a job for the
+     * event-dispatching thread: // creating and showing this application's GUI.
+     * javax.swing.SwingUtilities.invokeLater(new Runnable() { public void run()
+     * { createAndShowGUI(); } }); }
+     */
 
     @Override
     public void valueChanged(ListSelectionEvent arg0) {
