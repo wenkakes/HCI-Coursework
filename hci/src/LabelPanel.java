@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -27,25 +26,26 @@ import javax.swing.event.ListSelectionListener;
 
 import src.utils.Point;
 
-@SuppressWarnings("serial")
 public class LabelPanel extends JPanel implements ListSelectionListener {
+    // JFrame is serializable, so we need some ID to avoid compiler warnings.
+    private static final long serialVersionUID = 1L;
 
-    private JList list;
-    private DefaultListModel listModel;
-    private HashMap<String, Polygon> polygons;
-    private JButton addButton;
-    private JButton deleteButton;
-    private JPanel toolBox;
+    private final JButton addButton;
+    private final JButton deleteButton;
+    private final JPanel toolBox;
 
-    public LabelPanel(AtomicReference<JPanel> toolboxPanel) {
+    private final JList list;
+    private final DefaultListModel listModel;
+    private final HashMap<String, Polygon> polygons;
+
+    public LabelPanel(JPanel toolBox) {
         super(new BorderLayout());
 
-        toolBox = toolboxPanel.get();
+        this.toolBox = toolBox;
 
         listModel = new DefaultListModel();
         polygons = new HashMap<String, Polygon>();
 
-        // Create the list and put it in a scroll pane.
         list = new JList(listModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
@@ -53,160 +53,32 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
 
-        // Create the button to add a new polygon
         addButton = new JButton("Add New Polygon");
-        AddListener addListener = new AddListener(addButton);
-        addButton.setActionCommand("Add new Polygon");
-        addButton.addActionListener(addListener);
+        addButton.addActionListener(new AddListener());
         addButton.setEnabled(true);
 
-        // Create the button to delete a polygon
         deleteButton = new JButton("Delete Polygon");
-        deleteButton.setActionCommand("Delete Polygon");
         deleteButton.addActionListener(new DeleteListener());
         deleteButton.setEnabled(false);
 
-        // Create a panel that uses BoxLayout.
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(addButton);
-        buttonPane.add(Box.createHorizontalStrut(5));
-        buttonPane.add(Box.createHorizontalStrut(5));
+        buttonPane.add(Box.createHorizontalStrut(10));
         buttonPane.add(deleteButton);
+
         add(new JLabel("Current Labels"), BorderLayout.NORTH);
         add(listScrollPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
     }
 
-    // This listener is for adding a new polygon
-    class AddListener implements ActionListener, DocumentListener {
-        private boolean alreadyEnabled = true;
-        private JButton button;
-
-        public AddListener(JButton button) {
-            this.button = button;
-        }
-
-        // Required by ActionListener.
-        public void actionPerformed(ActionEvent e) {
-
-            toolBox.setVisible(true);
-
-            String name = null;
-            boolean hasName = false;
-
-            while (!hasName) {
-
-                JFrame frame = new JFrame();
-                String message = "Label Name";
-                name = JOptionPane.showInputDialog(frame, message);
-
-                if (name == null) {
-                    return;
-
-                } else if (alreadyInList(name)) {
-                    JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-
-                } else {
-                    hasName = true;
-                }
-            }
-
-            Polygon newPolygon = new Polygon(name, createTestPoints());
-
-            // ListModel.addElement(newPolygon);
-            listModel.addElement(name);
-            polygons.put(name, newPolygon);
-            deleteButton.setEnabled(true);
-
-        }
-
-        // This method tests for string equality. You could certainly
-        // get more sophisticated about the algorithm. For example,
-        // you might want to ignore white space and capitalization.
-        protected boolean alreadyInList(String name) {
-            return listModel.contains(name);
-        }
-
-        // Required by DocumentListener.
-        public void insertUpdate(DocumentEvent e) {
-        }
-
-        // Required by DocumentListener.
-        public void removeUpdate(DocumentEvent e) {
-        }
-
-        // Required by DocumentListener.
-        public void changedUpdate(DocumentEvent e) {
-        }
-    }
-
-    // This listener is for deleting a polygon
-    class DeleteListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent e) {
-
-            int index = list.getSelectedIndex();
-            polygons.remove(listModel.get(index));
-            listModel.remove(index);
-
-            int size = listModel.getSize();
-
-            if (size == 0) {
-                deleteButton.setEnabled(false);
-
-            } else { // Select an index.
-                if (index == listModel.getSize()) {
-                    // removed item in last position
-                    index--;
-                }
-            }
-        }
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
     }
 
     /**
-     * Create the GUI and show it. For thread safety, this method should be
-     * invoked from the event-dispatching thread.
+     * Clears the list of labels.
      */
-    /*
-     * private static void createAndShowGUI() { // Create and set up the window.
-     * JFrame frame = new JFrame("ListDemo");
-     * frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-     * 
-     * // Create and set up the content pane. JComponent newContentPane = new
-     * LabelPanel(); newContentPane.setOpaque(true); // content panes must be
-     * opaque frame.setContentPane(newContentPane);
-     * 
-     * // Display the window. frame.pack(); frame.setVisible(true); }
-     * 
-     * public static void main(String[] args) { // Schedule a job for the
-     * event-dispatching thread: // creating and showing this application's GUI.
-     * javax.swing.SwingUtilities.invokeLater(new Runnable() { public void run()
-     * { createAndShowGUI(); } }); }
-     */
-
-    @Override
-    public void valueChanged(ListSelectionEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    private static List<Point> createTestPoints() {
-        Point pt1 = new Point(0, 0);
-        Point pt2 = new Point(0, 5);
-        Point pt3 = new Point(5, 5);
-        Point pt4 = new Point(5, 0);
-
-        List<Point> points = new ArrayList<Point>();
-        points.add(pt1);
-        points.add(pt2);
-        points.add(pt3);
-        points.add(pt4);
-
-        return points;
-    }
-
     public void clearLabels() {
         listModel.clear();
         polygons.clear();
@@ -214,6 +86,11 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         deleteButton.setEnabled(false);
     }
 
+    /**
+     * Returns a list of each label, encoded in the following format:
+     * 
+     * {@literal label_name:x1,y1:x2,y2:}
+     */
     public List<String> getLabels() {
         List<String> labels = new ArrayList<String>();
 
@@ -236,4 +113,81 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         return labels;
     }
 
+    /**
+     * Listener class for adding a new polygon to the image.
+     */
+    class AddListener implements ActionListener, DocumentListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Once a label is created, it can be edited via the tool box.
+            toolBox.setVisible(true);
+
+            // TODO: Should not be able to hit new polygon when editing one.
+
+            String name = null;
+            boolean hasName = false;
+
+            while (!hasName) {
+                JFrame frame = new JFrame();
+                String message = "Label Name";
+                name = JOptionPane.showInputDialog(frame, message);
+
+                if (name == null) {
+                    return;
+                }
+
+                name = name.trim();
+
+                if (listModel.contains(name)) {
+                    JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                } else if (name.isEmpty()) {
+                    JOptionPane.showMessageDialog(new JFrame(), "Blank names are not allowed.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    hasName = true;
+                }
+            }
+
+            Polygon newPolygon = new Polygon(name);
+
+            listModel.addElement(name);
+            polygons.put(name, newPolygon);
+
+            deleteButton.setEnabled(true);
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+        }
+    }
+
+    /**
+     * Listener class for deleting a selected polygon from the image.
+     */
+    class DeleteListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int index = list.getSelectedIndex();
+
+            polygons.remove(listModel.get(index));
+            listModel.remove(index);
+
+            if (listModel.getSize() == 0) {
+                deleteButton.setEnabled(false);
+            }
+
+            // Make sure that the selected index is still within the list range.
+            list.setSelectedIndex(Math.min(index, listModel.getSize() - 1));
+        }
+    }
 }
