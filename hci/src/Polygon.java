@@ -20,9 +20,13 @@ public class Polygon {
 		this(name, new ArrayList<Point>());
 	}
 	
-	public Polygon(String name, ArrayList<Point> points) {
+	public Polygon(String name, List<Point> inputPoints) {
 		this.name = name;
-		this.points = points;
+		
+		points = new ArrayList<Point>(inputPoints.size());
+		for (Point point : inputPoints) {
+			points.add(point);
+		}
 		pointIndex = points.size() - 1;
 	}
 
