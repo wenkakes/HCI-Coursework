@@ -32,7 +32,7 @@ public class ImageLabeller {
 
                 JPanel toolboxPanel = new JPanel();
 
-                JButton newPolyButton = new JButton("New object");
+                JButton newPolyButton = new JButton("Done");
                 newPolyButton.setMnemonic(KeyEvent.VK_N);
                 newPolyButton.setSize(50, 20);
                 newPolyButton.setEnabled(true);
@@ -42,7 +42,7 @@ public class ImageLabeller {
                         imagePanel.addNewPolygon();
                     }
                 });
-                newPolyButton.setToolTipText("Click to add new object");
+                newPolyButton.setToolTipText("Finish editing polygon");
 
                 toolboxPanel.add(newPolyButton);
 
@@ -53,6 +53,7 @@ public class ImageLabeller {
                         imagePanel.undo();
                     }
                 });
+                undoButton.setToolTipText("Undo");
 
                 JButton redoButton = new JButton(new ImageIcon("hci/icons/redo.png"));
                 redoButton.addActionListener(new ActionListener() {
@@ -61,9 +62,19 @@ public class ImageLabeller {
                         imagePanel.redo();
                     }
                 });
+                undoButton.setToolTipText("Redo");
+
+                JButton cancelButton = new JButton("Cancel");
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        imagePanel.cancel();
+                    }
+                });
 
                 toolboxPanel.add(undoButton);
                 toolboxPanel.add(redoButton);
+                toolboxPanel.add(cancelButton);
 
                 f.add(toolboxPanel);
 

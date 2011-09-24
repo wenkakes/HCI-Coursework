@@ -186,4 +186,9 @@ public class ImagePanel extends JPanel implements MouseListener {
         }
         repaint();
     }
+
+    public void cancel() {
+        currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
+        repaint();
+    }
 }
