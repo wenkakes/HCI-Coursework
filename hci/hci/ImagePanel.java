@@ -1,5 +1,4 @@
 package hci;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
