@@ -11,39 +11,30 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import hci.utils.*;
 
 /**
- * Handles image editing panel
+ * Handles the editing of the image.
+ * 
  * @author Michal
- *
  */
 public class ImagePanel extends JPanel implements MouseListener {
-	/**
-	 * some java stuff to get rid of warnings
-	 */
+	
+	// JFrame is serializable, so we need some ID to avoid compiler warnings.
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * image to be tagged
-	 */
+	// Image that is being worked on.
 	BufferedImage image = null;
 	
-	/**
-	 * list of current polygon's vertices 
-	 */
+	// List of the current polygons vertices.
 	ArrayList<Point> currentPolygon = null;
 	
-	/**
-	 * list of polygons
-	 */
+	// List of all completed polygons for the current image.
 	ArrayList<ArrayList<Point>> polygonsList = null;
 	
-	/**
-	 * default constructor, sets up the window properties
-	 */
 	public ImagePanel() {
 		currentPolygon = new ArrayList<Point>();
 		polygonsList = new ArrayList<ArrayList<Point>>();
@@ -59,33 +50,22 @@ public class ImagePanel extends JPanel implements MouseListener {
 		addMouseListener(this);
 	}
 	
-	/**
-	 * extended constructor - loads image to be labelled
-	 * @param imageName - path to image
-	 * @throws Exception if error loading the image
-	 */
-	public ImagePanel(String imageName) throws Exception{
+	public ImagePanel(String imageName) {
 		this();
-		image = ImageIO.read(new File(imageName));
-		if (image.getWidth() > 800 || image.getHeight() > 600) {
-			int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)/image.getHeight();
-			int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)/image.getWidth();
-			System.out.println("SCALING TO " + newWidth + "x" + newHeight );
-			Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
-			image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-			image.getGraphics().drawImage(scaledImage, 0, 0, this);
-		}
-	}
-
-	/**
-	 * Displays the image
-	 */
-	public void ShowImage() {
-		Graphics g = this.getGraphics();
 		
-		if (image != null) {
-			g.drawImage(
-					image, 0, 0, null);
+		try {
+			image = ImageIO.read(new File(imageName));
+			if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
+				int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)/image.getHeight();
+				int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)/image.getWidth();
+				System.out.println("SCALING TO " + newWidth + "x" + newHeight );
+				Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
+				image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+				image.getGraphics().drawImage(scaledImage, 0, 0, this);
+			}
+		} catch (IOException ioe) {
+			// Do nothing - we just dont instantiate the window. 
+			// TODO(Stephen): Show an error message.
 		}
 	}
 	
@@ -93,22 +73,34 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		//display iamge
+		// Draw the image.
 		ShowImage();
 		
-		//display all the completed polygons
+		// Draw on all the completed polygons.
 		for(ArrayList<Point> polygon : polygonsList) {
 			drawPolygon(polygon);
 			finishPolygon(polygon);
 		}
 		
-		//display current polygon
+		// Draw on the current polygon.
 		drawPolygon(currentPolygon);
+	}
+
+	/**
+	 * Draws the image that is being edited.
+	 */
+	public void ShowImage() {
+		Graphics g = this.getGraphics();
+		
+		if (image != null) {
+			g.drawImage(image, 0, 0, null);
+		}
 	}
 	
 	/**
-	 * displays a polygon without last stroke
-	 * @param polygon to be displayed
+	 * Draws an unfinished polygon (i.e. with no line between the last and first vertices).
+	 * 
+	 * @param polygon the polygon to be drawn
 	 */
 	public void drawPolygon(ArrayList<Point> polygon) {
 		Graphics2D g = (Graphics2D)this.getGraphics();
@@ -124,11 +116,12 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 	
 	/**
-	 * displays last stroke of the polygon (arch between the last and first vertices)
-	 * @param polygon to be finished
+	 * Draws the last stroke of a polygon (the line between the last and first vertices).
+	 * 
+	 * @param polygon the polygon to draw the final stroke for
 	 */
 	public void finishPolygon(ArrayList<Point> polygon) {
-		//if there are less than 3 vertices than nothing to be completed
+		// A polygon with less than 3 vertices is just a line or point and needs no finishing.
 		if (polygon.size() >= 3) {
 			Point firstVertex = polygon.get(0);
 			Point lastVertex = polygon.get(polygon.size() - 1);
@@ -140,7 +133,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 	
 	/**
-	 * moves current polygon to the list of polygons and makes pace for a new one
+	 * Finishes editing the current polygon and starts on a new one.
 	 */
 	public void addNewPolygon() {
 		//finish the current polygon if any
@@ -157,15 +150,13 @@ public class ImagePanel extends JPanel implements MouseListener {
 		int x = e.getX();
 		int y = e.getY();
 		
-		//check if the cursos withing image area
 		if (x > image.getWidth() || y > image.getHeight()) {
-			//if not do nothing
 			return;
 		}
 		
-		Graphics2D g = (Graphics2D)this.getGraphics();
+		Graphics2D g = (Graphics2D) this.getGraphics();
 		
-		//if the left button than we will add a vertex to poly
+		// Left click adds a vertex to the current polygon.
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			g.setColor(Color.GREEN);
 			if (currentPolygon.size() != 0) {
@@ -194,5 +185,4 @@ public class ImagePanel extends JPanel implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 	}
-	
 }

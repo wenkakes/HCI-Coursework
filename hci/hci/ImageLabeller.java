@@ -1,6 +1,5 @@
 package hci;
 
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,36 +13,25 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
- * Main class of the program - handles display of the main window
+ * Main class of the program - handles display of the main GUI window.
+ * 
  * @author Michal
- *
  */
 public class ImageLabeller extends JFrame {
-	/**
-	 * some java stuff to get rid of warnings
-	 */
+	
+	// JFrame is serializable, so we need some ID to avoid compiler warnings.
 	private static final long serialVersionUID = 1L;
 	
-	/**
-	 * main window panel
-	 */
+	// The main application panel, ancestor of all other panels.
 	JPanel appPanel = null;
 	
-	/**
-	 * toolbox - put all buttons and stuff here!
-	 */
+	// Panels for the toolbox and the image being edited.
 	JPanel toolboxPanel = null;
-	
-	/**
-	 * image panel - displays image and editing area
-	 */
 	ImagePanel imagePanel = null;
 	
-	/**
-	 * handles New Object button action
-	 */
-	public void addNewPolygon() {
-		imagePanel.addNewPolygon();
+	public ImageLabeller(String fileName) {
+		super();
+		setupGUI(fileName);
 	}
 	
 	@Override
@@ -53,11 +41,18 @@ public class ImageLabeller extends JFrame {
 	}
 	
 	/**
-	 * sets up application window
-	 * @param imageFilename image to be loaded for editing
-	 * @throws Exception
+	 * Finishes the Polygon that is being edited, and starts a new one.
 	 */
-	public void setupGUI(String imageFilename) throws Exception {
+	public void addNewPolygon() {
+		imagePanel.addNewPolygon();
+	}
+	
+	/**
+	 * Sets up the application window.
+	 * 
+	 * @param imageFilename the name of the image to be loaded for editing
+	 */
+	public void setupGUI(String imageFilename) {
 		this.addWindowListener(new WindowAdapter() {
 		  	public void windowClosing(WindowEvent event) {
 		  		//here we exit the program (maybe we should ask if the user really wants to do it?)
@@ -105,17 +100,12 @@ public class ImageLabeller extends JFrame {
 	}
 	
 	/**
-	 * Runs the program
-	 * @param argv path to an image
+	 * Runs the program.
+	 * 
+	 * @param argv the list of arguments, of which the first should be the name of the image to
+	 *             load
 	 */
 	public static void main(String argv[]) {
-		try {
-			//create a window and display the image
-			ImageLabeller window = new ImageLabeller();
-			window.setupGUI(argv[0]);
-		} catch (Exception e) {
-			System.err.println("Image: " + argv[0]);
-			e.printStackTrace();
-		}
+		new ImageLabeller(argv[0]);
 	}
 }
