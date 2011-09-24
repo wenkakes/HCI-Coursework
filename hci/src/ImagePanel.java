@@ -102,8 +102,7 @@ public class ImagePanel extends JPanel implements MouseListener {
      * Draws an unfinished polygon (i.e. with no line between the last and first
      * vertices).
      * 
-     * @param polygon
-     *            the polygon to be drawn
+     * @param polygon the polygon to be drawn
      * @param graphics2d
      */
     public void drawPolygon(Polygon polygon, Graphics2D graphics2d) {
@@ -124,8 +123,7 @@ public class ImagePanel extends JPanel implements MouseListener {
      * Draws the last stroke of a polygon (the line between the last and first
      * vertices).
      * 
-     * @param polygon
-     *            the polygon to draw the final stroke for
+     * @param polygon the polygon to draw the final stroke for
      * @param graphics2d
      */
     public void finishPolygon(Polygon polygon, Graphics2D graphics2d) {
@@ -152,8 +150,12 @@ public class ImagePanel extends JPanel implements MouseListener {
         }
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            currentPolygon.addPoint(new Point(x, y));
-            repaint();
+            if (e.getClickCount() > 1) {
+                addNewPolygon();
+            } else {
+                currentPolygon.addPoint(new Point(x, y));
+                repaint();
+            }
         }
     }
 
