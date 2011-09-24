@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -36,10 +37,13 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
     private HashMap<String, Polygon> polygons;
     private JButton addButton;
     private JButton deleteButton;
+    private JPanel toolBox;
 
-    public LabelPanel() {
+    public LabelPanel(AtomicReference<JPanel> toolboxPanel) {
         super(new BorderLayout());
-
+        
+        toolBox = toolboxPanel.get(); 
+        
         listModel = new DefaultListModel();
         polygons = new HashMap<String, Polygon>();
 
@@ -69,9 +73,9 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(addButton);
         buttonPane.add(Box.createHorizontalStrut(5));
-        buttonPane.add(new JSeparator(SwingConstants.VERTICAL));
         buttonPane.add(Box.createHorizontalStrut(5));
         buttonPane.add(deleteButton);
+        add(new JLabel("Current Labels"), BorderLayout.NORTH);
         add(listScrollPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
     }
@@ -88,26 +92,28 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
         // Required by ActionListener.
         public void actionPerformed(ActionEvent e) {
 
-            String name = null;
-            boolean hasName = false;
+        	toolBox.setVisible(true);
+        	
+        	String name = null;
+        	boolean hasName = false;
 
-            while (!hasName) {
-
-                JFrame frame = new JFrame();
-                String message = "Label Name";
-                name = JOptionPane.showInputDialog(frame, message);
-
-                if (name == null) {
-                    return;
-
-                } else if (alreadyInList(name)) {
-                    JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-
-                } else {
-                    hasName = true;
-                }
-            }
+        	while (!hasName) {
+        		
+	            JFrame frame = new JFrame();
+	            String message = "Label Name";
+	            name = JOptionPane.showInputDialog(frame, message);
+	           
+	            if (name == null) {
+	              return;
+	              
+	            } else if (alreadyInList(name)) {
+	                JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.", 
+	                		"Error", JOptionPane.ERROR_MESSAGE);
+	                
+	            } else {
+	            	hasName = true;
+	            }
+        	}
 
             Polygon newPolygon = new Polygon(name, createTestPoints());
 
@@ -165,6 +171,7 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
      * Create the GUI and show it. For thread safety, this method should be
      * invoked from the event-dispatching thread.
      */
+    /*
     private static void createAndShowGUI() {
         // Create and set up the window.
         JFrame frame = new JFrame("ListDemo");
@@ -189,6 +196,7 @@ public class LabelPanel extends JPanel implements ListSelectionListener {
             }
         });
     }
+    */
 
     @Override
     public void valueChanged(ListSelectionEvent arg0) {
