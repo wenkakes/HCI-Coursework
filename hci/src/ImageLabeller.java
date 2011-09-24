@@ -1,6 +1,8 @@
 package src;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +14,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -138,14 +142,20 @@ public class ImageLabeller {
 
                 sidePanel.add(labelPanel);
                 sidePanel.add(toolboxPanel);
+                
+                JPanel containerPanel = new JPanel();
+                containerPanel.setLayout(new FlowLayout());
+                containerPanel.add(imagePanel);
+                containerPanel.add(sidePanel);
+                
                 toolboxPanel.setVisible(false);
-
+                
                 JPanel somePanel = new JPanel();
                 somePanel.add(openButton);
                 somePanel.add(saveButton);
+                f.setSize(800,800);
                 f.add(somePanel, BorderLayout.NORTH);
-                f.add(sidePanel, BorderLayout.EAST);
-                f.add(imagePanel, BorderLayout.CENTER);
+                f.add(containerPanel, BorderLayout.CENTER);
 
                 f.pack();
                 f.setVisible(true);
