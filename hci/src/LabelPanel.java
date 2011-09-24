@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -43,10 +44,12 @@ public class LabelPanel extends JPanel
 	private HashMap<String, Polygon> polygons;
     private JButton addButton;
     private JButton deleteButton;
+    private JPanel toolBox;
 
-    public LabelPanel() {
+    public LabelPanel(AtomicReference<JPanel> toolboxPanel) {
         super(new BorderLayout());
         
+        toolBox = toolboxPanel.get(); 
         
         listModel = new DefaultListModel();
         polygons = new HashMap<String, Polygon>();
@@ -77,9 +80,9 @@ public class LabelPanel extends JPanel
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(addButton);
         buttonPane.add(Box.createHorizontalStrut(5));
-        buttonPane.add(new JSeparator(SwingConstants.VERTICAL));
         buttonPane.add(Box.createHorizontalStrut(5));
         buttonPane.add(deleteButton);
+        add(new JLabel("Current Labels"), BorderLayout.NORTH);
         add(listScrollPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
     }
@@ -97,6 +100,8 @@ public class LabelPanel extends JPanel
         // Required by ActionListener.
         public void actionPerformed(ActionEvent e) {
 
+        	toolBox.setVisible(true);
+        	
         	String name = null;
         	boolean hasName = false;
 
@@ -175,6 +180,7 @@ public class LabelPanel extends JPanel
      * this method should be invoked from the
      * event-dispatching thread.
      */
+    /*
     private static void createAndShowGUI() {
         //Create and set up the window.
         JFrame frame = new JFrame("ListDemo");
@@ -199,6 +205,7 @@ public class LabelPanel extends JPanel
             }
         });
     }
+    */
 
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {

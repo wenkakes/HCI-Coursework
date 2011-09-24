@@ -1,9 +1,13 @@
 package src;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,6 +25,7 @@ public class ImageLabeller {
             @Override
             public void run() {
                 JFrame f = new JFrame();
+                f.setLayout(new BorderLayout());  
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
                 JPanel contentPane = new JPanel();
@@ -28,9 +33,15 @@ public class ImageLabeller {
                 f.setContentPane(contentPane);
 
                 final ImagePanel imagePanel = new ImagePanel(argv[0]);
-                f.add(imagePanel);
+                f.add(imagePanel, BorderLayout.CENTER);
 
-                JPanel toolboxPanel = new JPanel();
+                JPanel sidePanel = new JPanel();
+                GridLayout sidePanelLayout = new GridLayout(2,1);
+                sidePanelLayout.setVgap(20);
+                sidePanel.setLayout(sidePanelLayout);
+                
+                // Here is the beginning of the toolbox code
+                final JPanel toolboxPanel = new JPanel();
 
                 JButton newPolyButton = new JButton("Done");
                 newPolyButton.setMnemonic(KeyEvent.VK_N);
@@ -40,6 +51,7 @@ public class ImageLabeller {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         imagePanel.addNewPolygon();
+                        toolboxPanel.setVisible(false);
                     }
                 });
                 newPolyButton.setToolTipText("Finish editing polygon");
@@ -75,12 +87,17 @@ public class ImageLabeller {
                 toolboxPanel.add(undoButton);
                 toolboxPanel.add(redoButton);
                 toolboxPanel.add(cancelButton);
+                // Here is the end of the toolbox code
 
-               JPanel labelPanel = new LabelPanel();
+               AtomicReference<JPanel> toolBoxReferencePanel = new AtomicReference<JPanel>(toolboxPanel);
+               LabelPanel labelPanel = new LabelPanel(toolBoxReferencePanel);  
+               
+               sidePanel.add(labelPanel);
+               sidePanel.add(toolboxPanel);
+               //toolboxPanel.setVisible(false);
+
+                f.add(sidePanel, BorderLayout.EAST);
                 
-                f.add(toolboxPanel);
-                f.add(labelPanel);
-
                 f.pack();
                 f.setVisible(true);
             }
