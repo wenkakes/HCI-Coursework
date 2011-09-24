@@ -17,11 +17,11 @@
       <fileset dir="icons"/>
     </copy>
   	
-    <javac srcdir="${src}" destdir="${bin}"/>
+    <javac debug="true" srcdir="${src}" destdir="${bin}"/>
     <!-- <javac srcdir="${test}" destdir="${bin}/tests"/> -->
   </target>
 
   <target name="clean" description="clean up" >
-    <delete dir="${build}"/>
+    <delete dir="${bin}"/>
   </target>
 </project>
