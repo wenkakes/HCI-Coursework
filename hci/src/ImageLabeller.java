@@ -1,4 +1,4 @@
-package hci;
+package src;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;

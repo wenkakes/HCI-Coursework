@@ -1,6 +1,8 @@
-package hci;
+package src;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+
+import src.utils.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import hci.utils.*;
 
 /**
  * Handles the editing of the image.
