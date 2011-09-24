@@ -65,7 +65,10 @@ public class ImageLabeller {
                 toolboxPanel.add(undoButton);
                 toolboxPanel.add(redoButton);
 
+               JPanel labelPanel = new LabelPanel();
+                
                 f.add(toolboxPanel);
+                f.add(labelPanel);
 
                 f.pack();
                 f.setVisible(true);

@@ -146,7 +146,6 @@ public class LabelPanel extends JPanel
         public void changedUpdate(DocumentEvent e) {
         }
     }
-    
 
     // This listener is for deleting a polygon
     class DeleteListener implements ActionListener {
