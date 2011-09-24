@@ -1,0 +1,27 @@
+<project name="HCICoursework" default="compile" basedir=".">
+    <description>
+      HCI coursework for s0840449 and s0838969.
+    </description>
+
+  <property name="src" location="src"/>
+  <property name="test" location="test"/>
+  <property name="bin" location="bin"/>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${bin}"/>
+  </target>
+
+  <target name="compile" depends="init" description="compile the application" >
+    <copy todir="${bin}/icons">
+      <fileset dir="icons"/>
+    </copy>
+  	
+    <javac srcdir="${src}" destdir="${bin}"/>
+    <!-- <javac srcdir="${test}" destdir="${bin}/tests"/> -->
+  </target>
+
+  <target name="clean" description="clean up" >
+    <delete dir="${build}"/>
+  </target>
+</project>
