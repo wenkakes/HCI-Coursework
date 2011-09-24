@@ -12,7 +12,6 @@ import org.junit.Test;
 import src.Polygon;
 import src.utils.Point;
 
-
 public class PolygonTest {
 	
 	public Polygon setupTest() {
