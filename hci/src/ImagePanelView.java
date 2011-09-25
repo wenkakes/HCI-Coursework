@@ -13,17 +13,15 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import src.utils.Point;
-import src.utils.Polygon;
 
 /**
  * View for the image panel. Handles the rendering of the image and the overlaid
- * polygons.
+ * polygons, and interactions with it.
  */
 public class ImagePanelView extends JPanel implements MouseListener {
     // JFrame is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
-    // The controller
     private final AppController controller;
 
     // Image that is being worked on.
@@ -43,25 +41,6 @@ public class ImagePanelView extends JPanel implements MouseListener {
         addMouseListener(this);
     }
 
-    public void setImage(BufferedImage image) {
-        this.image = image;
-
-        // Scale if necessary
-        // TODO: Rewrite this.
-        if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
-            int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)
-                    / image.getHeight();
-            int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)
-                    / image.getWidth();
-            System.out.println("SCALING TO " + newWidth + "x" + newHeight);
-            Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
-            image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-            image.getGraphics().drawImage(scaledImage, 0, 0, this);
-        }
-
-        repaint();
-    }
-
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -73,60 +52,17 @@ public class ImagePanelView extends JPanel implements MouseListener {
 
             Graphics2D graphics2D = (Graphics2D) g;
 
-            List<Polygon> completedPolygons = controller.getCompletedPolygons();
-            for (Polygon polygon : completedPolygons) {
-                drawPolygon(polygon, graphics2D);
-                finishPolygon(polygon, graphics2D);
+            List<List<Point>> completedPolygonsPoints = controller.getCompletedPolygonsPoints();
+            for (List<Point> points : completedPolygonsPoints) {
+                drawPolygon(points, graphics2D);
+                finishPolygon(points, graphics2D);
             }
 
-            Polygon currentPolygon = controller.getCurrentPolygon();
-            if (currentPolygon != null) {
-                drawPolygon(currentPolygon, graphics2D);
+            List<Point> currentPolygonPoints = controller.getCurrentPolygonPoints();
+            if (currentPolygonPoints != null) {
+                drawPolygon(currentPolygonPoints, graphics2D);
             }
 
-        }
-    }
-
-    /**
-     * Draws an unfinished polygon (i.e. with no line between the last and first
-     * vertices).
-     * 
-     * @param polygon the polygon to be drawn
-     * @param graphics2d
-     */
-    private static void drawPolygon(Polygon polygon, Graphics2D graphics2d) {
-
-        List<Point> points = polygon.getPoints();
-        graphics2d.setColor(Color.GREEN);
-        for (int i = 0; i < points.size(); i++) {
-            Point currentVertex = points.get(i);
-            if (i != 0) {
-                Point prevVertex = points.get(i - 1);
-                graphics2d.drawLine(prevVertex.getX(), prevVertex.getY(), currentVertex.getX(),
-                        currentVertex.getY());
-            }
-            graphics2d.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
-        }
-    }
-
-    /**
-     * Draws the last stroke of a polygon (the line between the last and first
-     * vertices).
-     * 
-     * @param polygon the polygon to draw the final stroke for
-     * @param graphics2d
-     */
-    private static void finishPolygon(Polygon polygon, Graphics2D graphics2d) {
-        List<Point> points = polygon.getPoints();
-        // A polygon with less than 3 vertices is just a line or point and needs
-        // no finishing.
-        if (points.size() >= 3) {
-            Point firstVertex = points.get(0);
-            Point lastVertex = points.get(points.size() - 1);
-
-            graphics2d.setColor(Color.GREEN);
-            graphics2d.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(),
-                    lastVertex.getY());
         }
     }
 
@@ -161,5 +97,69 @@ public class ImagePanelView extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent arg0) {
+    }
+
+    /**
+     * Sets the image that is to be rendered in the panel.
+     * 
+     * @param image the image to draw
+     */
+    public void setImage(BufferedImage image) {
+        this.image = image;
+
+        // Scale if necessary
+        // TODO: Rewrite this.
+        if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
+            int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)
+                    / image.getHeight();
+            int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)
+                    / image.getWidth();
+            System.out.println("SCALING TO " + newWidth + "x" + newHeight);
+            Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
+            image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+            image.getGraphics().drawImage(scaledImage, 0, 0, this);
+        }
+
+        repaint();
+    }
+
+    /**
+     * Draws an unfinished polygon (i.e. with no line between the last and first
+     * vertices).
+     * 
+     * @param points the points of the polygon to be drawn
+     * @param graphics2d
+     */
+    private static void drawPolygon(List<Point> points, Graphics2D graphics2d) {
+        graphics2d.setColor(Color.GREEN);
+        for (int i = 0; i < points.size(); i++) {
+            Point currentVertex = points.get(i);
+            if (i != 0) {
+                Point prevVertex = points.get(i - 1);
+                graphics2d.drawLine(prevVertex.getX(), prevVertex.getY(), currentVertex.getX(),
+                        currentVertex.getY());
+            }
+            graphics2d.fillOval(currentVertex.getX() - 5, currentVertex.getY() - 5, 10, 10);
+        }
+    }
+
+    /**
+     * Draws the last stroke of a polygon (the line between the last and first
+     * vertices).
+     * 
+     * @param points the points of the polygon to draw the final stroke for
+     * @param graphics2d
+     */
+    private static void finishPolygon(List<Point> points, Graphics2D graphics2d) {
+        // A polygon with less than 3 vertices is just a line or point and needs
+        // no finishing.
+        if (points.size() >= 3) {
+            Point firstVertex = points.get(0);
+            Point lastVertex = points.get(points.size() - 1);
+
+            graphics2d.setColor(Color.GREEN);
+            graphics2d.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(),
+                    lastVertex.getY());
+        }
     }
 }

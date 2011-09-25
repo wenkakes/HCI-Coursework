@@ -8,6 +8,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+/**
+ * View for the toolbox panel, handling interactions with the toolbox buttons.
+ */
 public class ToolboxPanelView extends JPanel {
     // JFrame is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
@@ -17,7 +20,6 @@ public class ToolboxPanelView extends JPanel {
     public ToolboxPanelView(AppController appController) {
         this.controller = appController;
 
-        // Setup finished editing button.
         JButton finishedEditingButton = new JButton("Done");
         finishedEditingButton.setMnemonic(KeyEvent.VK_N);
         finishedEditingButton.setSize(50, 20);
@@ -30,7 +32,6 @@ public class ToolboxPanelView extends JPanel {
         });
         finishedEditingButton.setToolTipText("Finish editing polygon");
 
-        // Undo button
         JButton undoButton = new JButton(new ImageIcon("hci/icons/undo.png"));
         undoButton.addActionListener(new ActionListener() {
             @Override
@@ -40,7 +41,6 @@ public class ToolboxPanelView extends JPanel {
         });
         undoButton.setToolTipText("Undo");
 
-        // Redo button
         JButton redoButton = new JButton(new ImageIcon("hci/icons/redo.png"));
         redoButton.addActionListener(new ActionListener() {
             @Override
@@ -50,7 +50,6 @@ public class ToolboxPanelView extends JPanel {
         });
         redoButton.setToolTipText("Redo");
 
-        // Cancel button
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             @Override
@@ -65,5 +64,4 @@ public class ToolboxPanelView extends JPanel {
         add(redoButton);
         add(cancelButton);
     }
-
 }

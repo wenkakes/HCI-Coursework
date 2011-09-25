@@ -5,7 +5,8 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
- * Main class of the program.
+ * Launcher for the application. Sets the {@link UIManager.LookAndFeelInfo} of
+ * the application and instantiates the controller.
  */
 public class ImageLabeller {
 

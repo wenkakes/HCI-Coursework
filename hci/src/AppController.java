@@ -31,7 +31,7 @@ public class AppController {
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(this);
 
     // The current polygon.
-    Polygon currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
+    Polygon currentPolygon = new Polygon();
 
     // All completed polygons for the current image.
     private final HashMap<String, Polygon> polygons = new HashMap<String, Polygon>();
@@ -40,11 +40,9 @@ public class AppController {
     private boolean editingPolygon = false;
 
     public AppController(String imageName) {
-        // Set up the main application frame.
         appFrame.setLayout(new BorderLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // TODO: What does the sidepanel do?
         JPanel sidePanel = new JPanel();
         GridLayout sidePanelLayout = new GridLayout(2, 1);
         sidePanelLayout.setVgap(20);
@@ -53,7 +51,6 @@ public class AppController {
         sidePanel.add(labelPanel);
         sidePanel.add(toolboxPanel);
 
-        // TODO: What does the container panel do?
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new FlowLayout());
         containerPanel.add(imagePanel);
@@ -61,13 +58,12 @@ public class AppController {
 
         toolboxPanel.setVisible(false);
 
-        // TODO: Rename
         // TODO: Reimplement open/save
-        JPanel somePanel = new JPanel();
-        somePanel.add(new JButton("Open"));
-        somePanel.add(new JButton("Save"));
+        JPanel menuPanel = new JPanel();
+        menuPanel.add(new JButton("Open"));
+        menuPanel.add(new JButton("Save"));
 
-        appFrame.add(somePanel, BorderLayout.NORTH);
+        appFrame.add(menuPanel, BorderLayout.NORTH);
         appFrame.add(containerPanel, BorderLayout.CENTER);
         appFrame.pack();
         appFrame.setVisible(true);
@@ -82,33 +78,35 @@ public class AppController {
         }
     }
 
-    // These methods deal with the toolbox options.
+    /**
+     * Called when the user is finished editing the current polygon, either by
+     * double-clicking or clicking the "Done" button on the toolbox.
+     */
     public void finishEditingPolygon() {
-        // This checks that it's not already been hidden (to avoid
-        // naming multiple times)
         if (!editingPolygon) {
             return;
         }
         editingPolygon = false;
 
+        labelPanel.setAddButtonEnabled(true);
+        toolboxPanel.setVisible(false);
+
         String name = null;
         boolean hasName = false;
-
         while (!hasName) {
             String message = "Label Name";
             name = JOptionPane.showInputDialog(appFrame, message);
 
-            // 'Cancel'
+            // Occurs if the user hits the cancel option.
+            // TODO: Should this totally cancel, or only cancel the "done"?
             if (name == null) {
-                currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
-                labelPanel.setAddButtonEnabled(true);
+                currentPolygon = new Polygon();
                 imagePanel.repaint();
-                toolboxPanel.setVisible(false);
+
                 return;
             }
 
             name = name.trim();
-
             if (polygons.containsKey(name)) {
                 JOptionPane.showMessageDialog(new JFrame(), "That name is already in use.",
                         "Error", JOptionPane.ERROR_MESSAGE);
@@ -120,40 +118,52 @@ public class AppController {
             }
         }
 
-        labelPanel.addLabel(name);
-
         polygons.put(name, currentPolygon);
         currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
 
-        imagePanel.repaint();
-
-        labelPanel.setAddButtonEnabled(true);
-        labelPanel.setEditButtonEnabled(true);
-        labelPanel.setDeleteButtonEnabled(true);
+        labelPanel.addLabel(name);
         labelPanel.showLabelList();
 
-        toolboxPanel.setVisible(false);
+        imagePanel.repaint();
     }
 
+    /**
+     * Called when the user wishes to undo their last move when editing a
+     * polygon.
+     */
     public void undoLastVertex() {
         currentPolygon.removeLastPoint();
         imagePanel.repaint();
     }
 
+    /**
+     * Called when the user wishes to redo their last move when editing a
+     * polygon.
+     */
     public void redoLastVertex() {
         currentPolygon.redoPoint();
         imagePanel.repaint();
     }
 
+    /**
+     * Called when the user cancels the polygon that they are currently drawing.
+     */
     public void cancelDrawingVertex() {
-        currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
         editingPolygon = false;
-        toolboxPanel.setVisible(false);
+        currentPolygon = new Polygon();
+
         labelPanel.setAddButtonEnabled(true);
+        toolboxPanel.setVisible(false);
+
         imagePanel.repaint();
     }
 
-    // These methods deal with the image panel events.
+    /**
+     * Called when the image is clicked on.
+     * 
+     * @param x the x-coordinate of the mouse click
+     * @param y the y-coordinate of the mouse click
+     */
     public void imageClick(int x, int y) {
         if (editingPolygon) {
             currentPolygon.addPoint(new Point(x, y));
@@ -161,32 +171,53 @@ public class AppController {
         }
     }
 
-    public List<Polygon> getCompletedPolygons() {
-        // TODO: Copy individual polygons?
-        return new ArrayList<Polygon>(polygons.values());
+    /**
+     * Returns a list of the points of each completed polygon.
+     */
+    public List<List<Point>> getCompletedPolygonsPoints() {
+        List<List<Point>> points = new ArrayList<List<Point>>(polygons.size());
+        for (Polygon polygon : polygons.values()) {
+            points.add(new ArrayList<Point>(polygon.getPoints()));
+        }
+        return points;
     }
 
-    public Polygon getCurrentPolygon() {
-        // TODO: Copy the polygon?
-        return currentPolygon;
+    /**
+     * Returns a list of the points in the current Polygon.
+     */
+    public List<Point> getCurrentPolygonPoints() {
+        return currentPolygon.getPoints();
     }
 
-    public void addPolygonButtonPressed() {
+    /**
+     * Start editing a new polygon.
+     */
+    public void startEditingNewPolygon() {
         labelPanel.setAddButtonEnabled(false);
         toolboxPanel.setVisible(true);
 
         editingPolygon = true;
     }
 
+    /**
+     * Renames a polygon.
+     * 
+     * @param oldName the old name for the polygon
+     * @param newName the replacement name for the polygon
+     */
     public void renamePolygon(String oldName, String newName) {
-        Polygon polygon = polygons.get(oldName);
-        polygons.remove(oldName);
+        Polygon polygon = polygons.remove(oldName);
         if (polygon != null) {
             polygon.setName(newName);
             polygons.put(newName, polygon);
         }
     }
 
+    /**
+     * Removes a polygon from the image.
+     * 
+     * @param name the name of the polygon to remove
+     */
     public void removePolygon(String name) {
         polygons.remove(name);
         imagePanel.repaint();
