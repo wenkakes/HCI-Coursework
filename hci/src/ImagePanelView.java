@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import src.utils.Point;
+import src.utils.Polygon;
 
 /**
  * View for the image panel. Handles the rendering of the image and the overlaid

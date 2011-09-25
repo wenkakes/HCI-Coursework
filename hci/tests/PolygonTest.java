@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import src.Polygon;
 import src.utils.Point;
+import src.utils.Polygon;
 
 /**
  * Tests for the {@link Polygon} class.

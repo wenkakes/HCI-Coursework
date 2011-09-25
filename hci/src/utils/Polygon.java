@@ -1,9 +1,8 @@
-package src;
+package src.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import src.utils.Point;
 
 /**
  * Class representing a Polygon, either in-progress or finished. Supports

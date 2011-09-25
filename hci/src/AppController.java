@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import src.utils.Point;
+import src.utils.Polygon;
 
 /**
  * Main controller class for the application.
