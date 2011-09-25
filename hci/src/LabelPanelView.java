@@ -60,7 +60,6 @@ public class LabelPanelView extends JPanel {
         deleteButton.setEnabled(false);
 
         loadButton = new JButton("Load button");
-        // loadButton.addActionListener(new LoadListener());
         loadButton.setEnabled(true);
 
         JPanel buttonPane = new JPanel();

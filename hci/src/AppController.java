@@ -15,8 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import src.utils.Point;
 
@@ -41,8 +39,6 @@ public class AppController {
     private boolean editingPolygon = false;
 
     public AppController(String imageName) {
-        setLookAndFeel();
-
         // Set up the main application frame.
         appFrame.setLayout(new BorderLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -82,19 +78,6 @@ public class AppController {
         } catch (IOException e) {
             labelPanel.setAddButtonEnabled(false);
             labelPanel.setLoadButtonEnabled(false);
-        }
-    }
-
-    private void setLookAndFeel() {
-        try {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // Ignore - just use the default theme.
         }
     }
 

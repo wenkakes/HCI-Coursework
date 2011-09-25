@@ -1,6 +1,8 @@
 package src;
 
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  * Main class of the program.
@@ -8,6 +10,8 @@ import javax.swing.SwingUtilities;
 public class ImageLabeller {
 
     public static void main(String argv[]) {
+        setLookAndFeel();
+
         // The user may pass in an initial image name at the command line.
         final String imageName = (argv.length > 0) ? argv[0] : "";
 
@@ -17,5 +21,18 @@ public class ImageLabeller {
                 new AppController(imageName);
             }
         });
+    }
+
+    private static void setLookAndFeel() {
+        try {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // Ignore - just use the default theme.
+        }
     }
 }

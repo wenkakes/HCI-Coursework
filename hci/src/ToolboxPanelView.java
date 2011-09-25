@@ -48,7 +48,7 @@ public class ToolboxPanelView extends JPanel {
                 controller.redoLastVertex();
             }
         });
-        undoButton.setToolTipText("Redo");
+        redoButton.setToolTipText("Redo");
 
         // Cancel button
         JButton cancelButton = new JButton("Cancel");
@@ -58,6 +58,7 @@ public class ToolboxPanelView extends JPanel {
                 controller.cancelDrawingVertex();
             }
         });
+        cancelButton.setToolTipText("Cancel editing polygon");
 
         add(finishedEditingButton);
         add(undoButton);
