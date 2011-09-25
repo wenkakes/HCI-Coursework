@@ -1,13 +1,10 @@
 package src;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,15 +12,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  * Main class of the program. Instantiates the JFrame etc etc.
@@ -39,6 +35,17 @@ public class ImageLabeller {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                try {
+                    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            UIManager.setLookAndFeel(info.getClassName());
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    // Just use the default theme.
+                }
+
                 final JFrame f = new JFrame();
                 f.setLayout(new BorderLayout());
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,7 +56,7 @@ public class ImageLabeller {
                 final ToolboxPanel toolboxPanel = new ToolboxPanel();
                 final ImagePanel imagePanel = new ImagePanel(imageName, toolboxPanel);
                 final LabelPanel labelPanel = new LabelPanel(toolboxPanel, imagePanel);
-                
+
                 JPanel sidePanel = new JPanel();
                 GridLayout sidePanelLayout = new GridLayout(2, 1);
                 sidePanelLayout.setVgap(20);
@@ -66,7 +73,7 @@ public class ImageLabeller {
                     public void actionPerformed(ActionEvent e) {
                         imagePanel.addNewPolygon();
                         toolboxPanel.setVisible(false);
-                        
+
                     }
                 });
                 newPolyButton.setToolTipText("Finish editing polygon");
@@ -142,14 +149,14 @@ public class ImageLabeller {
 
                 sidePanel.add(labelPanel);
                 sidePanel.add(toolboxPanel);
-                
+
                 JPanel containerPanel = new JPanel();
                 containerPanel.setLayout(new FlowLayout());
                 containerPanel.add(imagePanel);
                 containerPanel.add(sidePanel);
-                
+
                 toolboxPanel.setVisible(false);
-                
+
                 JPanel somePanel = new JPanel();
                 somePanel.add(openButton);
                 somePanel.add(saveButton);
@@ -158,8 +165,8 @@ public class ImageLabeller {
 
                 f.pack();
                 f.setVisible(true);
-            }          
-            
+            }
+
         });
     }
 }
