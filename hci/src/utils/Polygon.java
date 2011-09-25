@@ -3,7 +3,6 @@ package src.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Class representing a Polygon, either in-progress or finished. Supports
  * undo/redo state.
@@ -12,6 +11,10 @@ public class Polygon {
     private String name;
     private ArrayList<Point> points;
     private int pointIndex;
+
+    public Polygon() {
+        this("");
+    }
 
     public Polygon(String name) {
         this(name, new ArrayList<Point>());
