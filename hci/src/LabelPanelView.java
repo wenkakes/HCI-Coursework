@@ -4,12 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -23,7 +25,7 @@ import javax.swing.ListSelectionModel;
  * and interactions with it and the panel buttons.
  */
 public class LabelPanelView extends JPanel {
-    // JFrame is serializable, so we need some ID to avoid compiler warnings.
+    // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
     private final AppController controller;
@@ -65,6 +67,7 @@ public class LabelPanelView extends JPanel {
         deleteButton.setEnabled(false);
 
         loadButton = new JButton("Load button");
+        loadButton.addActionListener(new LoadListener());
         loadButton.setEnabled(true);
 
         JPanel buttonPane = new JPanel();
@@ -105,6 +108,19 @@ public class LabelPanelView extends JPanel {
         // Once a label has been added, renaming/deleting is possible.
         setEditButtonEnabled(true);
         setDeleteButtonEnabled(true);
+        showLabelList();
+    }
+
+    /**
+     * Clears the list of labels.
+     */
+    public void clear() {
+        listModel.clear();
+
+        setEditButtonEnabled(false);
+        setDeleteButtonEnabled(false);
+
+        hideLabelList();
     }
 
     /**
@@ -146,7 +162,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Show the list of labels.
      */
-    public void showLabelList() {
+    private void showLabelList() {
         CardLayout cl = (CardLayout) (labelListPane.getLayout());
         cl.show(labelListPane, "HAVELABELS");
     }
@@ -154,7 +170,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Hides the list of labels.
      */
-    public void hideLabelList() {
+    private void hideLabelList() {
         CardLayout cl = (CardLayout) (labelListPane.getLayout());
         cl.show(labelListPane, "NOLABELS");
     }
@@ -241,6 +257,18 @@ public class LabelPanelView extends JPanel {
 
             // Make sure that the selected index is still within the list range.
             list.setSelectedIndex(Math.min(index, listModel.getSize() - 1));
+        }
+    }
+
+    class LoadListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser chooser = new JFileChooser();
+            int returnValue = chooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                controller.loadLabels(file);
+            }
         }
     }
 }

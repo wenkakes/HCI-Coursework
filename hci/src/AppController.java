@@ -9,13 +9,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import src.utils.LabelIO;
+import src.utils.LabelIO.LabelParseException;
 import src.utils.Point;
 import src.utils.Polygon;
 
@@ -29,12 +31,13 @@ public class AppController {
     private final ImagePanelView imagePanel = new ImagePanelView(this);
     private final LabelPanelView labelPanel = new LabelPanelView(this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(this);
+    private final MainMenuPanelView menuPanel = new MainMenuPanelView(this);
 
     // The current polygon.
     Polygon currentPolygon = new Polygon();
 
     // All completed polygons for the current image.
-    private final HashMap<String, Polygon> polygons = new HashMap<String, Polygon>();
+    private Map<String, Polygon> polygons = new HashMap<String, Polygon>();
 
     // Whether or not we are editing a polygon.
     private boolean editingPolygon = false;
@@ -58,13 +61,9 @@ public class AppController {
 
         toolboxPanel.setVisible(false);
 
-        // TODO: Reimplement open/save
-        JPanel menuPanel = new JPanel();
-        menuPanel.add(new JButton("Open"));
-        menuPanel.add(new JButton("Save"));
-
         appFrame.add(menuPanel, BorderLayout.NORTH);
         appFrame.add(containerPanel, BorderLayout.CENTER);
+
         appFrame.pack();
         appFrame.setVisible(true);
 
@@ -118,11 +117,11 @@ public class AppController {
             }
         }
 
+        currentPolygon.setName(name);
         polygons.put(name, currentPolygon);
-        currentPolygon = new Polygon(Long.toString(System.currentTimeMillis()));
+        currentPolygon = new Polygon();
 
         labelPanel.addLabel(name);
-        labelPanel.showLabelList();
 
         imagePanel.repaint();
     }
@@ -221,5 +220,38 @@ public class AppController {
     public void removePolygon(String name) {
         polygons.remove(name);
         imagePanel.repaint();
+    }
+
+    /**
+     * Saves the current list of polygons to a file.
+     * 
+     * @param file the file to save to
+     */
+    public void saveLabels(File file) {
+        try {
+            LabelIO.writeLabels(file, new ArrayList<Polygon>(polygons.values()));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Loads in a new list of polygons from a file.
+     * 
+     * @param file the file to load from
+     */
+    public void loadLabels(File file) {
+        try {
+            polygons = LabelIO.readLabels(file);
+            labelPanel.clear();
+            for (String name : polygons.keySet()) {
+                labelPanel.addLabel(name);
+            }
+            imagePanel.repaint();
+        } catch (LabelParseException e) {
+            JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

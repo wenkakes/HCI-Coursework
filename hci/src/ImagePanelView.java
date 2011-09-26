@@ -19,7 +19,7 @@ import src.utils.Point;
  * polygons, and interactions with it.
  */
 public class ImagePanelView extends JPanel implements MouseListener {
-    // JFrame is serializable, so we need some ID to avoid compiler warnings.
+    // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
     private final AppController controller;

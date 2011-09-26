@@ -12,7 +12,7 @@ import javax.swing.JPanel;
  * View for the toolbox panel, handling interactions with the toolbox buttons.
  */
 public class ToolboxPanelView extends JPanel {
-    // JFrame is serializable, so we need some ID to avoid compiler warnings.
+    // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
     private final AppController controller;

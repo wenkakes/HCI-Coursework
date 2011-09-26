@@ -112,4 +112,9 @@ public class Polygon {
     public boolean canRedo() {
         return points.size() - pointIndex > 1;
     }
+
+    @Override
+    public String toString() {
+        return "Polygon [name=" + name + ", points=" + getPoints() + "]";
+    }
 }
