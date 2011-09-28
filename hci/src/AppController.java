@@ -162,11 +162,16 @@ public class AppController {
      * 
      * @param x the x-coordinate of the mouse click
      * @param y the y-coordinate of the mouse click
+     * @param doubleClick whether or not the user is double clicking
      */
-    public void imageClick(int x, int y) {
-        if (editingPolygon) {
-            currentPolygon.addPoint(new Point(x, y));
-            imagePanel.repaint();
+    public void imageClick(int x, int y, boolean doubleClick) {
+        if (doubleClick) {
+            finishEditingPolygon();
+        } else {
+            if (editingPolygon) {
+                currentPolygon.addPoint(new Point(x, y));
+                imagePanel.repaint();
+            }
         }
     }
 

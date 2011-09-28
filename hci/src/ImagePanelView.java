@@ -62,7 +62,6 @@ public class ImagePanelView extends JPanel implements MouseListener {
             if (currentPolygonPoints != null) {
                 drawPolygon(currentPolygonPoints, graphics2D);
             }
-
         }
     }
 
@@ -76,11 +75,7 @@ public class ImagePanelView extends JPanel implements MouseListener {
             return;
         }
 
-        if (e.getClickCount() != 2) {
-            controller.imageClick(x, y);
-        } else {
-            controller.finishEditingPolygon();
-        }
+        controller.imageClick(x, y, e.getClickCount() == 2);
     }
 
     @Override
