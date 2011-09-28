@@ -179,7 +179,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Listener class for adding a new polygon to the image.
      */
-    class AddListener implements ActionListener {
+    private class AddListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             controller.startEditingNewPolygon();
@@ -189,7 +189,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Listener class for editing the name of a label.
      */
-    class EditListener implements ActionListener {
+    private class EditListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -235,7 +235,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Listener class for deleting a selected label/polygon from the image.
      */
-    class DeleteListener implements ActionListener {
+    private class DeleteListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -261,7 +261,10 @@ public class LabelPanelView extends JPanel {
         }
     }
 
-    class LoadListener implements ActionListener {
+    /**
+     * Listener class for loading labels from a file.
+     */
+    private class LoadListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser();
