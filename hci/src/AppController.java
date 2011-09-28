@@ -254,4 +254,22 @@ public class AppController {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    /**
+     * Opens the image from a file.
+     * 
+     * @param file the file to open the image from
+     */
+    public void openImage(File file) {
+        try {
+            BufferedImage image = ImageIO.read(file);
+
+            polygons.clear();
+
+            imagePanel.setImage(image);
+            labelPanel.clear();
+        } catch (IOException e) {
+            // TODO: Add error message.
+        }
+    }
 }

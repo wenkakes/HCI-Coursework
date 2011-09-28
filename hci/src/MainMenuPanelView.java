@@ -22,6 +22,17 @@ public class MainMenuPanelView extends JPanel {
 
         // TODO: Reimplement loading of images.
         JButton openButton = new JButton("Open Image");
+        openButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                int returnValue = chooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File file = chooser.getSelectedFile();
+                    controller.openImage(file);
+                }
+            }
+        });
 
         JButton saveButton = new JButton("Save Labels");
         saveButton.addActionListener(new ActionListener() {

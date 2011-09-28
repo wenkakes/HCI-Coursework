@@ -117,6 +117,7 @@ public class LabelPanelView extends JPanel {
     public void clear() {
         listModel.clear();
 
+        setAddButtonEnabled(true);
         setEditButtonEnabled(false);
         setDeleteButtonEnabled(false);
 
