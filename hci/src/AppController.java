@@ -28,9 +28,10 @@ public class AppController {
 
     // The core Swing components that make up the application.
     private final JFrame appFrame = new JFrame("Image Labeller");
+
     private final ImagePanelView imagePanel = new ImagePanelView(this);
     private final LabelPanelView labelPanel = new LabelPanelView(this);
-    private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(this);
+    private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
     private final MainMenuPanelView menuPanel = new MainMenuPanelView(this);
 
     // The current polygon.
@@ -52,14 +53,11 @@ public class AppController {
         sidePanel.setLayout(sidePanelLayout);
 
         sidePanel.add(labelPanel);
-        sidePanel.add(toolboxPanel);
 
         JPanel containerPanel = new JPanel();
         containerPanel.setLayout(new FlowLayout());
         containerPanel.add(imagePanel);
         containerPanel.add(sidePanel);
-
-        toolboxPanel.setVisible(false);
 
         appFrame.add(menuPanel, BorderLayout.NORTH);
         appFrame.add(containerPanel, BorderLayout.CENTER);

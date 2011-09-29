@@ -1,24 +1,34 @@
 package src;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 /**
- * View for the toolbox panel, handling interactions with the toolbox buttons.
+ * View for the toolbox floating panel, handling interactions with the toolbox
+ * buttons.
+ * 
+ * Actually a subclass of JDialog, in order to get the right interaction with
+ * the main frame.
  */
-public class ToolboxPanelView extends JPanel {
-    // JPanel is serializable, so we need some ID to avoid compiler warnings.
+public class ToolboxPanelView extends JDialog {
+    // JDialog is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
     private final AppController controller;
 
-    public ToolboxPanelView(AppController appController) {
+    public ToolboxPanelView(JFrame parentFrame, AppController appController) {
+        super(parentFrame);
+
         this.controller = appController;
+
+        setLayout(new FlowLayout());
 
         JButton finishedEditingButton = new JButton("Done");
         finishedEditingButton.setMnemonic(KeyEvent.VK_N);
@@ -63,5 +73,9 @@ public class ToolboxPanelView extends JPanel {
         add(undoButton);
         add(redoButton);
         add(cancelButton);
+
+        setFocusableWindowState(false);
+        setVisible(false);
+        pack();
     }
 }
