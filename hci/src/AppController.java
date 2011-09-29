@@ -83,6 +83,13 @@ public class AppController {
         if (!editingPolygon) {
             return;
         }
+
+        if (currentPolygon.getPoints().size() < 3) {
+            JOptionPane.showMessageDialog(new JFrame(), "A polygon must have 3 or more vertices.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         editingPolygon = false;
 
         labelPanel.setAddButtonEnabled(true);
