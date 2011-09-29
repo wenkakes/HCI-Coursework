@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.swing.Box;
@@ -15,8 +17,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
@@ -45,12 +49,54 @@ public class LabelPanelView extends JPanel {
 
         this.controller = appController;
 
+        final JPopupMenu rightClickMenu = new JPopupMenu();
+        JMenuItem renameLabel = new JMenuItem("Rename");
+        renameLabel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                renamePolygon();
+            }
+        });
+        JMenuItem deleteLabel = new JMenuItem("Delete");
+        deleteLabel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deletePolygon();
+            }
+        });
+        rightClickMenu.add(renameLabel);
+        rightClickMenu.add(deleteLabel);
+
         // Set up the backing data structures for the label list.
         listModel = new DefaultListModel();
         list = new JList(listModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
+        list.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3 && !list.isSelectionEmpty()) {
+                    rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+        });
         JScrollPane listScrollPane = new JScrollPane(list);
 
         // Create the buttons.
@@ -193,42 +239,7 @@ public class LabelPanelView extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int index = list.getSelectedIndex();
-            if (index == -1) {
-                JOptionPane.showMessageDialog(new JFrame(), "No label selected", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String name = null;
-            String currentName = listModel.get(index).toString();
-
-            // TODO: Replace new JFrame with null
-            JFrame frame = new JFrame();
-            String message = "New Label Name:";
-            name = JOptionPane.showInputDialog(frame, message, currentName);
-
-            // If the user hits cancel, we do nothing.
-            if (name == null) {
-                return;
-            }
-
-            name = name.trim();
-            if (listModel.contains(name)) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        "That name is already in use. The name was not changed.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-
-            } else if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(new JFrame(),
-                        "Blank names are not allowed. The name was not changed.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } else {
-                listModel.remove(index);
-                listModel.add(index, name);
-
-                controller.renamePolygon(currentName, name);
-            }
+            renamePolygon();
         }
     }
 
@@ -239,25 +250,7 @@ public class LabelPanelView extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int index = list.getSelectedIndex();
-
-            if (index == -1) {
-                JOptionPane.showMessageDialog(new JFrame(), "No label selected", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            controller.removePolygon((String) listModel.get(index));
-            listModel.remove(index);
-
-            if (listModel.getSize() == 0) {
-                setEditButtonEnabled(false);
-                setDeleteButtonEnabled(false);
-                hideLabelList();
-            }
-
-            // Make sure that the selected index is still within the list range.
-            list.setSelectedIndex(Math.min(index, listModel.getSize() - 1));
+            deletePolygon();
         }
     }
 
@@ -274,5 +267,66 @@ public class LabelPanelView extends JPanel {
                 controller.loadLabels(file);
             }
         }
+    }
+
+    public void renamePolygon() {
+        int index = list.getSelectedIndex();
+        if (index == -1) {
+            JOptionPane.showMessageDialog(new JFrame(), "No label selected", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String name = null;
+        String currentName = listModel.get(index).toString();
+
+        // TODO: Replace new JFrame with null or something else
+        JFrame frame = new JFrame();
+        String message = "New Label Name:";
+        name = JOptionPane.showInputDialog(frame, message, currentName);
+
+        // If the user hits cancel, we do nothing.
+        if (name == null) {
+            return;
+        }
+
+        name = name.trim();
+        if (listModel.contains(name)) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "That name is already in use. The name was not changed.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+        } else if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Blank names are not allowed. The name was not changed.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else {
+            listModel.remove(index);
+            listModel.add(index, name);
+
+            controller.renamePolygon(currentName, name);
+        }
+    }
+
+    public void deletePolygon() {
+        int index = list.getSelectedIndex();
+
+        if (index == -1) {
+            JOptionPane.showMessageDialog(new JFrame(), "No label selected", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        controller.removePolygon((String) listModel.get(index));
+        listModel.remove(index);
+
+        if (listModel.getSize() == 0) {
+            setEditButtonEnabled(false);
+            setDeleteButtonEnabled(false);
+            hideLabelList();
+        }
+
+        // Make sure that the selected index is still within the list range.
+        list.setSelectedIndex(Math.min(index, listModel.getSize() - 1));
     }
 }
