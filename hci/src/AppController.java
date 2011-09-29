@@ -267,6 +267,7 @@ public class AppController {
         try {
             BufferedImage image = ImageIO.read(file);
 
+            cancelDrawingVertex();
             polygons.clear();
 
             imagePanel.setImage(image);

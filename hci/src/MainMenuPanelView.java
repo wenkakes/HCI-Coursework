@@ -20,7 +20,6 @@ public class MainMenuPanelView extends JPanel {
     public MainMenuPanelView(AppController appController) {
         this.controller = appController;
 
-        // TODO: Reimplement loading of images.
         JButton openButton = new JButton("Open Image");
         openButton.addActionListener(new ActionListener() {
             @Override
