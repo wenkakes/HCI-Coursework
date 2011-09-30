@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 public final class LabelIO {
 
     private LabelIO() {
-        // Non-instantiable
+        // Non-instantiable.
     }
 
     /**
