@@ -39,7 +39,7 @@ public class ToolboxPanelView extends JDialog {
         finishedEditingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.finishEditingPolygon();
+                controller.finishedAddingPolygon();
             }
         });
         finishedEditingButton.setToolTipText("Finish editing polygon");

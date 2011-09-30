@@ -43,6 +43,8 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         addMouseMotionListener(this);
     }
 
+    // TODO: This should probably not call into the controller. At any rate, it
+    // needs tidied.
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -103,6 +105,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        controller.mouseReleased();
     }
 
     /**
