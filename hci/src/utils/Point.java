@@ -45,6 +45,12 @@ public class Point {
         return result;
     }
 
+    /**
+     * Returns the Euclidean distance between this point and another
+     * {@link Point}.
+     * 
+     * @param point the point to calculate the distance to.
+     */
     public double distanceFrom(Point point) {
         int dx = x - point.getX();
         int dy = y - point.getY();
