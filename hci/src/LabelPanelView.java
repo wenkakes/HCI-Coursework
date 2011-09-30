@@ -17,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -33,10 +34,11 @@ import javax.swing.border.SoftBevelBorder;
  * View for the polygon label panel, handling the refreshing of the label list
  * and interactions with it and the panel buttons.
  */
-public class LabelPanelView extends JPanel {
+public class LabelPanelView extends JInternalFrame {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
+    private final JFrame appFrame;
     private final AppController controller;
 
     // The label list and its backing model.
@@ -49,12 +51,19 @@ public class LabelPanelView extends JPanel {
     private JButton loadButton;
     private JButton deleteButton;
 
-    public LabelPanelView(AppController appController) {
-        super(new BorderLayout());
-
+    public LabelPanelView(JFrame frame, AppController appController) {
+        //super(new BorderLayout());
+    	this.setTitle("Labels");
+    	this.setClosable(false);
+    	this.setMaximizable(false);
+    	this.setResizable(false);
+    	this.setIconifiable(true);
+    	
+    	this.setVisible(true);
+    	
+//    	this.setLocation(x, y);
+        this.appFrame = frame;
         this.controller = appController;
-        this.setBackground(Color.LIGHT_GRAY);
-        this.setBorder(new BevelBorder(5));
         final JPopupMenu rightClickMenu = new JPopupMenu();
         JMenuItem renameLabel = new JMenuItem("Rename");
         renameLabel.addActionListener(new ActionListener() {
@@ -82,7 +91,8 @@ public class LabelPanelView extends JPanel {
         list.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON3 && !list.isSelectionEmpty()) {
+                // TODO: If user clicks off of list, unselect.
+                if (e.getButton() == MouseEvent.BUTTON3 && list.getSelectedIndices().length == 1) {
                     rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
                 }
             }
@@ -133,7 +143,7 @@ public class LabelPanelView extends JPanel {
         // Create the panel to be shown if there are labels.
         JPanel noLabelsPane = new JPanel();
         noLabelsPane.add(new JLabel(
-                "<html>You don't seem to have any labels currently. <br /> Add or load some"
+                "<html>You don't seem to have any labels currently. <br /> Add or load some "
                         + "labels?</html>"));
         noLabelsPane.add(loadButton);
 
@@ -141,10 +151,11 @@ public class LabelPanelView extends JPanel {
         labelListPane.add(noLabelsPane, "NOLABELS");
         labelListPane.add(listScrollPane, "HAVELABELS");
 
-        add(new JLabel("Current Labels"), BorderLayout.NORTH);
         add(labelListPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
 
+
+        
         CardLayout cl = (CardLayout) (labelListPane.getLayout());
         cl.show(labelListPane, "NOLABELS");
     }
@@ -234,7 +245,7 @@ public class LabelPanelView extends JPanel {
     private class AddListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            controller.startEditingNewPolygon();
+            controller.startAddingNewPolygon();
         }
     }
 
@@ -267,7 +278,7 @@ public class LabelPanelView extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser();
-            int returnValue = chooser.showOpenDialog(null);
+            int returnValue = chooser.showOpenDialog(appFrame);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
                 controller.loadLabels(file);
@@ -278,7 +289,7 @@ public class LabelPanelView extends JPanel {
     public void renamePolygon() {
         int index = list.getSelectedIndex();
         if (index == -1) {
-            JOptionPane.showMessageDialog(new JFrame(), "No label selected", "Error",
+            JOptionPane.showMessageDialog(appFrame, "No label selected", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -286,10 +297,8 @@ public class LabelPanelView extends JPanel {
         String name = null;
         String currentName = listModel.get(index).toString();
 
-        // TODO: Replace new JFrame with null or something else
-        JFrame frame = new JFrame();
         String message = "New Label Name:";
-        name = JOptionPane.showInputDialog(frame, message, currentName);
+        name = JOptionPane.showInputDialog(appFrame, message, currentName);
 
         // If the user hits cancel, we do nothing.
         if (name == null) {
@@ -298,12 +307,12 @@ public class LabelPanelView extends JPanel {
 
         name = name.trim();
         if (listModel.contains(name)) {
-            JOptionPane.showMessageDialog(new JFrame(),
+            JOptionPane.showMessageDialog(appFrame,
                     "That name is already in use. The name was not changed.", "Error",
                     JOptionPane.ERROR_MESSAGE);
 
         } else if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(),
+            JOptionPane.showMessageDialog(appFrame,
                     "Blank names are not allowed. The name was not changed.", "Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {
@@ -318,7 +327,7 @@ public class LabelPanelView extends JPanel {
         int index = list.getSelectedIndex();
 
         if (index == -1) {
-            JOptionPane.showMessageDialog(new JFrame(), "No label selected", "Error",
+            JOptionPane.showMessageDialog(appFrame, "No label selected", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
