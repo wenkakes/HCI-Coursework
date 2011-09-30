@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
@@ -71,7 +72,7 @@ public class LabelPanelView extends JPanel {
         // Set up the backing data structures for the label list.
         listModel = new DefaultListModel();
         list = new JList(listModel);
-        // list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         list.addMouseListener(new MouseListener() {
