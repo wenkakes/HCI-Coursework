@@ -2,6 +2,8 @@ package src;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -15,6 +17,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -23,12 +26,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.SoftBevelBorder;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
  * and interactions with it and the panel buttons.
  */
-public class LabelPanelView extends JPanel {
+public class LabelPanelView extends JInternalFrame {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
@@ -46,11 +52,18 @@ public class LabelPanelView extends JPanel {
     private JButton deleteButton;
 
     public LabelPanelView(JFrame frame, AppController appController) {
-        super(new BorderLayout());
-
+        //super(new BorderLayout());
+    	this.setTitle("Labels");
+    	this.setClosable(false);
+    	this.setMaximizable(false);
+    	this.setResizable(false);
+    	this.setIconifiable(true);
+    	
+    	this.setVisible(true);
+    	
+//    	this.setLocation(x, y);
         this.appFrame = frame;
         this.controller = appController;
-
         final JPopupMenu rightClickMenu = new JPopupMenu();
         JMenuItem renameLabel = new JMenuItem("Rename");
         renameLabel.addActionListener(new ActionListener() {
@@ -103,15 +116,15 @@ public class LabelPanelView extends JPanel {
         JScrollPane listScrollPane = new JScrollPane(list);
 
         // Create the buttons.
-        addButton = new JButton(new ImageIcon("hci/icons/add.png"));
+        addButton = new JButton(new ImageIcon("hci/icons/small/add.png"));
         addButton.addActionListener(new AddListener());
         addButton.setEnabled(true);
 
-        editButton = new JButton(new ImageIcon("hci/icons/edit.png"));
+        editButton = new JButton(new ImageIcon("hci/icons/small/edit.png"));
         editButton.addActionListener(new EditListener());
         editButton.setEnabled(false);
 
-        deleteButton = new JButton(new ImageIcon("hci/icons/delete.png"));
+        deleteButton = new JButton(new ImageIcon("hci/icons/small/delete.png"));
         deleteButton.addActionListener(new DeleteListener());
         deleteButton.setEnabled(false);
 
@@ -138,10 +151,11 @@ public class LabelPanelView extends JPanel {
         labelListPane.add(noLabelsPane, "NOLABELS");
         labelListPane.add(listScrollPane, "HAVELABELS");
 
-        add(new JLabel("Current Labels"), BorderLayout.NORTH);
         add(labelListPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
 
+
+        
         CardLayout cl = (CardLayout) (labelListPane.getLayout());
         cl.show(labelListPane, "NOLABELS");
     }

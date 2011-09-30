@@ -1,7 +1,6 @@
 package src;
 
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,7 +13,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import src.utils.LabelIO;
 import src.utils.LabelIO.LabelParseException;
@@ -47,20 +45,14 @@ public class AppController {
         appFrame.setLayout(new FlowLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel sidePanel = new JPanel();
-        GridLayout sidePanelLayout = new GridLayout(2, 1);
-        sidePanelLayout.setVgap(20);
-        sidePanel.setLayout(sidePanelLayout);
-
-        sidePanel.add(labelPanel);
-
         appFrame.add(imagePanel);
-        appFrame.add(sidePanel);
+        appFrame.add(labelPanel);
         appFrame.setJMenuBar(menuBar);
-
+        
         appFrame.pack();
         appFrame.setVisible(true);
-
+        
+        
         // Load the default image and set it.
         try {
             BufferedImage image = ImageIO.read(new File(imageName));
