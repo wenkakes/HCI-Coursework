@@ -2,15 +2,19 @@ package src;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import src.utils.Point;
@@ -22,6 +26,8 @@ import src.utils.Point;
 public class ImagePanelView extends JPanel implements MouseListener, MouseMotionListener {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
+
+    private static final String NO_IMAGE_STRING = "Please open an image for editing.";
 
     private final AppController controller;
 
@@ -39,6 +45,8 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         setPreferredSize(panelSize);
         setMaximumSize(panelSize);
 
+        setBorder(BorderFactory.createLineBorder(Color.black));
+
         addMouseListener(this);
         addMouseMotionListener(this);
     }
@@ -50,7 +58,15 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         super.paintComponent(g);
 
         if (image == null) {
-            g.drawString("LOL EDIT AN IMAGE NOOB", this.getWidth() / 2, this.getHeight() / 2);
+            FontMetrics fm = getFontMetrics(getFont());
+            Rectangle2D textsize = fm.getStringBounds(NO_IMAGE_STRING, g);
+            int textWidth = new Double(textsize.getWidth()).intValue();
+            int textHeight = new Double(textsize.getHeight()).intValue();
+
+            int xPos = (getWidth() - textWidth) / 2;
+            int yPos = (getHeight() - textHeight) / 2 + fm.getAscent();
+            g.setFont(new Font("Serif", Font.PLAIN, 16));
+            g.drawString(NO_IMAGE_STRING, xPos, yPos);
         } else {
             g.drawImage(image, 0, 0, null);
 
