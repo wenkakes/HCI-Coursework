@@ -79,7 +79,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
             return;
         }
 
-        controller.imageClick(x, y, e.getClickCount() == 2);
+        controller.imageMouseClick(x, y, e.getClickCount() == 2);
     }
 
     @Override
@@ -100,12 +100,12 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
             return;
         }
 
-        controller.mousePressed(x, y);
+        controller.imageMousePress(x, y);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        controller.mouseReleased();
+        controller.imageMouseReleased();
     }
 
     /**
@@ -174,7 +174,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        controller.mouseDragged(e.getX(), e.getY());
+        controller.imageMouseDrag(e.getX(), e.getY());
     }
 
     @Override

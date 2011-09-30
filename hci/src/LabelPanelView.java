@@ -231,7 +231,7 @@ public class LabelPanelView extends JPanel {
     private class AddListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            controller.startEditingNewPolygon();
+            controller.startAddingNewPolygon();
         }
     }
 

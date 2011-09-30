@@ -39,7 +39,7 @@ public class ToolboxPanelView extends JDialog {
         finishedEditingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.finishedAddingPolygon();
+                controller.toolboxDoneButtonClicked();
             }
         });
         finishedEditingButton.setToolTipText("Finish editing polygon");
@@ -66,7 +66,7 @@ public class ToolboxPanelView extends JDialog {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.cancelDrawingVertex();
+                controller.toolboxCancelButtonClicked();
             }
         });
         cancelButton.setToolTipText("Cancel editing polygon");
@@ -97,7 +97,7 @@ public class ToolboxPanelView extends JDialog {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            controller.cancelDrawingVertex();
+            controller.toolboxWindowClosed();
         }
 
         @Override
