@@ -48,11 +48,7 @@ public class AppController {
         appFrame.add(imagePanel);
         appFrame.add(labelPanel);
         appFrame.setJMenuBar(menuBar);
-        
-        appFrame.pack();
-        appFrame.setVisible(true);
-        
-        
+
         // Load the default image and set it.
         try {
             BufferedImage image = ImageIO.read(new File(imageName));
@@ -61,6 +57,9 @@ public class AppController {
             labelPanel.setAddButtonEnabled(false);
             labelPanel.setLoadButtonEnabled(false);
         }
+
+        appFrame.pack();
+        appFrame.setVisible(true);
     }
 
     /**
@@ -272,6 +271,7 @@ public class AppController {
 
             imagePanel.setImage(image);
             labelPanel.clear();
+            labelPanel.setLoadButtonEnabled(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(appFrame, "Unable to open image.", "Error",
                     JOptionPane.ERROR_MESSAGE);

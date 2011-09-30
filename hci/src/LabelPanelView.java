@@ -2,8 +2,6 @@ package src;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -26,9 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.SoftBevelBorder;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
@@ -52,16 +47,16 @@ public class LabelPanelView extends JInternalFrame {
     private JButton deleteButton;
 
     public LabelPanelView(JFrame frame, AppController appController) {
-        //super(new BorderLayout());
-    	this.setTitle("Labels");
-    	this.setClosable(false);
-    	this.setMaximizable(false);
-    	this.setResizable(false);
-    	this.setIconifiable(true);
-    	
-    	this.setVisible(true);
-    	
-//    	this.setLocation(x, y);
+        // super(new BorderLayout());
+        this.setTitle("Labels");
+        this.setClosable(false);
+        this.setMaximizable(false);
+        this.setResizable(false);
+        this.setIconifiable(true);
+
+        this.setVisible(true);
+
+        // this.setLocation(x, y);
         this.appFrame = frame;
         this.controller = appController;
         final JPopupMenu rightClickMenu = new JPopupMenu();
@@ -154,8 +149,6 @@ public class LabelPanelView extends JInternalFrame {
         add(labelListPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
 
-
-        
         CardLayout cl = (CardLayout) (labelListPane.getLayout());
         cl.show(labelListPane, "NOLABELS");
     }
@@ -183,6 +176,7 @@ public class LabelPanelView extends JInternalFrame {
         setAddButtonEnabled(true);
         setEditButtonEnabled(false);
         setDeleteButtonEnabled(false);
+        setLoadButtonEnabled(true);
 
         hideLabelList();
     }
