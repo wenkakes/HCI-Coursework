@@ -74,8 +74,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         int x = e.getX();
         int y = e.getY();
 
-        if (image == null || e.getButton() != MouseEvent.BUTTON1 || x > image.getWidth()
-                || y > image.getHeight()) {
+        if (image == null || e.getButton() != MouseEvent.BUTTON1 || !withinImageBounds(x, y)) {
             return;
         }
 
@@ -95,8 +94,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         int x = e.getX();
         int y = e.getY();
 
-        if (image == null || e.getButton() != MouseEvent.BUTTON1 || x > image.getWidth()
-                || y > image.getHeight()) {
+        if (image == null || e.getButton() != MouseEvent.BUTTON1 || !withinImageBounds(x, y)) {
             return;
         }
 
@@ -108,6 +106,26 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         controller.imageMouseReleased();
     }
 
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+
+        if (image == null) {
+            return;
+        }
+
+        // Make sure that the drag-to point is within the image bounds.
+        x = Math.max(0, Math.min(x, image.getWidth()));
+        y = Math.max(0, Math.min(y, image.getHeight()));
+
+        controller.imageMouseDrag(x, y);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+    }
+
     /**
      * Sets the image that is to be rendered in the panel.
      * 
@@ -116,7 +134,6 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
     public void setImage(BufferedImage image) {
         this.image = image;
 
-        // Scale if necessary
         // TODO: Rewrite this.
         if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
             int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)
@@ -130,6 +147,19 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         }
 
         repaint();
+    }
+
+    /**
+     * Checks that a point is within the bounds of the image.
+     * 
+     * @param x the x coordinate of the point to check
+     * @param y the y coordinate of the point to check
+     * 
+     * @return true if the point is within the bounds of the image, false
+     *         otherwise
+     */
+    private boolean withinImageBounds(int x, int y) {
+        return x >= 0 && x <= image.getWidth() && y >= 0 && y <= image.getHeight();
     }
 
     /**
@@ -170,14 +200,5 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
             graphics2d.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(),
                     lastVertex.getY());
         }
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        controller.imageMouseDrag(e.getX(), e.getY());
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
     }
 }
