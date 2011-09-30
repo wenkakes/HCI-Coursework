@@ -44,4 +44,10 @@ public class Point {
         result = prime * result + y;
         return result;
     }
+
+    public double distanceFrom(Point point) {
+        int dx = x - point.getX();
+        int dy = y - point.getY();
+        return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    }
 }

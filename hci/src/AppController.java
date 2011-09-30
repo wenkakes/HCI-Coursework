@@ -26,6 +26,8 @@ import src.utils.Polygon;
  * Main controller class for the application.
  */
 public class AppController {
+    // Select pixel threshold level.
+    private static final double THRESHOLD_DISTANCE = 5.0;
 
     // The core Swing components that make up the application.
     private final JFrame appFrame = new JFrame("Image Labeller");
@@ -173,10 +175,28 @@ public class AppController {
     public void imageClick(int x, int y, boolean doubleClick) {
         if (doubleClick) {
             finishEditingPolygon();
+        } else if (editingPolygon) {
+            currentPolygon.addPoint(new Point(x, y));
+            imagePanel.repaint();
         } else {
-            if (editingPolygon) {
-                currentPolygon.addPoint(new Point(x, y));
-                imagePanel.repaint();
+            Point mousePoint = new Point(x, y);
+            // TODO: Remove when you do something with this.
+            @SuppressWarnings("unused")
+            Point closestPoint = null;
+            double lowestDistance = -1;
+            for (Polygon polygon : polygons.values()) {
+                for (Point point : polygon.getPoints()) {
+                    double distanceBetween = mousePoint.distanceFrom(point);
+
+                    if (distanceBetween < lowestDistance || lowestDistance < 0) {
+                        lowestDistance = distanceBetween;
+                        closestPoint = point;
+                    }
+                }
+            }
+
+            if (lowestDistance >= 0 && lowestDistance < THRESHOLD_DISTANCE) {
+                // TODO: Do something with this.
             }
         }
     }
