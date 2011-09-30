@@ -2,6 +2,8 @@ package src;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -23,6 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.SoftBevelBorder;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
@@ -48,7 +53,8 @@ public class LabelPanelView extends JPanel {
         super(new BorderLayout());
 
         this.controller = appController;
-
+        this.setBackground(Color.LIGHT_GRAY);
+        this.setBorder(new BevelBorder(5));
         final JPopupMenu rightClickMenu = new JPopupMenu();
         JMenuItem renameLabel = new JMenuItem("Rename");
         renameLabel.addActionListener(new ActionListener() {
@@ -100,15 +106,15 @@ public class LabelPanelView extends JPanel {
         JScrollPane listScrollPane = new JScrollPane(list);
 
         // Create the buttons.
-        addButton = new JButton(new ImageIcon("hci/icons/add.png"));
+        addButton = new JButton(new ImageIcon("hci/icons/small/add.png"));
         addButton.addActionListener(new AddListener());
         addButton.setEnabled(true);
 
-        editButton = new JButton(new ImageIcon("hci/icons/edit.png"));
+        editButton = new JButton(new ImageIcon("hci/icons/small/edit.png"));
         editButton.addActionListener(new EditListener());
         editButton.setEnabled(false);
 
-        deleteButton = new JButton(new ImageIcon("hci/icons/delete.png"));
+        deleteButton = new JButton(new ImageIcon("hci/icons/small/delete.png"));
         deleteButton.addActionListener(new DeleteListener());
         deleteButton.setEnabled(false);
 
