@@ -11,7 +11,7 @@
   </path>
   <path id="classpath.test">
     <pathelement location="/usr/lib64/eclipse/dropins/jdt/plugins/org.junit_4.8.1.v4_8_1_v20100427-1100/junit.jar" />
-    <pathelement location="${tests}" />
+    <pathelement location="${bin}" />
     <path refid="classpath.base" />
   </path>
 
@@ -26,15 +26,12 @@
     </copy>
     
     <javac debug="true" verbose="true" srcdir="${src}" destdir="${bin}"/>
-  </target>
-
-  <target name="compile-test">
-    <javac srcdir="${test}" destdir="${bin}" verbose="true">
+    <javac debug="true" srcdir="${test}" destdir="${bin}" verbose="true">
       <classpath refid="classpath.test"/> 
     </javac>
   </target>
 
-  <target name="test" depends="compile-test">
+  <target name="test" depends="compile">
     <junit>
       <classpath refid="classpath.test" /> 
      <formatter type="brief" usefile="false" />

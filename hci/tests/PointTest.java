@@ -34,8 +34,9 @@ public class PointTest {
         Point point2 = new Point(3, 6);
         Point point3 = new Point(1, 4);
 
+        assertTrue(point1.equals(point1));
         assertTrue(point1.equals(point2));
-        assertTrue(point1.equals(point3));
+        assertFalse(point1.equals(point3));
         assertFalse(point2.equals(point3));
     }
 
