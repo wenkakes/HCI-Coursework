@@ -4,6 +4,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -74,8 +76,52 @@ public class ToolboxPanelView extends JDialog {
         add(redoButton);
         add(cancelButton);
 
+        addWindowListener(new ToolboxWindowListener(controller));
+
         setFocusableWindowState(false);
+        setResizable(false);
         setVisible(false);
         pack();
+    }
+
+    /**
+     * Listener for the Toolbox, to allow the X button to apply the same effect
+     * as "Cancel".
+     */
+    private static class ToolboxWindowListener implements WindowListener {
+        private final AppController controller;
+
+        public ToolboxWindowListener(AppController controller) {
+            this.controller = controller;
+        }
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            controller.cancelDrawingVertex();
+        }
+
+        @Override
+        public void windowOpened(WindowEvent e) {
+        }
+
+        @Override
+        public void windowIconified(WindowEvent e) {
+        }
+
+        @Override
+        public void windowDeiconified(WindowEvent e) {
+        }
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+        }
+
+        @Override
+        public void windowActivated(WindowEvent e) {
+        }
     }
 }

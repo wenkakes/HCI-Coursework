@@ -3,6 +3,7 @@ package src;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -203,6 +204,10 @@ public class AppController {
      */
     public void startEditingNewPolygon() {
         labelPanel.setAddButtonEnabled(false);
+
+        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        mouseLocation.setLocation(mouseLocation.getX(), mouseLocation.getY() + 20);
+        toolboxPanel.setLocation(mouseLocation);
         toolboxPanel.setVisible(true);
 
         editingPolygon = true;
