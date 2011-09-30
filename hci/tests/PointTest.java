@@ -48,5 +48,7 @@ public class PointTest {
 
         assertEquals(0, point1.distanceFrom(point1), 0.01);
         assertEquals(4.24, point1.distanceFrom(point2), 0.01);
+        assertEquals(2.82, point1.distanceFrom(point3), 0.01);
+        assertEquals(5.09, point2.distanceFrom(point3), 0.01);
     }
 }
