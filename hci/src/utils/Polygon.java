@@ -1,6 +1,7 @@
 package src.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -82,6 +83,14 @@ public class Polygon {
         newPoints.add(point);
         points = newPoints;
         pointIndex++;
+    }
+
+    public boolean replacePoint(Point oldPoint, Point newPoint) {
+        if (!points.contains(oldPoint) || points.indexOf(oldPoint) > pointIndex) {
+            return false;
+        }
+
+        return Collections.replaceAll(points, oldPoint, newPoint);
     }
 
     /**

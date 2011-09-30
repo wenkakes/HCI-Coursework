@@ -46,6 +46,9 @@ public class AppController {
     // Whether or not we are editing a polygon.
     private boolean editingPolygon = false;
 
+    // The currently selected point.
+    private Point currentlySelectedPoint = null;
+
     public AppController(String imageName) {
         appFrame.setLayout(new BorderLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -178,26 +181,6 @@ public class AppController {
         } else if (editingPolygon) {
             currentPolygon.addPoint(new Point(x, y));
             imagePanel.repaint();
-        } else {
-            Point mousePoint = new Point(x, y);
-            // TODO: Remove when you do something with this.
-            @SuppressWarnings("unused")
-            Point closestPoint = null;
-            double lowestDistance = -1;
-            for (Polygon polygon : polygons.values()) {
-                for (Point point : polygon.getPoints()) {
-                    double distanceBetween = mousePoint.distanceFrom(point);
-
-                    if (distanceBetween < lowestDistance || lowestDistance < 0) {
-                        lowestDistance = distanceBetween;
-                        closestPoint = point;
-                    }
-                }
-            }
-
-            if (lowestDistance >= 0 && lowestDistance < THRESHOLD_DISTANCE) {
-                // TODO: Do something with this.
-            }
         }
     }
 
@@ -307,5 +290,42 @@ public class AppController {
         } catch (IOException e) {
             // TODO: Add error message.
         }
+    }
+
+    public void mouseDragged(int x, int y) {
+        System.out.println("Mouse dragged to " + x + ", " + y);
+        if (currentlySelectedPoint != null) {
+            System.out.println("Replacing and repainting.");
+            Point newPoint = new Point(x, y);
+            if (currentPolygon.replacePoint(currentlySelectedPoint, newPoint)) {
+                currentlySelectedPoint = newPoint;
+            }
+            imagePanel.repaint();
+        }
+    }
+
+    public void mousePressed(int x, int y) {
+        Point mousePoint = new Point(x, y);
+        Point closestPoint = null;
+        double lowestDistance = -1;
+        for (Polygon polygon : polygons.values()) {
+            for (Point point : polygon.getPoints()) {
+                double distanceBetween = mousePoint.distanceFrom(point);
+
+                if (distanceBetween < lowestDistance || lowestDistance < 0) {
+                    lowestDistance = distanceBetween;
+                    closestPoint = point;
+                    currentPolygon = polygon;
+                }
+            }
+        }
+
+        if (lowestDistance >= 0 && lowestDistance < THRESHOLD_DISTANCE) {
+            currentlySelectedPoint = closestPoint;
+        }
+    }
+
+    public void mouseReleased() {
+        currentlySelectedPoint = null;
     }
 }

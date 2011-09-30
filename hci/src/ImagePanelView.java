@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import src.utils.Point;
  * View for the image panel. Handles the rendering of the image and the overlaid
  * polygons, and interactions with it.
  */
-public class ImagePanelView extends JPanel implements MouseListener {
+public class ImagePanelView extends JPanel implements MouseListener, MouseMotionListener {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
@@ -39,6 +40,7 @@ public class ImagePanelView extends JPanel implements MouseListener {
         setMaximumSize(panelSize);
 
         addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     @Override
@@ -79,19 +81,28 @@ public class ImagePanelView extends JPanel implements MouseListener {
     }
 
     @Override
-    public void mouseEntered(MouseEvent arg0) {
+    public void mouseEntered(MouseEvent e) {
     }
 
     @Override
-    public void mouseExited(MouseEvent arg0) {
+    public void mouseExited(MouseEvent e) {
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+
+        if (image == null || e.getButton() != MouseEvent.BUTTON1 || x > image.getWidth()
+                || y > image.getHeight()) {
+            return;
+        }
+
+        controller.mousePressed(x, y);
     }
 
     @Override
-    public void mouseReleased(MouseEvent arg0) {
+    public void mouseReleased(MouseEvent e) {
     }
 
     /**
@@ -156,5 +167,14 @@ public class ImagePanelView extends JPanel implements MouseListener {
             graphics2d.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(),
                     lastVertex.getY());
         }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        controller.mouseDragged(e.getX(), e.getY());
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
     }
 }
