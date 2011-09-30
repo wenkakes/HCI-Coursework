@@ -4,8 +4,16 @@
     </description>
 
   <property name="src" location="src"/>
-  <property name="test" location="test"/>
+  <property name="test" location="tests"/>
   <property name="bin" location="bin"/>
+
+  <path id="classpath.base">
+  </path>
+  <path id="classpath.test">
+    <pathelement location="/usr/lib64/eclipse/dropins/jdt/plugins/org.junit_4.8.1.v4_8_1_v20100427-1100/junit.jar" />
+    <pathelement location="${tests}" />
+    <path refid="classpath.base" />
+  </path>
 
   <target name="init">
     <tstamp/>
@@ -16,10 +24,23 @@
     <copy todir="${bin}/icons">
       <fileset dir="icons"/>
     </copy>
-  	
-    <javac debug="true" srcdir="${src}" destdir="${bin}"/>
-    <!-- <javac srcdir="${test}" destdir="${bin}/tests"/> -->
+    
+    <javac debug="true" verbose="true" srcdir="${src}" destdir="${bin}"/>
   </target>
+
+  <target name="compile-test">
+    <javac srcdir="${test}" destdir="${bin}" verbose="true">
+      <classpath refid="classpath.test"/> 
+    </javac>
+  </target>
+
+  <target name="test" depends="compile-test">
+    <junit>
+      <classpath refid="classpath.test" /> 
+     <formatter type="brief" usefile="false" />
+      <test name="tests.PointTest" />
+    </junit>
+  </target> 
 
   <target name="clean" description="clean up" >
     <delete dir="${bin}"/>

@@ -1,7 +1,8 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -29,11 +30,22 @@ public class PointTest {
 
     @Test
     public void testEquality() {
-        fail();
+        Point point1 = new Point(3, 6);
+        Point point2 = new Point(3, 6);
+        Point point3 = new Point(1, 4);
+
+        assertTrue(point1.equals(point2));
+        assertTrue(point1.equals(point3));
+        assertFalse(point2.equals(point3));
     }
 
     @Test
     public void testDistanceFrom() {
-        fail();
+        Point point1 = new Point(3, 6);
+        Point point2 = new Point(6, 3);
+        Point point3 = new Point(1, 4);
+
+        assertEquals(0, point1.distanceFrom(point1), 0.01);
+        assertEquals(4.24, point1.distanceFrom(point2), 0.01);
     }
 }
