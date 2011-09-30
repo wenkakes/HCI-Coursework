@@ -23,7 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
@@ -40,6 +39,8 @@ public class LabelPanelView extends JInternalFrame {
     private JPanel labelListPane;
     private final DefaultListModel listModel;
     private final JList list;
+
+    public JPopupMenu rightClickMenu;
 
     private JButton addButton;
     private JButton editButton;
@@ -59,19 +60,20 @@ public class LabelPanelView extends JInternalFrame {
         // this.setLocation(x, y);
         this.appFrame = frame;
         this.controller = appController;
-        final JPopupMenu rightClickMenu = new JPopupMenu();
+
+        rightClickMenu = new JPopupMenu();
         JMenuItem renameLabel = new JMenuItem("Rename");
         renameLabel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                renamePolygon();
+                renameSelectedPolygon();
             }
         });
         JMenuItem deleteLabel = new JMenuItem("Delete");
         deleteLabel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                deletePolygon();
+                deleteSelectedPolygons();
             }
         });
         rightClickMenu.add(renameLabel);
@@ -80,34 +82,9 @@ public class LabelPanelView extends JInternalFrame {
         // Set up the backing data structures for the label list.
         listModel = new DefaultListModel();
         list = new JList(listModel);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
-        list.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // TODO: If user clicks off of list, unselect.
-                if (e.getButton() == MouseEvent.BUTTON3 && list.getSelectedIndices().length == 1) {
-                    rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-        });
+        list.addMouseListener(new LabelListMouseListener());
         JScrollPane listScrollPane = new JScrollPane(list);
 
         // Create the buttons.
@@ -218,69 +195,9 @@ public class LabelPanelView extends JInternalFrame {
     }
 
     /**
-     * Show the list of labels.
+     * Allows the user to rename the currently selected polygon.
      */
-    private void showLabelList() {
-        CardLayout cl = (CardLayout) (labelListPane.getLayout());
-        cl.show(labelListPane, "HAVELABELS");
-    }
-
-    /**
-     * Hides the list of labels.
-     */
-    private void hideLabelList() {
-        CardLayout cl = (CardLayout) (labelListPane.getLayout());
-        cl.show(labelListPane, "NOLABELS");
-    }
-
-    /**
-     * Listener class for adding a new polygon to the image.
-     */
-    private class AddListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            controller.startAddingNewPolygon();
-        }
-    }
-
-    /**
-     * Listener class for editing the name of a label.
-     */
-    private class EditListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            renamePolygon();
-        }
-    }
-
-    /**
-     * Listener class for deleting a selected label/polygon from the image.
-     */
-    private class DeleteListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            deletePolygon();
-        }
-    }
-
-    /**
-     * Listener class for loading labels from a file.
-     */
-    private class LoadListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JFileChooser chooser = new JFileChooser();
-            int returnValue = chooser.showOpenDialog(appFrame);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
-                controller.loadLabels(file);
-            }
-        }
-    }
-
-    public void renamePolygon() {
+    public void renameSelectedPolygon() {
         int index = list.getSelectedIndex();
         if (index == -1) {
             JOptionPane.showMessageDialog(appFrame, "No label selected", "Error",
@@ -317,17 +234,22 @@ public class LabelPanelView extends JInternalFrame {
         }
     }
 
-    public void deletePolygon() {
-        int index = list.getSelectedIndex();
+    /**
+     * Deletes the currently selected polygons.
+     */
+    public void deleteSelectedPolygons() {
+        int[] indices = list.getSelectedIndices();
 
-        if (index == -1) {
-            JOptionPane.showMessageDialog(appFrame, "No label selected", "Error",
+        if (indices.length == 0) {
+            JOptionPane.showMessageDialog(appFrame, "No label(s) selected", "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        controller.removePolygon((String) listModel.get(index));
-        listModel.remove(index);
+        for (int i = indices.length - 1; i >= 0; i--) {
+            controller.removePolygon((String) listModel.get(indices[i]));
+            listModel.remove(indices[i]);
+        }
 
         if (listModel.getSize() == 0) {
             setEditButtonEnabled(false);
@@ -336,6 +258,111 @@ public class LabelPanelView extends JInternalFrame {
         }
 
         // Make sure that the selected index is still within the list range.
-        list.setSelectedIndex(Math.min(index, listModel.getSize() - 1));
+        list.setSelectedIndex(Math.min(indices[0], listModel.getSize() - 1));
+        editButton.setEnabled(list.getSelectedIndices().length == 1);
+    }
+
+    /**
+     * Deletes all of the polygons.
+     */
+    public void deleteAllPolygons() {
+        for (int i = 0; i < listModel.getSize(); i++) {
+            controller.removePolygon((String) listModel.get(i));
+        }
+        listModel.clear();
+
+        setEditButtonEnabled(false);
+        setDeleteButtonEnabled(false);
+        hideLabelList();
+    }
+
+    /**
+     * Show the list of labels.
+     */
+    private void showLabelList() {
+        CardLayout cl = (CardLayout) (labelListPane.getLayout());
+        cl.show(labelListPane, "HAVELABELS");
+    }
+
+    /**
+     * Hides the list of labels.
+     */
+    private void hideLabelList() {
+        CardLayout cl = (CardLayout) (labelListPane.getLayout());
+        cl.show(labelListPane, "NOLABELS");
+    }
+
+    /**
+     * Listener class for adding a new polygon to the image.
+     */
+    private class AddListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            controller.startAddingNewPolygon();
+        }
+    }
+
+    /**
+     * Listener class for editing the name of a label.
+     */
+    private class EditListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            renameSelectedPolygon();
+        }
+    }
+
+    /**
+     * Listener class for deleting a selected label/polygon from the image.
+     */
+    private class DeleteListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            deleteSelectedPolygons();
+        }
+    }
+
+    /**
+     * Listener class for loading labels from a file.
+     */
+    private class LoadListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser chooser = new JFileChooser();
+            int returnValue = chooser.showOpenDialog(appFrame);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                controller.loadLabels(file);
+            }
+        }
+    }
+
+    private class LabelListMouseListener implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            // Only allow renaming of single items at once.
+            editButton.setEnabled(list.getSelectedIndices().length == 1);
+
+            if (e.getButton() == MouseEvent.BUTTON3 && list.getSelectedIndices().length == 1) {
+                rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
+            }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
     }
 }

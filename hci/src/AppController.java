@@ -271,7 +271,6 @@ public class AppController {
 
             imagePanel.setImage(image);
             labelPanel.clear();
-            labelPanel.setLoadButtonEnabled(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(appFrame, "Unable to open image.", "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -355,6 +354,22 @@ public class AppController {
             default:
                 // TODO: Throw/show appropriate error.
         }
+    }
+
+    /**
+     * Deletes all of the polygons.
+     */
+    public void deleteAllPolygons() {
+        labelPanel.deleteAllPolygons();
+        imagePanel.repaint();
+    }
+
+    /**
+     * Deletes the currently selected polygons.
+     */
+    public void deleteSelectedPolygons() {
+        labelPanel.deleteSelectedPolygons();
+        imagePanel.repaint();
     }
 
     /**
