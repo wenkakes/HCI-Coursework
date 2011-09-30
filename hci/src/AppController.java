@@ -33,9 +33,9 @@ public class AppController {
     private final JFrame appFrame = new JFrame("Image Labeller");
 
     private final ImagePanelView imagePanel = new ImagePanelView(this);
-    private final LabelPanelView labelPanel = new LabelPanelView(this);
+    private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
-    private final MainMenuPanelView menuPanel = new MainMenuPanelView(this);
+    private final MainMenuPanelView menuPanel = new MainMenuPanelView(appFrame, this);
 
     // The current polygon.
     Polygon currentPolygon = new Polygon();

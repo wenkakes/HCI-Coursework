@@ -6,6 +6,7 @@ import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -15,9 +16,11 @@ public class MainMenuPanelView extends JPanel {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
+    private final JFrame appFrame;
     private final AppController controller;
 
-    public MainMenuPanelView(AppController appController) {
+    public MainMenuPanelView(JFrame frame, AppController appController) {
+        this.appFrame = frame;
         this.controller = appController;
 
         JButton openButton = new JButton("Open Image");
@@ -25,7 +28,7 @@ public class MainMenuPanelView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                int returnValue = chooser.showOpenDialog(null);
+                int returnValue = chooser.showOpenDialog(appFrame);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File file = chooser.getSelectedFile();
                     controller.openImage(file);
@@ -38,7 +41,7 @@ public class MainMenuPanelView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                int returnValue = chooser.showSaveDialog(null);
+                int returnValue = chooser.showSaveDialog(appFrame);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File file = chooser.getSelectedFile();
                     controller.saveLabels(file);
