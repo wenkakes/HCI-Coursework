@@ -65,7 +65,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
             int xPos = (getWidth() - textWidth) / 2;
             int yPos = (getHeight() - textHeight) / 2 + fm.getAscent();
-            g.setFont(new Font("Serif", Font.PLAIN, 16));
+            g.setFont(new Font(getFont().getFamily(), getFont().getStyle(), 16));
             g.drawString(NO_IMAGE_STRING, xPos, yPos);
         } else {
             g.drawImage(image, 0, 0, null);
@@ -124,18 +124,18 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        if (image == null) {
-            return;
-        }
-
-        // Make sure that the drag-to point is within the image bounds.
-        x = Math.max(0, Math.min(x, image.getWidth()));
-        y = Math.max(0, Math.min(y, image.getHeight()));
-
-        controller.imageMouseDrag(x, y);
+        // Disabled for now.
+        /*
+         * int x = e.getX(); int y = e.getY();
+         * 
+         * if (image == null) { return; }
+         * 
+         * // Make sure that the drag-to point is within the image bounds. x =
+         * Math.max(0, Math.min(x, image.getWidth())); y = Math.max(0,
+         * Math.min(y, image.getHeight()));
+         * 
+         * controller.imageMouseDrag(x, y);
+         */
     }
 
     @Override
@@ -147,8 +147,8 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
      * 
      * @param image the image to draw
      */
-    public void setImage(BufferedImage image) {
-        this.image = image;
+    public void setImage(BufferedImage newImage) {
+        image = newImage;
 
         // TODO: Rewrite this.
         if (image != null && (image.getWidth() > 800 || image.getHeight() > 600)) {
