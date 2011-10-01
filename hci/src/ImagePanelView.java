@@ -151,15 +151,28 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         image = newImage;
 
         // TODO: Rewrite this.
-        if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
-            int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)
-                    / image.getHeight();
-            int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)
-                    / image.getWidth();
-            System.out.println("SCALING TO " + newWidth + "x" + newHeight);
-            Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
-            image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-            image.getGraphics().drawImage(scaledImage, 0, 0, this);
+        if (image != null) {
+            // If the image is too big in one dimension, scale it down.
+            if (image.getWidth() > 800 || image.getHeight() > 600) {
+                int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)
+                        / image.getHeight();
+                int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)
+                        / image.getWidth();
+                System.out.println("SCALING TO " + newWidth + "x" + newHeight);
+                Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
+                image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+                image.getGraphics().drawImage(scaledImage, 0, 0, this);
+            } else if (image.getWidth() < 800 || image.getHeight() < 600) {
+                // Otherwise scale it up.
+                int newWidth = image.getWidth() < 800 ? 800
+                        : (image.getWidth() * image.getHeight()) / 600;
+                int newHeight = image.getHeight() < 600 ? 600 : (image.getHeight() * image
+                        .getWidth()) / 800;
+                System.out.println("SCALING TO " + newWidth + "x" + newHeight);
+                Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
+                image = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+                image.getGraphics().drawImage(scaledImage, 0, 0, this);
+            }
         }
 
         repaint();
