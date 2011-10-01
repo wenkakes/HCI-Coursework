@@ -124,18 +124,18 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        if (image == null) {
-            return;
-        }
-
-        // Make sure that the drag-to point is within the image bounds.
-        x = Math.max(0, Math.min(x, image.getWidth()));
-        y = Math.max(0, Math.min(y, image.getHeight()));
-
-        controller.imageMouseDrag(x, y);
+        // Disabled for now.
+        /*
+         * int x = e.getX(); int y = e.getY();
+         * 
+         * if (image == null) { return; }
+         * 
+         * // Make sure that the drag-to point is within the image bounds. x =
+         * Math.max(0, Math.min(x, image.getWidth())); y = Math.max(0,
+         * Math.min(y, image.getHeight()));
+         * 
+         * controller.imageMouseDrag(x, y);
+         */
     }
 
     @Override
