@@ -1,5 +1,6 @@
 package src;
 
+import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -143,11 +144,20 @@ public class MenuBarView extends JMenuBar {
         JMenuItem howToUse = new JMenuItem("How to Use");
         howToUse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                controller.openImage(new File("hci/images/help.png"));
+            	
+            	HelpDialog helpDialog = new HelpDialog();
+            	
+                java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+                mouseLocation.setLocation(mouseLocation.getX(), mouseLocation.getY() + 20);
+                
+                helpDialog.setLocation(mouseLocation);
+                helpDialog.setVisible(true);
+
             }
         });
         
         JMenuItem aboutProgram = new JMenuItem("About");
+        
         help.add(howToUse);
         help.add(aboutProgram);
 
