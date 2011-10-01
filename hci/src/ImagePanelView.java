@@ -65,7 +65,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
             int xPos = (getWidth() - textWidth) / 2;
             int yPos = (getHeight() - textHeight) / 2 + fm.getAscent();
-            g.setFont(new Font("Serif", Font.PLAIN, 16));
+            g.setFont(new Font(getFont().getFamily(), getFont().getStyle(), 16));
             g.drawString(NO_IMAGE_STRING, xPos, yPos);
         } else {
             g.drawImage(image, 0, 0, null);
