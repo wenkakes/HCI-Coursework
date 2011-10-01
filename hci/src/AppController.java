@@ -471,4 +471,8 @@ public class AppController {
             currentPolygon = closestPolygon;
         }
     }
+
+	public void closeImage() {
+		imagePanel.setImage(null);		
+	}
 }

@@ -82,6 +82,13 @@ public class MenuBarView extends JMenuBar {
         JMenuItem fileClose = new JMenuItem("Close");
         fileClose.setMnemonic(KeyEvent.VK_C);
         fileClose.setToolTipText("Close current image");
+        
+        fileClose.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                controller.closeImage();
+            }
+
+        });
 
         // JMenuItem fileExit = new JMenuItem("Exit", iconExit);
         JMenuItem fileExit = new JMenuItem("Exit");
@@ -129,8 +136,23 @@ public class MenuBarView extends JMenuBar {
 
         edit.add(deleteSelected);
         edit.add(deleteAll);
+        
+        JMenu help = new JMenu("Help");
+        edit.setMnemonic(KeyEvent.VK_H);
+        
+        JMenuItem howToUse = new JMenuItem("How to Use");
+        howToUse.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                controller.openImage(new File("hci/images/help.png"));
+            }
+        });
+        
+        JMenuItem aboutProgram = new JMenuItem("About");
+        help.add(howToUse);
+        help.add(aboutProgram);
 
         this.add(file);
         this.add(edit);
+        this.add(help);
     }
 }

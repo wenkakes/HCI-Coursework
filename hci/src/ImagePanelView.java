@@ -151,7 +151,7 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         this.image = image;
 
         // TODO: Rewrite this.
-        if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
+        if (image != null && (image.getWidth() > 800 || image.getHeight() > 600)) {
             int newWidth = image.getWidth() > 800 ? 800 : (image.getWidth() * 600)
                     / image.getHeight();
             int newHeight = image.getHeight() > 600 ? 600 : (image.getHeight() * 800)
