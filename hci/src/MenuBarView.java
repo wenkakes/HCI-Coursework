@@ -7,9 +7,11 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 public class MenuBarView extends JMenuBar {
@@ -97,7 +99,6 @@ public class MenuBarView extends JMenuBar {
             public void actionPerformed(ActionEvent event) {
                 controller.closeImage();
             }
-
         });
 
         // JMenuItem fileExit = new JMenuItem("Exit", iconExit);
@@ -168,6 +169,15 @@ public class MenuBarView extends JMenuBar {
         });
         
         JMenuItem aboutProgram = new JMenuItem("About");
+        aboutProgram.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent event) {
+        		JFrame parent = new JFrame();
+        		parent.setTitle("About");
+        		JOptionPane.showMessageDialog(parent, "<html> Image Labeller v1.1 <br />" +
+        				"A 4th year Human-Computer Interaction project </html>");
+        		
+        	}
+        });
         
         help.add(howToUse);
         help.add(aboutProgram);
