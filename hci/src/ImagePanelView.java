@@ -147,8 +147,8 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
      * 
      * @param image the image to draw
      */
-    public void setImage(BufferedImage image) {
-        this.image = image;
+    public void setImage(BufferedImage newImage) {
+        image = newImage;
 
         // TODO: Rewrite this.
         if (image != null && image.getWidth() > 800 || image.getHeight() > 600) {
