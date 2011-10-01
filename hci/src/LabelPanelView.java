@@ -329,12 +329,7 @@ public class LabelPanelView extends JInternalFrame {
     private class LoadListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser chooser = new JFileChooser();
-            int returnValue = chooser.showOpenDialog(appFrame);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
-                controller.loadLabels(file);
-            }
+            controller.loadLabels();
         }
     }
 

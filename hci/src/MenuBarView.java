@@ -35,7 +35,7 @@ public class MenuBarView extends JMenuBar {
 
         JMenu file = new JMenu("File");
         file.setMnemonic(KeyEvent.VK_F);
-
+/*
         JMenu imp = new JMenu("Import");
         imp.setMnemonic(KeyEvent.VK_M);
 
@@ -45,9 +45,9 @@ public class MenuBarView extends JMenuBar {
 
         imp.add(mproj);
         imp.add(mlabels);
-
+*/
         // JMenuItem fileNew = new JMenuItem("New", iconNew);
-        JMenuItem fileNew = new JMenuItem("New ____ from Image");
+        JMenuItem fileNew = new JMenuItem("Open New Image");
         fileNew.setMnemonic(KeyEvent.VK_N);
         fileNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         fileNew.addActionListener(new ActionListener() {
@@ -64,7 +64,7 @@ public class MenuBarView extends JMenuBar {
         });
 
         // JMenuItem fileSave = new JMenuItem("Save", iconSave);
-        JMenuItem fileSave = new JMenuItem("Save");
+        JMenuItem fileSave = new JMenuItem("Save Current Labels");
         fileSave.setMnemonic(KeyEvent.VK_S);
         fileSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         fileSave.addActionListener(new ActionListener() {
@@ -80,10 +80,19 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        JMenuItem fileClose = new JMenuItem("Close");
+        JMenuItem fileImport = new JMenuItem("Import Saved Labels");
+        fileImport.setMnemonic(KeyEvent.VK_M);
+        fileImport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.loadLabels();
+            }
+        });
+        
+        JMenuItem fileClose = new JMenuItem("Close Current Image");
         fileClose.setMnemonic(KeyEvent.VK_C);
         fileClose.setToolTipText("Close current image");
-        
+        fileClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
         fileClose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 controller.closeImage();
@@ -95,7 +104,7 @@ public class MenuBarView extends JMenuBar {
         JMenuItem fileExit = new JMenuItem("Exit");
         fileExit.setMnemonic(KeyEvent.VK_X);
         fileExit.setToolTipText("Exit application");
-        fileExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+
 
         fileExit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -105,10 +114,12 @@ public class MenuBarView extends JMenuBar {
         });
 
         file.add(fileNew);
-        file.add(imp);
+        //file.add(imp);
+        file.add(fileImport);
         file.add(fileSave);
         file.addSeparator();
         file.add(fileClose);
+        file.addSeparator();
         file.add(fileExit);
 
         JMenu edit = new JMenu("Edit");

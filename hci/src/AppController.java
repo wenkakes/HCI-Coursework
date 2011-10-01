@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -243,17 +244,24 @@ public class AppController {
      * 
      * @param file the file to load from
      */
-    public void loadLabels(File file) {
-        try {
-            completedPolygons = LabelIO.readLabels(file);
-            labelPanel.clear();
-            for (String name : completedPolygons.keySet()) {
-                labelPanel.addLabel(name);
-            }
-            imagePanel.repaint();
-        } catch (LabelParseException e) {
-            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+    public void loadLabels() {
+    	
+        JFileChooser chooser = new JFileChooser();
+        int returnValue = chooser.showOpenDialog(appFrame);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File loadFile = chooser.getSelectedFile();
+    	
+	        try {
+	            completedPolygons = LabelIO.readLabels(loadFile);
+	            labelPanel.clear();
+	            for (String name : completedPolygons.keySet()) {
+	                labelPanel.addLabel(name);
+	            }
+	            imagePanel.repaint();
+	        } catch (LabelParseException e) {
+	            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
+	                    JOptionPane.ERROR_MESSAGE);
+	        }
         }
     }
 
