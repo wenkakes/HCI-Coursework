@@ -36,6 +36,7 @@ public class AppController {
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
 
     Polygon currentPolygon = new Polygon();
+    Polygon editedPolygon = new Polygon();
     private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
     private Point currentPoint = null; // Used when moving points.
 
@@ -78,7 +79,7 @@ public class AppController {
                     // Double clicking does nothing in the default state.
                     return;
                 }
-
+                imagePanel.repaint();
                 // TODO: Enter explicit editing at this point.
 
                 break;
@@ -107,20 +108,21 @@ public class AppController {
     public void imageMouseDrag(int x, int y) {
         switch (applicationState) {
             case DEFAULT:
-                // If the user is dragging a point, move it.
-                if (currentPoint != null) {
-                    Point newPoint = new Point(x, y);
-                    if (currentPolygon.replacePoint(currentPoint, newPoint)) {
-                        currentPoint = newPoint;
-                    }
-                    imagePanel.repaint();
-                }
+            	// Do nothing
+
                 break;
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
             case EDITING_POLYGON:
-                // TODO: Implement dragging for explicit editing.
+                if (currentPoint != null) {
+                    Point newPoint = new Point(x, y);
+                    if (currentPolygon.replacePoint(currentPoint, newPoint)) {
+                        currentPoint = newPoint;
+                    }
+                    editedPolygon = currentPolygon;
+                    imagePanel.repaint();
+                }
                 break;
             default:
                 // TODO: Throw/show appropriate error.
@@ -144,6 +146,7 @@ public class AppController {
                 break;
             case EDITING_POLYGON:
                 // Implement explicit editing logic.
+            	selectClosestPoint(x, y);
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -158,12 +161,15 @@ public class AppController {
             case DEFAULT:
                 currentPoint = null;
                 currentPolygon = new Polygon();
+                imagePanel.repaint();
                 break;
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
             case EDITING_POLYGON:
                 // Implement logic for explicit editing.
+                currentPoint = null;
+                currentPolygon = new Polygon();
                 break;
             default:
                 // TODO: Throw/show appropriate error.
@@ -470,19 +476,29 @@ public class AppController {
                 double distanceToTarget = targetPoint.distanceFrom(point);
 
                 if (distanceToTarget < smallestDistance || smallestDistance < 0) {
-                    smallestDistance = distanceToTarget;
-                    closestPoint = point;
-                    closestPolygon = polygon;
+                	if (isSelected(polygon.getName())) {
+	                    smallestDistance = distanceToTarget;
+	                    closestPoint = point;
+	                    closestPolygon = polygon;
+                	}
                 }
+                
             }
         }
 
         if (smallestDistance >= 0 && smallestDistance < EDITING_THRESHOLD_DISTANCE) {
+        	applicationState = ApplicationState.EDITING_POLYGON;
             currentPoint = closestPoint;
             currentPolygon = closestPolygon;
+        } else {
+        	applicationState = ApplicationState.DEFAULT;
         }
     }
 
+    public Polygon getPolygon(String name) {
+    	return completedPolygons.get(name);
+    }
+    
     public void closeImage() {
         imagePanel.setImage(null);
         labelPanel.clear();
@@ -490,4 +506,39 @@ public class AppController {
         labelPanel.setAddButtonEnabled(false);
         labelPanel.setLoadButtonEnabled(false);
     }
+
+    public void highlightSelected() {
+    	imagePanel.repaint();
+    }
+    
+	public List<List<Point>> getSelectedPolygonsPoints() {
+		List<Polygon> selectedPolygons = getSelectedPolygons();
+		List<List<Point>> points = new ArrayList<List<Point>>(selectedPolygons.size());
+		for (Polygon selectedPolygon : selectedPolygons) {
+			points.add(selectedPolygon.getPoints());
+		}
+		return points;
+	}
+	
+	public List<Polygon> getSelectedPolygons() {
+		return labelPanel.getSelectedPolygons();
+	}
+	
+	private boolean isSelected(String name) {
+		List<Polygon> polygons = getSelectedPolygons();
+		for (Polygon selected : polygons) {
+			if (selected.getName() == name) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<Point> getEditedPolygonPoints() {
+		if (applicationState == ApplicationState.EDITING_POLYGON) {
+			return editedPolygon.getPoints();
+		}
+			
+		return null;
+	}
 }

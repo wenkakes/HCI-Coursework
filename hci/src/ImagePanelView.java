@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import src.utils.Point;
+import src.utils.Polygon;
 
 /**
  * View for the image panel. Handles the rendering of the image and the overlaid
@@ -74,16 +75,27 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
             List<List<Point>> completedPolygonsPoints = controller.getCompletedPolygonsPoints();
             for (List<Point> points : completedPolygonsPoints) {
-                drawPolygon(points, graphics2D);
-                finishPolygon(points, graphics2D);
+                drawPolygon(points, graphics2D, Color.BLUE);
+                finishPolygon(points, graphics2D, Color.BLUE);
             }
             
-            //List<Point> selectedPolygonPoints = controller.getSelectedPolygonsPoints();
+            List<List<Point>> selectedPolygonsPoints = controller.getSelectedPolygonsPoints();
+            for (List<Point> points : selectedPolygonsPoints) {
+                drawPolygon(points, graphics2D, Color.GREEN);
+                finishPolygon(points, graphics2D, Color.GREEN);
+            }
 
             List<Point> currentPolygonPoints = controller.getCurrentPolygonPoints();
             if (currentPolygonPoints != null) {
-                drawPolygon(currentPolygonPoints, graphics2D);
+                drawPolygon(currentPolygonPoints, graphics2D, Color.PINK);
             }
+            
+            List<Point> editedPolygonPoints = controller.getEditedPolygonPoints();
+            if (editedPolygonPoints != null) {
+                drawPolygon(editedPolygonPoints, graphics2D, Color.YELLOW);
+                finishPolygon(editedPolygonPoints, graphics2D, Color.YELLOW);
+            }
+            
         }
     }
 
@@ -126,18 +138,17 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        // Disabled for now.
-        /*
-         * int x = e.getX(); int y = e.getY();
-         * 
-         * if (image == null) { return; }
-         * 
-         * // Make sure that the drag-to point is within the image bounds. x =
-         * Math.max(0, Math.min(x, image.getWidth())); y = Math.max(0,
-         * Math.min(y, image.getHeight()));
-         * 
-         * controller.imageMouseDrag(x, y);
-         */
+        
+         int x = e.getX(); int y = e.getY();
+         
+         if (image == null) { return; }
+         
+         // Make sure that the drag-to point is within the image bounds. x =
+         Math.max(0, Math.min(x, image.getWidth())); y = Math.max(0,
+         Math.min(y, image.getHeight()));
+         
+         controller.imageMouseDrag(x, y);
+         
     }
 
     @Override
@@ -200,8 +211,8 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
      * @param points the points of the polygon to be drawn
      * @param graphics2d
      */
-    private static void drawPolygon(List<Point> points, Graphics2D graphics2d) {
-        graphics2d.setColor(Color.GREEN);
+    private static void drawPolygon(List<Point> points, Graphics2D graphics2d, Color colour) {
+        graphics2d.setColor(colour);
         for (int i = 0; i < points.size(); i++) {
             Point currentVertex = points.get(i);
             if (i != 0) {
@@ -220,14 +231,14 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
      * @param points the points of the polygon to draw the final stroke for
      * @param graphics2d
      */
-    private static void finishPolygon(List<Point> points, Graphics2D graphics2d) {
+    private static void finishPolygon(List<Point> points, Graphics2D graphics2d, Color colour) {
         // A polygon with less than 3 vertices is just a line or point and needs
         // no finishing.
         if (points.size() >= 3) {
             Point firstVertex = points.get(0);
             Point lastVertex = points.get(points.size() - 1);
 
-            graphics2d.setColor(Color.GREEN);
+            graphics2d.setColor(colour);
             graphics2d.drawLine(firstVertex.getX(), firstVertex.getY(), lastVertex.getX(),
                     lastVertex.getY());
         }

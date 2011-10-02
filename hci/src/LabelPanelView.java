@@ -2,10 +2,13 @@ package src;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,6 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
+
+import src.utils.Point;
+import src.utils.Polygon;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
@@ -335,6 +341,8 @@ public class LabelPanelView extends JPanel {
             // Only allow renaming of single items at once.
             editButton.setEnabled(list.getSelectedIndices().length == 1);
 
+            controller.highlightSelected();
+            
             if (e.getButton() == MouseEvent.BUTTON3 && list.getSelectedIndices().length == 1) {
                 rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
             }
@@ -355,5 +363,16 @@ public class LabelPanelView extends JPanel {
         @Override
         public void mouseEntered(MouseEvent e) {
         }
+    }
+    
+    public List<Polygon> getSelectedPolygons() {
+    	int[] indices = list.getSelectedIndices();
+    	List<Polygon> selectedPolygons = new ArrayList<Polygon>(indices.length);
+    	Polygon selectedPolygon;
+        for (int i = indices.length - 1; i >= 0; i--) {
+            selectedPolygon = controller.getPolygon(((String) listModel.get(indices[i])));
+            selectedPolygons.add(selectedPolygon);
+        }
+        return selectedPolygons;
     }
 }
