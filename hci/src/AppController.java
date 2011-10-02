@@ -61,6 +61,7 @@ public class AppController {
 
         appFrame.pack();
         appFrame.setVisible(true);
+        appFrame.setResizable(false);
     }
 
     /**

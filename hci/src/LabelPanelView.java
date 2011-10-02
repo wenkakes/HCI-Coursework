@@ -6,16 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -23,12 +21,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 
 /**
  * View for the polygon label panel, handling the refreshing of the label list
  * and interactions with it and the panel buttons.
  */
-public class LabelPanelView extends JInternalFrame {
+public class LabelPanelView extends JPanel {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
@@ -49,13 +48,9 @@ public class LabelPanelView extends JInternalFrame {
 
     public LabelPanelView(JFrame frame, AppController appController) {
         // super(new BorderLayout());
-        this.setTitle("Labels");
-        this.setClosable(false);
-        this.setMaximizable(false);
-        this.setResizable(false);
-        this.setIconifiable(true);
-
-        this.setVisible(true);
+    	Border labelBorder = BorderFactory.createTitledBorder("Labels");
+    	this.setBorder(labelBorder);
+    	this.setLayout(new BorderLayout());
 
         // this.setLocation(x, y);
         this.appFrame = frame;
@@ -128,6 +123,7 @@ public class LabelPanelView extends JInternalFrame {
 
         CardLayout cl = (CardLayout) (labelListPane.getLayout());
         cl.show(labelListPane, "NOLABELS");
+        this.setVisible(true);
     }
 
     /**
