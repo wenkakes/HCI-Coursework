@@ -77,6 +77,8 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
                 drawPolygon(points, graphics2D);
                 finishPolygon(points, graphics2D);
             }
+            
+            //List<Point> selectedPolygonPoints = controller.getSelectedPolygonsPoints();
 
             List<Point> currentPolygonPoints = controller.getCurrentPolygonPoints();
             if (currentPolygonPoints != null) {

@@ -1,16 +1,22 @@
 package src;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * View for the toolbox floating panel, handling interactions with the toolbox
@@ -70,12 +76,31 @@ public class ToolboxPanelView extends JDialog {
             }
         });
         cancelButton.setToolTipText("Cancel editing polygon");
+        
+        setLayout(new GridLayout(2,1));
+        
+        JLabel instructions = new JLabel("<html><center>" +
+        		"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+        		"Click on the image to draw labels.<br />" +
+        		"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+        		"Double click (or click \"Done\") to finish.</center></html>");
 
-        add(finishedEditingButton);
-        add(undoButton);
-        add(redoButton);
-        add(cancelButton);
-
+        
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+        buttonPane.add(Box.createHorizontalStrut(20));
+        buttonPane.add(finishedEditingButton);
+        buttonPane.add(Box.createHorizontalStrut(10));
+        buttonPane.add(undoButton);
+        buttonPane.add(Box.createHorizontalStrut(10));
+        buttonPane.add(redoButton);
+        buttonPane.add(Box.createHorizontalStrut(10));
+        buttonPane.add(cancelButton);
+        buttonPane.add(Box.createHorizontalStrut(20));
+       
+        add(instructions);
+        add(buttonPane);
+        
         addWindowListener(new ToolboxWindowListener(controller));
 
         setFocusableWindowState(false);

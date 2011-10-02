@@ -426,7 +426,7 @@ public class AppController {
             } else {
                 hasName = true;
             }
-            imagePanel.setImage(null);
+            //imagePanel.setImage(null);
 
         }
 
