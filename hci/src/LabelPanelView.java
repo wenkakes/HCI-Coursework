@@ -260,6 +260,8 @@ public class LabelPanelView extends JPanel {
         // Make sure that the selected index is still within the list range.
         list.setSelectedIndex(Math.min(indices[0], listModel.getSize() - 1));
         editButton.setEnabled(list.getSelectedIndices().length == 1);
+        controller.highlightSelected();
+        
     }
 
     /**
@@ -270,10 +272,12 @@ public class LabelPanelView extends JPanel {
             controller.removePolygon((String) listModel.get(i));
         }
         listModel.clear();
-
+        controller.highlightSelected();
+        
         setEditButtonEnabled(false);
         setDeleteButtonEnabled(false);
         hideLabelList();
+
     }
 
     /**
