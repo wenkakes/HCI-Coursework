@@ -260,8 +260,8 @@ public class LabelPanelView extends JPanel {
         // Make sure that the selected index is still within the list range.
         list.setSelectedIndex(Math.min(indices[0], listModel.getSize() - 1));
         editButton.setEnabled(list.getSelectedIndices().length == 1);
-        controller.highlightSelected();
-        
+        controller.highlightSelected(getSelectedNames());
+
     }
 
     /**
@@ -272,8 +272,8 @@ public class LabelPanelView extends JPanel {
             controller.removePolygon((String) listModel.get(i));
         }
         listModel.clear();
-        controller.highlightSelected();
-        
+        controller.highlightSelected(getSelectedNames());
+
         setEditButtonEnabled(false);
         setDeleteButtonEnabled(false);
         hideLabelList();
@@ -343,7 +343,7 @@ public class LabelPanelView extends JPanel {
             // Only allow renaming of single items at once.
             editButton.setEnabled(list.getSelectedIndices().length == 1);
 
-            controller.highlightSelected();
+            controller.highlightSelected(getSelectedNames());
 
             if (e.getButton() == MouseEvent.BUTTON3 && list.getSelectedIndices().length == 1) {
                 rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
@@ -376,5 +376,21 @@ public class LabelPanelView extends JPanel {
             selectedPolygons.add(selectedPolygon);
         }
         return selectedPolygons;
+    }
+
+    public List<String> getSelectedNames() {
+        List<Integer> indices = new ArrayList<Integer>(list.getSelectedIndices().length);
+        for (int index : list.getSelectedIndices()) {
+            indices.add(index);
+        }
+
+        List<String> names = new ArrayList<String>(list.getSelectedIndices().length);
+        for (int i = 0; i < listModel.getSize(); i++) {
+            if (indices.contains(i)) {
+                names.add((String) listModel.get(i));
+            }
+        }
+
+        return names;
     }
 }
