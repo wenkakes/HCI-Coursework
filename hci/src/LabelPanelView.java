@@ -2,7 +2,6 @@ package src;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -26,7 +25,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
-import src.utils.Point;
 import src.utils.Polygon;
 
 /**
@@ -54,9 +52,9 @@ public class LabelPanelView extends JPanel {
 
     public LabelPanelView(JFrame frame, AppController appController) {
         // super(new BorderLayout());
-    	Border labelBorder = BorderFactory.createTitledBorder("Labels");
-    	this.setBorder(labelBorder);
-    	this.setLayout(new BorderLayout());
+        Border labelBorder = BorderFactory.createTitledBorder("Labels");
+        this.setBorder(labelBorder);
+        this.setLayout(new BorderLayout());
 
         // this.setLocation(x, y);
         this.appFrame = frame;
@@ -101,7 +99,7 @@ public class LabelPanelView extends JPanel {
         deleteButton.addActionListener(new DeleteListener());
         deleteButton.setEnabled(false);
 
-        loadButton = new JButton("Load button");
+        loadButton = new JButton("Load Labels");
         loadButton.addActionListener(new LoadListener());
         loadButton.setEnabled(true);
 
@@ -342,7 +340,7 @@ public class LabelPanelView extends JPanel {
             editButton.setEnabled(list.getSelectedIndices().length == 1);
 
             controller.highlightSelected();
-            
+
             if (e.getButton() == MouseEvent.BUTTON3 && list.getSelectedIndices().length == 1) {
                 rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());
             }
@@ -364,11 +362,11 @@ public class LabelPanelView extends JPanel {
         public void mouseEntered(MouseEvent e) {
         }
     }
-    
+
     public List<Polygon> getSelectedPolygons() {
-    	int[] indices = list.getSelectedIndices();
-    	List<Polygon> selectedPolygons = new ArrayList<Polygon>(indices.length);
-    	Polygon selectedPolygon;
+        int[] indices = list.getSelectedIndices();
+        List<Polygon> selectedPolygons = new ArrayList<Polygon>(indices.length);
+        Polygon selectedPolygon;
         for (int i = indices.length - 1; i >= 0; i--) {
             selectedPolygon = controller.getPolygon(((String) listModel.get(indices[i])));
             selectedPolygons.add(selectedPolygon);
