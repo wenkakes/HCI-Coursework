@@ -24,6 +24,9 @@ import src.utils.Polygon;
  * Main controller class for the application.
  */
 public class AppController {
+    // The main folder for the application.
+    private static final String MAIN_FOLDER = System.getProperty("user.home") + "/ImageLabeller";
+
     // The farthest distance, in pixels, that the user can click from a point
     // and still 'select' it.
     private static final double EDITING_THRESHOLD_DISTANCE = 5.0;

@@ -4,9 +4,7 @@ import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -37,6 +35,42 @@ public class MenuBarView extends JMenuBar {
 
         JMenu file = new JMenu("File");
         file.setMnemonic(KeyEvent.VK_F);
+
+        JMenuItem newProject = new JMenuItem("New Project");
+        newProject.setMnemonic(KeyEvent.VK_N);
+        newProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+
+        JMenuItem closeProject = new JMenuItem("Close Project");
+
+        JMenuItem openProject = new JMenuItem("Open Project");
+        openProject.setMnemonic(KeyEvent.VK_O);
+        openProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+
+        JMenuItem importImage = new JMenuItem("Import Image");
+        importImage.setMnemonic(KeyEvent.VK_I);
+        importImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
+
+        JMenuItem openImage = new JMenuItem("Open Image");
+
+        JMenuItem saveImage = new JMenuItem("Save Image");
+        saveImage.setMnemonic(KeyEvent.VK_S);
+        saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+
+        JMenuItem closeImage = new JMenuItem("Close Image");
+
+        JMenuItem exit = new JMenuItem("Exit");
+
+        file.add(newProject);
+        file.add(closeProject);
+        file.add(openProject);
+        file.addSeparator();
+        file.add(importImage);
+        file.add(openImage);
+        file.add(saveImage);
+        file.add(closeImage);
+        file.addSeparator();
+        file.add(exit);
+
         /*
          * JMenu imp = new JMenu("Import"); imp.setMnemonic(KeyEvent.VK_M);
          * 
@@ -48,78 +82,81 @@ public class MenuBarView extends JMenuBar {
          * imp.add(mproj); imp.add(mlabels);
          */
         // JMenuItem fileNew = new JMenuItem("New", iconNew);
-        JMenuItem fileNew = new JMenuItem("Open New Image");
-        fileNew.setMnemonic(KeyEvent.VK_N);
-        fileNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        fileNew.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setDialogTitle("Open an image to label");
-                int returnValue = chooser.showOpenDialog(null);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File file = chooser.getSelectedFile();
-                    controller.openImage(file);
-                }
-            }
-        });
+        // JMenuItem fileNew = new JMenuItem("Open New Image");
+        // fileNew.setMnemonic(KeyEvent.VK_N);
+        // fileNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+        // ActionEvent.CTRL_MASK));
+        // fileNew.addActionListener(new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // JFileChooser chooser = new JFileChooser();
+        // chooser.setDialogTitle("Open an image to label");
+        // int returnValue = chooser.showOpenDialog(null);
+        // if (returnValue == JFileChooser.APPROVE_OPTION) {
+        // File file = chooser.getSelectedFile();
+        // controller.openImage(file);
+        // }
+        // }
+        // });
+        //
+        // // JMenuItem fileSave = new JMenuItem("Save", iconSave);
+        // JMenuItem fileSave = new JMenuItem("Save Current Labels");
+        // fileSave.setMnemonic(KeyEvent.VK_S);
+        // fileSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+        // ActionEvent.CTRL_MASK));
+        // fileSave.addActionListener(new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // JFileChooser chooser = new JFileChooser();
+        // chooser.setDialogTitle("Save as...");
+        // int returnValue = chooser.showSaveDialog(null);
+        // if (returnValue == JFileChooser.APPROVE_OPTION) {
+        // File file = chooser.getSelectedFile();
+        // controller.saveLabels(file);
+        // }
+        // }
+        // });
+        //
+        // JMenuItem fileImport = new JMenuItem("Import Saved Labels");
+        // fileImport.setMnemonic(KeyEvent.VK_M);
+        // fileImport.addActionListener(new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // controller.loadLabels();
+        // }
+        // });
+        //
+        // JMenuItem fileClose = new JMenuItem("Close Current Image");
+        // fileClose.setMnemonic(KeyEvent.VK_C);
+        // fileClose.setToolTipText("Close current image");
+        // fileClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
+        // ActionEvent.CTRL_MASK));
+        // fileClose.addActionListener(new ActionListener() {
+        // public void actionPerformed(ActionEvent event) {
+        // controller.closeImage();
+        // }
+        // });
+        //
+        // // JMenuItem fileExit = new JMenuItem("Exit", iconExit);
+        // JMenuItem fileExit = new JMenuItem("Exit");
+        // fileExit.setMnemonic(KeyEvent.VK_X);
+        // fileExit.setToolTipText("Exit application");
+        //
+        // fileExit.addActionListener(new ActionListener() {
+        // public void actionPerformed(ActionEvent event) {
+        // System.exit(0);
+        // }
+        //
+        // });
 
-        // JMenuItem fileSave = new JMenuItem("Save", iconSave);
-        JMenuItem fileSave = new JMenuItem("Save Current Labels");
-        fileSave.setMnemonic(KeyEvent.VK_S);
-        fileSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-        fileSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setDialogTitle("Save as...");
-                int returnValue = chooser.showSaveDialog(null);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File file = chooser.getSelectedFile();
-                    controller.saveLabels(file);
-                }
-            }
-        });
-
-        JMenuItem fileImport = new JMenuItem("Import Saved Labels");
-        fileImport.setMnemonic(KeyEvent.VK_M);
-        fileImport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.loadLabels();
-            }
-        });
-
-        JMenuItem fileClose = new JMenuItem("Close Current Image");
-        fileClose.setMnemonic(KeyEvent.VK_C);
-        fileClose.setToolTipText("Close current image");
-        fileClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-        fileClose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                controller.closeImage();
-            }
-        });
-
-        // JMenuItem fileExit = new JMenuItem("Exit", iconExit);
-        JMenuItem fileExit = new JMenuItem("Exit");
-        fileExit.setMnemonic(KeyEvent.VK_X);
-        fileExit.setToolTipText("Exit application");
-
-        fileExit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                System.exit(0);
-            }
-
-        });
-
-        file.add(fileNew);
-        // file.add(imp);
-        file.add(fileImport);
-        file.add(fileSave);
-        file.addSeparator();
-        file.add(fileClose);
-        file.addSeparator();
-        file.add(fileExit);
+        // file.add(fileNew);
+        // // file.add(imp);
+        // file.add(fileImport);
+        // file.add(fileSave);
+        // file.addSeparator();
+        // file.add(fileClose);
+        // file.addSeparator();
+        // file.add(fileExit);
 
         JMenu edit = new JMenu("Edit");
         edit.setMnemonic(KeyEvent.VK_E);
