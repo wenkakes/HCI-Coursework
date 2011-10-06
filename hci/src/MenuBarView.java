@@ -37,17 +37,16 @@ public class MenuBarView extends JMenuBar {
 
         JMenu file = new JMenu("File");
         file.setMnemonic(KeyEvent.VK_F);
-/*
-        JMenu imp = new JMenu("Import");
-        imp.setMnemonic(KeyEvent.VK_M);
-
-        JMenuItem mproj = new JMenuItem("Import existing project");
-        JMenuItem mlabels = new JMenuItem("Import existing labels");
-        mproj.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-
-        imp.add(mproj);
-        imp.add(mlabels);
-*/
+        /*
+         * JMenu imp = new JMenu("Import"); imp.setMnemonic(KeyEvent.VK_M);
+         * 
+         * JMenuItem mproj = new JMenuItem("Import existing project"); JMenuItem
+         * mlabels = new JMenuItem("Import existing labels");
+         * mproj.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+         * ActionEvent.CTRL_MASK));
+         * 
+         * imp.add(mproj); imp.add(mlabels);
+         */
         // JMenuItem fileNew = new JMenuItem("New", iconNew);
         JMenuItem fileNew = new JMenuItem("Open New Image");
         fileNew.setMnemonic(KeyEvent.VK_N);
@@ -90,7 +89,7 @@ public class MenuBarView extends JMenuBar {
                 controller.loadLabels();
             }
         });
-        
+
         JMenuItem fileClose = new JMenuItem("Close Current Image");
         fileClose.setMnemonic(KeyEvent.VK_C);
         fileClose.setToolTipText("Close current image");
@@ -106,7 +105,6 @@ public class MenuBarView extends JMenuBar {
         fileExit.setMnemonic(KeyEvent.VK_X);
         fileExit.setToolTipText("Exit application");
 
-
         fileExit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 System.exit(0);
@@ -115,7 +113,7 @@ public class MenuBarView extends JMenuBar {
         });
 
         file.add(fileNew);
-        //file.add(imp);
+        // file.add(imp);
         file.add(fileImport);
         file.add(fileSave);
         file.addSeparator();
@@ -149,36 +147,39 @@ public class MenuBarView extends JMenuBar {
 
         edit.add(deleteSelected);
         edit.add(deleteAll);
-        
+
         JMenu help = new JMenu("Help");
         edit.setMnemonic(KeyEvent.VK_H);
-        
+
         JMenuItem howToUse = new JMenuItem("How to Use");
+        // howToUse.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         howToUse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-            	
-            	HelpDialog helpDialog = new HelpDialog();
-            	
+
+                HelpDialog helpDialog = new HelpDialog();
+
+                // TODO: Create in middle of screen, not at a mouse location
+                // offset -_-.
                 java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
                 mouseLocation.setLocation(mouseLocation.getX(), mouseLocation.getY() + 20);
-                
+
                 helpDialog.setLocation(mouseLocation);
                 helpDialog.setVisible(true);
 
             }
         });
-        
+
         JMenuItem aboutProgram = new JMenuItem("About");
         aboutProgram.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent event) {
-        		JFrame parent = new JFrame();
-        		parent.setTitle("About");
-        		JOptionPane.showMessageDialog(parent, "<html> Image Labeller v1.1 <br />" +
-        				"A 4th year Human-Computer Interaction project </html>");
-        		
-        	}
+            public void actionPerformed(ActionEvent event) {
+                JFrame parent = new JFrame();
+                parent.setTitle("About");
+                JOptionPane.showMessageDialog(parent, "<html> Image Labeller v1.1 <br />"
+                        + "A 4th year Human-Computer Interaction project </html>");
+
+            }
         });
-        
+
         help.add(howToUse);
         help.add(aboutProgram);
 
