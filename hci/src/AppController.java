@@ -108,7 +108,7 @@ public class AppController {
     public void imageMouseDrag(int x, int y) {
         switch (applicationState) {
             case DEFAULT:
-            	// Do nothing
+                // Do nothing
 
                 break;
             case ADDING_POLYGON:
@@ -146,7 +146,7 @@ public class AppController {
                 break;
             case EDITING_POLYGON:
                 // Implement explicit editing logic.
-            	selectClosestPoint(x, y);
+                selectClosestPoint(x, y);
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -432,7 +432,7 @@ public class AppController {
             } else {
                 hasName = true;
             }
-            //imagePanel.setImage(null);
+            // imagePanel.setImage(null);
 
         }
 
@@ -476,29 +476,29 @@ public class AppController {
                 double distanceToTarget = targetPoint.distanceFrom(point);
 
                 if (distanceToTarget < smallestDistance || smallestDistance < 0) {
-                	if (isSelected(polygon.getName())) {
-	                    smallestDistance = distanceToTarget;
-	                    closestPoint = point;
-	                    closestPolygon = polygon;
-                	}
+                    if (isSelected(polygon.getName())) {
+                        smallestDistance = distanceToTarget;
+                        closestPoint = point;
+                        closestPolygon = polygon;
+                    }
                 }
-                
+
             }
         }
 
         if (smallestDistance >= 0 && smallestDistance < EDITING_THRESHOLD_DISTANCE) {
-        	applicationState = ApplicationState.EDITING_POLYGON;
+            applicationState = ApplicationState.EDITING_POLYGON;
             currentPoint = closestPoint;
             currentPolygon = closestPolygon;
         } else {
-        	applicationState = ApplicationState.DEFAULT;
+            applicationState = ApplicationState.DEFAULT;
         }
     }
 
     public Polygon getPolygon(String name) {
-    	return completedPolygons.get(name);
+        return completedPolygons.get(name);
     }
-    
+
     public void closeImage() {
         imagePanel.setImage(null);
         labelPanel.clear();
@@ -508,37 +508,37 @@ public class AppController {
     }
 
     public void highlightSelected() {
-    	imagePanel.repaint();
+        imagePanel.repaint();
     }
-    
-	public List<List<Point>> getSelectedPolygonsPoints() {
-		List<Polygon> selectedPolygons = getSelectedPolygons();
-		List<List<Point>> points = new ArrayList<List<Point>>(selectedPolygons.size());
-		for (Polygon selectedPolygon : selectedPolygons) {
-			points.add(selectedPolygon.getPoints());
-		}
-		return points;
-	}
-	
-	public List<Polygon> getSelectedPolygons() {
-		return labelPanel.getSelectedPolygons();
-	}
-	
-	private boolean isSelected(String name) {
-		List<Polygon> polygons = getSelectedPolygons();
-		for (Polygon selected : polygons) {
-			if (selected.getName() == name) {
-				return true;
-			}
-		}
-		return false;
-	}
 
-	public List<Point> getEditedPolygonPoints() {
-		if (applicationState == ApplicationState.EDITING_POLYGON) {
-			return editedPolygon.getPoints();
-		}
-			
-		return null;
-	}
+    public List<List<Point>> getSelectedPolygonsPoints() {
+        List<Polygon> selectedPolygons = getSelectedPolygons();
+        List<List<Point>> points = new ArrayList<List<Point>>(selectedPolygons.size());
+        for (Polygon selectedPolygon : selectedPolygons) {
+            points.add(selectedPolygon.getPoints());
+        }
+        return points;
+    }
+
+    public List<Polygon> getSelectedPolygons() {
+        return labelPanel.getSelectedPolygons();
+    }
+
+    private boolean isSelected(String name) {
+        List<Polygon> polygons = getSelectedPolygons();
+        for (Polygon selected : polygons) {
+            if (selected.getName() == name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Point> getEditedPolygonPoints() {
+        if (applicationState == ApplicationState.EDITING_POLYGON) {
+            return editedPolygon.getPoints();
+        }
+
+        return null;
+    }
 }

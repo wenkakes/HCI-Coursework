@@ -1,5 +1,8 @@
 package src;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -10,8 +13,15 @@ import javax.swing.UIManager.LookAndFeelInfo;
  */
 public class ImageLabeller {
 
-    public static void main(String argv[]) {
+    public static void main(String argv[]) throws IOException {
         setLookAndFeel();
+
+        // Folder setup.
+        try {
+            setupApplicationFolders();
+        } catch (IOException e) {
+            System.err.println("IOException caught: " + e.getMessage());
+        }
 
         // The user may pass in an initial image name at the command line.
         final String imageName = (argv.length > 0) ? argv[0] : "";
@@ -34,6 +44,35 @@ public class ImageLabeller {
             }
         } catch (Exception e) {
             // Ignore - just use the default theme.
+        }
+    }
+
+    private static void setupApplicationFolders() throws IOException {
+        String userHome = System.getProperty("user.home");
+
+        // The main $HOME/ImageLabeller directory.
+        File imageLabellerDir = new File(userHome + "/ImageLabeller");
+        if (!imageLabellerDir.exists() && !imageLabellerDir.mkdir()) {
+            throw new IOException("Unable to create ImageLabeller directory at "
+                    + imageLabellerDir.getAbsolutePath());
+        }
+
+        // The .settings file.
+        File settingsFile = new File(imageLabellerDir.getAbsolutePath() + "/.settings");
+        if (!settingsFile.exists()) {
+            try {
+                settingsFile.createNewFile();
+            } catch (IOException e) {
+                throw new IOException("Unable to create .settings file at "
+                        + settingsFile.getAbsolutePath());
+            }
+        }
+
+        // The Projects directory.
+        File projectsDir = new File(imageLabellerDir.getAbsolutePath() + "/Projects");
+        if (!projectsDir.exists() && !projectsDir.mkdir()) {
+            throw new IOException("Unable to create Projects directory at "
+                    + projectsDir.getAbsolutePath());
         }
     }
 }
