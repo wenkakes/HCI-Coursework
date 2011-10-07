@@ -6,8 +6,11 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -710,5 +713,144 @@ public class AppController {
         }
 
         return true;
+    }
+
+    public void importImage() {
+        // User chooses image from file dialog.
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Choose an image to import");
+        int returnValue = chooser.showOpenDialog(appFrame);
+        if (returnValue != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File imageFile = chooser.getSelectedFile();
+        String imageName = imageFile.getName();
+
+        // Check for filename conflict. If so, prompt user to overwrite, rename,
+        // or cancel.
+        File imagesDirectory = new File(currentProjectFile.getAbsolutePath() + "/images");
+        if (!imagesDirectory.exists()) {
+            // ERROR
+            System.err.println("Images dir doesnt exist");
+            return;
+        }
+
+        FileFilter fileFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile();
+            }
+        };
+        File images[] = imagesDirectory.listFiles(fileFilter);
+        String imageNames[] = new String[images.length];
+        for (int i = 0; i < imageNames.length; i++) {
+            imageNames[i] = images[i].getName();
+        }
+
+        Object[] options = { "Cancel", "Rename New Image", "Overwrite Old Image" };
+
+        // Cannot just use getNameFromUser, as this is a complex case.
+        boolean hasName = false;
+        while (!hasName) {
+            for (int i = 0; i < images.length; i++) {
+                System.out.println(images[i].getName());
+                if (imageName.equals(images[i].getName())) {
+                    int result = JOptionPane.showOptionDialog(appFrame,
+                            "Cannot import image due to duplicate name.", "Unable to import image",
+                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                            options, options[2]);
+                    if (result == 0) {
+                        // Cancel.
+                        return;
+                    } else if (result == 1) {
+                        // Rename
+                        imageName = getNameFromUser("Image Name", imageNames, false);
+                        if (imageName == null) {
+                            // User cancelled.
+                            return;
+                        }
+
+                        break;
+                    } else {
+                        // Overwrite
+                        // TODO: Delete labels file.
+                        break;
+                    }
+                }
+            }
+
+            hasName = true;
+        }
+
+        // Copy the image over.
+        File destFile = new File(imagesDirectory.getAbsolutePath() + "/" + imageName);
+        try {
+            copyFile(imageFile, destFile);
+        } catch (IOException e) {
+            // FAIL
+            System.err.println("Ioexception");
+            return;
+        }
+
+        // Open image up, no labels.
+        openImage(destFile);
+    }
+
+    private void copyFile(File sourceFile, File destFile) throws IOException {
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            if (!destFile.exists()) {
+                destFile.createNewFile();
+            }
+
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+        }
+
+    }
+
+    private String getNameFromUser(String message, String[] disallowedNames, boolean allowEmpty) {
+        String name = null;
+        boolean hasName = false;
+
+        while (!hasName) {
+            name = JOptionPane.showInputDialog(appFrame, message);
+
+            if (name == null) {
+                // User cancelled.
+                return null;
+            }
+
+            name = name.trim();
+            if (name.isEmpty() && !allowEmpty) {
+                JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            // Check for duplicates.
+            hasName = true;
+            for (int i = 0; i < disallowedNames.length; i++) {
+                if (name.equals(disallowedNames[i])) {
+                    JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    hasName = false;
+                }
+            }
+        }
+
+        return name;
     }
 }

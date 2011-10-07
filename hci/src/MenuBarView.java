@@ -58,6 +58,12 @@ public class MenuBarView extends JMenuBar {
         JMenuItem importImage = new JMenuItem("Import Image");
         importImage.setMnemonic(KeyEvent.VK_I);
         importImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
+        importImage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.importImage();
+            }
+        });
 
         JMenuItem openImage = new JMenuItem("Open Image");
 
