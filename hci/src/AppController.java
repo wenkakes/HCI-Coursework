@@ -617,7 +617,7 @@ public class AppController {
         // Create folders for new project.
         File newProjectDir = new File(projectsDir.getAbsolutePath() + "/" + newProjectName);
         File imageFolder = new File(newProjectDir.getAbsolutePath() + "/images");
-        File labelsFolder = new File(newProjectDir.getAbsolutePath() + "/labes");
+        File labelsFolder = new File(newProjectDir.getAbsolutePath() + "/labels");
         if (!newProjectDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
             // TODO: Error
             System.err.println("Unable to create dir");
@@ -665,6 +665,12 @@ public class AppController {
             }
         };
         File projects[] = projectsDir.listFiles(directoryFilter);
+        if (projects.length == 0) {
+            JOptionPane.showMessageDialog(appFrame, "There are no projects. Please create one.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         String projectNames[] = new String[projects.length];
         for (int i = 0; i < projectNames.length; i++) {
             projectNames[i] = projects[i].getName();
@@ -795,6 +801,8 @@ public class AppController {
 
         // Open image up, no labels.
         openImage(destFile);
+
+        // TODO: Update settings file.
     }
 
     private void copyFile(File sourceFile, File destFile) throws IOException {
@@ -852,5 +860,43 @@ public class AppController {
         }
 
         return name;
+    }
+
+    public void openImage() {
+        // User chooses image
+        File imagesDirectory = new File(currentProjectFile.getAbsoluteFile() + "/images");
+
+        FileFilter fileFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile();
+            }
+        };
+
+        File images[] = imagesDirectory.listFiles(fileFilter);
+        if (images.length == 0) {
+            JOptionPane.showMessageDialog(appFrame, "Project has no images. Please import some.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String imageNames[] = new String[images.length];
+        for (int i = 0; i < imageNames.length; i++) {
+            imageNames[i] = images[i].getName();
+        }
+
+        String newImageName = (String) JOptionPane.showInputDialog(appFrame,
+                "Choose an image to open", "Open Image", JOptionPane.QUESTION_MESSAGE, null,
+                imageNames, imageNames[0]);
+
+        if (newImageName == null) {
+            // User hit cancel.
+            return;
+        }
+
+        // Open image up
+        openImage(new File(imagesDirectory.getAbsoluteFile() + "/" + newImageName));
+
+        // TODO: Edit settings file.
     }
 }
