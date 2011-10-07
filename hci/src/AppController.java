@@ -3,7 +3,10 @@ package src;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +48,9 @@ public class AppController {
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
+
+    // The current project.
+    private File currentProjectFile = null;
 
     public AppController(String imageName) {
         appFrame.setLayout(new FlowLayout());
@@ -551,5 +557,91 @@ public class AppController {
         }
 
         return null;
+    }
+
+    public void newProject() {
+        // Prompt for project name.
+        String newProjectName = null;
+        boolean hasName = false;
+
+        File projectsDir = new File(MAIN_FOLDER + "/Projects");
+        if (!projectsDir.exists()) {
+            // TODO: Error somehow.
+            System.err.println("projects dir doesnt exist...");
+            return;
+        }
+
+        FileFilter directoryFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        };
+        File directories[] = projectsDir.listFiles(directoryFilter);
+
+        while (!hasName) {
+            String message = "Project Name";
+            newProjectName = JOptionPane.showInputDialog(appFrame, message);
+
+            hasName = true;
+
+            // Occurs if the user hits the cancel option.
+            if (newProjectName == null) {
+                return;
+            }
+
+            newProjectName = newProjectName.trim();
+
+            if (newProjectName.isEmpty()) {
+                JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                hasName = false;
+                continue;
+            }
+
+            // Check for duplicates.
+            for (int i = 0; i < directories.length; i++) {
+                if (newProjectName.equals(directories[i].getName())) {
+                    // TODO: Give the option to overwrite.
+                    JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    hasName = false;
+                    break;
+                }
+            }
+        }
+
+        // Create folders for new project.
+        File newProjectDir = new File(projectsDir.getAbsolutePath() + "/" + newProjectName);
+        File imageFolder = new File(newProjectDir.getAbsolutePath() + "/images");
+        File labelsFolder = new File(newProjectDir.getAbsolutePath() + "/labes");
+        if (!newProjectDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
+            // TODO: Error
+            System.err.println("Unable to create dir");
+            return;
+        }
+
+        // Set the current project folder.
+        currentProjectFile = newProjectDir;
+
+        // Clear everything interface wise, etc.
+        closeImage();
+
+        // Update the .settings file.
+        File settingsFile = new File(MAIN_FOLDER + "/.settings");
+        if (!settingsFile.canWrite()) {
+            System.err.println("Can't write settings file...");
+            return;
+        }
+
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
+            out.write("project:" + currentProjectFile.getName());
+            out.close();
+        } catch (IOException e) {
+            // TODO: Error
+            e.printStackTrace();
+            return;
+        }
     }
 }
