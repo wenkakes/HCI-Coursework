@@ -231,7 +231,10 @@ public class AppController {
      * @param name the name of the polygon to remove
      */
     public void removePolygon(String name) {
-        completedPolygons.remove(name);
+        Polygon removedPolygon = completedPolygons.remove(name);
+        if (removedPolygon == editedPolygon) {
+            applicationState = ApplicationState.DEFAULT;
+        }
         imagePanel.repaint();
     }
 
@@ -510,7 +513,12 @@ public class AppController {
         labelPanel.setLoadButtonEnabled(false);
     }
 
-    public void highlightSelected() {
+    public void highlightSelected(List<String> highlightedNames) {
+        if (applicationState == ApplicationState.EDITING_POLYGON
+                && !highlightedNames.contains(editedPolygon.getName())) {
+            applicationState = ApplicationState.DEFAULT;
+        }
+
         imagePanel.repaint();
     }
 
