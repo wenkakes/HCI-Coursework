@@ -637,6 +637,7 @@ public class AppController {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
             out.write("project:" + currentProjectFile.getName());
+            out.newLine();
             out.close();
         } catch (IOException e) {
             // TODO: Error
