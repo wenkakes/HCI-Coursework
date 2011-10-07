@@ -628,22 +628,7 @@ public class AppController {
         closeImage();
 
         // Update the .settings file.
-        File settingsFile = new File(MAIN_FOLDER + "/.settings");
-        if (!settingsFile.canWrite()) {
-            System.err.println("Can't write settings file...");
-            return;
-        }
-
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
-            out.write("project:" + currentProjectFile.getName());
-            out.newLine();
-            out.close();
-        } catch (IOException e) {
-            // TODO: Error
-            e.printStackTrace();
-            return;
-        }
+        writeToSettingsFile(currentProjectFile.getName());
     }
 
     public void closeProject() {
@@ -658,20 +643,72 @@ public class AppController {
         closeImage();
 
         // Update the .settings file.
+        writeToSettingsFile("");
+    }
+
+    public void openProject() {
+        // Ask user to choose project.
+        File projectsDir = new File(MAIN_FOLDER + "/Projects");
+        if (!projectsDir.exists()) {
+            // TODO: Error somehow.
+            System.err.println("projects dir doesnt exist...");
+            return;
+        }
+
+        FileFilter directoryFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        };
+        File projects[] = projectsDir.listFiles(directoryFilter);
+        String projectNames[] = new String[projects.length];
+        for (int i = 0; i < projectNames.length; i++) {
+            projectNames[i] = projects[i].getName();
+        }
+
+        String newProjectName = (String) JOptionPane.showInputDialog(appFrame,
+                "Choose a project to open", "Open Project", JOptionPane.QUESTION_MESSAGE, null,
+                projectNames, projectNames[0]);
+
+        if (newProjectName == null) {
+            // User hit cancel.
+            return;
+        }
+
+        // Close current project.
+        closeImage();
+
+        // Open other project.
+        // TODO: Open images, etc.
+        currentProjectFile = new File(projectsDir.getAbsolutePath() + "/" + newProjectName);
+
+        // Update settings file.
+        writeToSettingsFile(currentProjectFile.getName());
+    }
+
+    private boolean writeToSettingsFile(String projectName) {
         File settingsFile = new File(MAIN_FOLDER + "/.settings");
         if (!settingsFile.canWrite()) {
             System.err.println("Can't write settings file...");
-            return;
+            return false;
         }
 
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
-            out.write(new String());
+
+            out.write(projectName);
+            if (!projectName.isEmpty()) {
+                out.newLine();
+            }
+
             out.close();
         } catch (IOException e) {
             // TODO: Error
             e.printStackTrace();
-            return;
+            return false;
         }
+
+        return true;
     }
 }

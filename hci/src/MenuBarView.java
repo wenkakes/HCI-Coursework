@@ -48,6 +48,12 @@ public class MenuBarView extends JMenuBar {
         JMenuItem openProject = new JMenuItem("Open Project");
         openProject.setMnemonic(KeyEvent.VK_O);
         openProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        openProject.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.openProject();
+            }
+        });
 
         JMenuItem importImage = new JMenuItem("Import Image");
         importImage.setMnemonic(KeyEvent.VK_I);
