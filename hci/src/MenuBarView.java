@@ -38,6 +38,12 @@ public class MenuBarView extends JMenuBar {
         });
 
         JMenuItem closeProject = new JMenuItem("Close Project");
+        closeProject.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                controller.closeProject();
+            }
+        });
 
         JMenuItem openProject = new JMenuItem("Open Project");
         openProject.setMnemonic(KeyEvent.VK_O);

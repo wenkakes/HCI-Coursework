@@ -645,4 +645,33 @@ public class AppController {
             return;
         }
     }
+
+    public void closeProject() {
+        // TODO: Shouldnt be able to close if no project open.
+        if (currentProjectFile == null) {
+            return;
+        }
+
+        // TODO: Confirm?
+
+        currentProjectFile = null;
+        closeImage();
+
+        // Update the .settings file.
+        File settingsFile = new File(MAIN_FOLDER + "/.settings");
+        if (!settingsFile.canWrite()) {
+            System.err.println("Can't write settings file...");
+            return;
+        }
+
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
+            out.write(new String());
+            out.close();
+        } catch (IOException e) {
+            // TODO: Error
+            e.printStackTrace();
+            return;
+        }
+    }
 }
