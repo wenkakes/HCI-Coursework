@@ -68,12 +68,12 @@ public class LabelPanelView extends JPanel {
         rightClickMenu = createRightClickMenu();
 
         // Set up the buttons.
-        addButton = createButton(new ImageIcon("hci/icons/small/add.png"), new AddListener(), true);
+        addButton = createButton(new ImageIcon("hci/icons/small/add.png"), new AddListener(), false);
         editButton = createButton(new ImageIcon("hci/icons/small/edit.png"), new EditListener(),
-                true);
+                false);
         deleteButton = createButton(new ImageIcon("hci/icons/small/delete.png"),
-                new DeleteListener(), true);
-        loadButton = createButton("Load Labels", new LoadListener(), true);
+                new DeleteListener(), false);
+        loadButton = createButton("Load Labels", new LoadListener(), false);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));

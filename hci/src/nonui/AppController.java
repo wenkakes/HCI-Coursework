@@ -3,11 +3,13 @@ package src.nonui;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -60,7 +62,7 @@ public class AppController {
     private String currentProjectName;
     private String currentImageName;
 
-    public AppController(String imageName) {
+    public AppController() {
         appFrame.setLayout(new FlowLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -68,18 +70,11 @@ public class AppController {
         appFrame.add(labelPanel);
         appFrame.setJMenuBar(menuBar);
 
-        // Load the default image and set it.
-        try {
-            BufferedImage image = ImageIO.read(new File(imageName));
-            imagePanel.setImage(image);
-        } catch (IOException e) {
-            labelPanel.setAddButtonEnabled(false);
-            labelPanel.setLoadButtonEnabled(false);
-        }
-
         appFrame.pack();
         appFrame.setVisible(true);
         appFrame.setResizable(false);
+
+        loadSettingsFile();
     }
 
     /**
@@ -646,7 +641,7 @@ public class AppController {
         closeImage();
 
         // Update the .settings file.
-        writeToSettingsFile(currentProjectName);
+        writeToSettingsFile(currentProjectName, "");
     }
 
     public void closeProject() {
@@ -661,7 +656,7 @@ public class AppController {
         closeImage();
 
         // Update the .settings file.
-        writeToSettingsFile("");
+        writeToSettingsFile("", "");
     }
 
     public void openProject() {
@@ -708,10 +703,10 @@ public class AppController {
         currentProjectName = newProjectName;
 
         // Update settings file.
-        writeToSettingsFile(currentProjectName);
+        writeToSettingsFile(currentProjectName, "");
     }
 
-    private boolean writeToSettingsFile(String projectName) {
+    private boolean writeToSettingsFile(String projectName, String imageName) {
         File settingsFile = new File(MAIN_FOLDER + "/.settings");
         if (!settingsFile.canWrite()) {
             System.err.println("Can't write settings file...");
@@ -724,8 +719,12 @@ public class AppController {
             out.write(projectName);
             if (!projectName.isEmpty()) {
                 out.newLine();
-            }
 
+                out.write(imageName);
+                if (!imageName.isEmpty()) {
+                    out.newLine();
+                }
+            }
             out.close();
         } catch (IOException e) {
             // TODO: Error
@@ -818,7 +817,7 @@ public class AppController {
         openImage(destFile);
         currentImageName = imageName;
 
-        // TODO: Update settings file.
+        writeToSettingsFile(currentProjectName, currentImageName);
     }
 
     private void copyFile(File sourceFile, File destFile) throws IOException {
@@ -914,7 +913,7 @@ public class AppController {
         openImage(new File(imagesDirectory.getAbsoluteFile() + "/" + newImageName));
         currentImageName = newImageName;
 
-        // TODO: Edit settings file.
+        writeToSettingsFile(currentProjectName, currentImageName);
     }
 
     public void save() {
@@ -942,5 +941,43 @@ public class AppController {
             return fileName;
         }
         return fileName.substring(0, extensionIndex);
+    }
+
+    /**
+     * Loads the data from the settings file.
+     */
+    private void loadSettingsFile() {
+        File settingsFile = new File(MAIN_FOLDER + "/.settings");
+        if (!settingsFile.exists() || !settingsFile.canRead()) {
+            // Just ignore it.
+            return;
+        }
+
+        String projectName = null;
+        String imageName = null;
+        BufferedReader in;
+
+        try {
+            in = new BufferedReader(new FileReader(settingsFile));
+            projectName = in.readLine();
+        } catch (IOException e) {
+            return;
+        }
+
+        try {
+            imageName = in.readLine();
+        } catch (IOException e) {
+            // Image names aren't needed.
+        }
+
+        // TODO: Check project exists.
+
+        currentProjectName = projectName;
+        currentImageName = imageName;
+        if (imageName != null) {
+            File imageFile = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images/"
+                    + currentImageName);
+            openImage(imageFile);
+        }
     }
 }

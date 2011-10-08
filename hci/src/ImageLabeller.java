@@ -11,31 +11,39 @@ import src.nonui.AppController;
 
 /**
  * Launcher for the application. Sets the {@link UIManager.LookAndFeelInfo} of
- * the application and instantiates the controller.
+ * the application and instantiates the main controller.
  */
 public class ImageLabeller {
 
-    public static void main(String argv[]) throws IOException {
+    /**
+     * The entry point for the application.
+     * 
+     * @param argv the arguments to the program, which are ignored
+     */
+    public static void main(String argv[]) {
         setLookAndFeel();
 
         // Folder setup.
         try {
             setupApplicationFolders();
         } catch (IOException e) {
+            // TODO: Bail.
             System.err.println("IOException caught: " + e.getMessage());
         }
-
-        // The user may pass in an initial image name at the command line.
-        final String imageName = (argv.length > 0) ? argv[0] : "";
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new AppController(imageName);
+                new AppController();
             }
         });
     }
 
+    /**
+     * Attempts to set the program look and feel to "Nimbus".
+     * 
+     * @see <a href="http://download.oracle.com/javase/6/docs/technotes/guides/jweb/otherFeatures/nimbus_laf.html">Nimbus</a>
+     */
     private static void setLookAndFeel() {
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -49,6 +57,11 @@ public class ImageLabeller {
         }
     }
 
+    /**
+     * Attempts to set up the folders for the application.
+     * 
+     * @throws IOException if unable to create folder, etc
+     */
     private static void setupApplicationFolders() throws IOException {
         String userHome = System.getProperty("user.home");
 
@@ -65,7 +78,7 @@ public class ImageLabeller {
             try {
                 settingsFile.createNewFile();
             } catch (IOException e) {
-                throw new IOException("Unable to create .settings file at "
+                throw new IOException("Unable to create settings file at "
                         + settingsFile.getAbsolutePath());
             }
         }
