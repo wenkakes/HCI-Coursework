@@ -172,9 +172,13 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
             if (width > 800 || height > 600) {
                 width = (width > 800) ? 800 : ((width * 600) / height);
                 height = (height > 600) ? 600 : ((height * 800) / width);
+
+                scaled = true;
             } else if (width < 800 || height < 600) {
                 width = (width < 800) ? 800 : ((width * height) / 600);
                 height = (height < 600) ? 600 : ((height * width) / 800);
+
+                scaled = true;
             }
 
             if (scaled) {

@@ -598,7 +598,7 @@ public class AppController {
         boolean hasName = false;
 
         File projectsDir = new File(MAIN_FOLDER + "/Projects");
-        if (!projectsDir.exists() || !projectsDir.mkdir()) {
+        if (!projectsDir.exists() && !projectsDir.mkdir()) {
             // TODO: Error somehow. This is bad enough that we could crash out.
             System.err.println("Cannot open Projects directory.");
             return;
@@ -685,7 +685,7 @@ public class AppController {
     public void openProject() {
         // Ask user to choose project.
         File projectsDir = new File(MAIN_FOLDER + "/Projects");
-        if (!projectsDir.exists() || !projectsDir.mkdir()) {
+        if (!projectsDir.exists() && !projectsDir.mkdir()) {
             // TODO: Error somehow.
             System.err.println("Cannot open Projects directory.");
             return;
@@ -779,7 +779,7 @@ public class AppController {
         // Check for filename conflict. If so, prompt user to overwrite, rename,
         // or cancel.
         File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
-        if (!imagesDirectory.exists() || !imagesDirectory.mkdir()) {
+        if (!imagesDirectory.exists() && !imagesDirectory.mkdir()) {
             // TODO: Error
             System.err.println("Cannot open images directory for project.");
             return;
