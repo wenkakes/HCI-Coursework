@@ -53,7 +53,8 @@ public class AppController {
     private ApplicationState applicationState = ApplicationState.DEFAULT;
 
     // The current project.
-    private File currentProjectFile = null;
+    private String currentProjectName;
+    private String currentImageName;
 
     public AppController(String imageName) {
         appFrame.setLayout(new FlowLayout());
@@ -624,25 +625,25 @@ public class AppController {
             return;
         }
 
-        // Set the current project folder.
-        currentProjectFile = newProjectDir;
+        // Set the current project.
+        currentProjectName = newProjectName;
 
         // Clear everything interface wise, etc.
         closeImage();
 
         // Update the .settings file.
-        writeToSettingsFile(currentProjectFile.getName());
+        writeToSettingsFile(currentProjectName);
     }
 
     public void closeProject() {
         // TODO: Shouldnt be able to close if no project open.
-        if (currentProjectFile == null) {
+        if (currentProjectName == null) {
             return;
         }
 
         // TODO: Confirm?
 
-        currentProjectFile = null;
+        currentProjectName = null;
         closeImage();
 
         // Update the .settings file.
@@ -690,10 +691,10 @@ public class AppController {
 
         // Open other project.
         // TODO: Open images, etc.
-        currentProjectFile = new File(projectsDir.getAbsolutePath() + "/" + newProjectName);
+        currentProjectName = newProjectName;
 
         // Update settings file.
-        writeToSettingsFile(currentProjectFile.getName());
+        writeToSettingsFile(currentProjectName);
     }
 
     private boolean writeToSettingsFile(String projectName) {
@@ -735,7 +736,7 @@ public class AppController {
 
         // Check for filename conflict. If so, prompt user to overwrite, rename,
         // or cancel.
-        File imagesDirectory = new File(currentProjectFile.getAbsolutePath() + "/images");
+        File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
         if (!imagesDirectory.exists()) {
             // ERROR
             System.err.println("Images dir doesnt exist");
@@ -864,7 +865,7 @@ public class AppController {
 
     public void openImage() {
         // User chooses image
-        File imagesDirectory = new File(currentProjectFile.getAbsoluteFile() + "/images");
+        File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
 
         FileFilter fileFilter = new FileFilter() {
             @Override
