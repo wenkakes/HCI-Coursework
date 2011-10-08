@@ -1,6 +1,5 @@
-package src;
+package src.ui;
 
-import java.awt.MouseInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -12,27 +11,57 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-public class MenuBarView extends JMenuBar {
+import src.nonui.AppController;
 
+/**
+ * View for the menu bar.
+ */
+public class MenuBarView extends JMenuBar {
+    // JMenuBar is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
-    private final AppController controller;
+    private JFrame parentFrame;
+    private final AppController controller;;
 
-    public MenuBarView(AppController appController) {
+    public MenuBarView(JFrame parentFrame, AppController appController) {
+        this.parentFrame = parentFrame;
         this.controller = appController;
         initUI();
     }
 
-    public final void initUI() {
-        JMenu file = new JMenu("File");
-        file.setMnemonic(KeyEvent.VK_F);
+    /**
+     * Sets up the menu items.
+     */
+    private void initUI() {
+        add(createFileMenu());
+        add(createEditMenu());
+        add(createHelpMenu());
+    }
+
+    /**
+     * Creates a file menu with the following options:
+     * 
+     * <ul>
+     * <li>New Project</li>
+     * <li>Close Project</li>
+     * <li>Open Project</li>
+     * <li>Import Image</li>
+     * <li>Open Image</li>
+     * <li>Save Image</li>
+     * <li>Close Image</li>
+     * <li>Exit</li>
+     * </ul>
+     */
+    private JMenu createFileMenu() {
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
 
         JMenuItem newProject = new JMenuItem("New Project");
         newProject.setMnemonic(KeyEvent.VK_N);
         newProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         newProject.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 controller.newProject();
             }
         });
@@ -40,7 +69,7 @@ public class MenuBarView extends JMenuBar {
         JMenuItem closeProject = new JMenuItem("Close Project");
         closeProject.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 controller.closeProject();
             }
         });
@@ -73,12 +102,13 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
+        // TODO: Rename this? (it saves labels, not images).
         JMenuItem saveImage = new JMenuItem("Save Image");
         saveImage.setMnemonic(KeyEvent.VK_S);
         saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         saveImage.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 controller.save();
             }
         });
@@ -86,7 +116,7 @@ public class MenuBarView extends JMenuBar {
         JMenuItem closeImage = new JMenuItem("Close Image");
         closeImage.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 controller.closeImage();
             }
         });
@@ -94,24 +124,38 @@ public class MenuBarView extends JMenuBar {
         JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
 
-        file.add(newProject);
-        file.add(closeProject);
-        file.add(openProject);
-        file.addSeparator();
-        file.add(importImage);
-        file.add(openImage);
-        file.add(saveImage);
-        file.add(closeImage);
-        file.addSeparator();
-        file.add(exit);
+        fileMenu.add(newProject);
+        fileMenu.add(closeProject);
+        fileMenu.add(openProject);
+        fileMenu.addSeparator();
 
-        JMenu edit = new JMenu("Edit");
-        edit.setMnemonic(KeyEvent.VK_E);
+        fileMenu.add(importImage);
+        fileMenu.add(openImage);
+        fileMenu.add(saveImage);
+        fileMenu.add(closeImage);
+        fileMenu.addSeparator();
+
+        fileMenu.add(exit);
+
+        return fileMenu;
+    }
+
+    /**
+     * Creates an edit menu with the following options:
+     * 
+     * <ul>
+     * <li>Delete Selected Label(s)</li>
+     * <li>Delete All Labels</li>
+     * </ul>
+     */
+    private JMenu createEditMenu() {
+        JMenu editMenu = new JMenu("Edit");
+        editMenu.setMnemonic(KeyEvent.VK_E);
 
         JMenuItem deleteSelected = new JMenuItem("Delete Selected Label(s)");
         deleteSelected.setMnemonic(KeyEvent.VK_D);
@@ -134,37 +178,39 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        edit.add(deleteSelected);
-        edit.add(deleteAll);
+        editMenu.add(deleteSelected);
+        editMenu.add(deleteAll);
 
+        return editMenu;
+    }
+
+    /**
+     * Creates a help menu with the following options:
+     * 
+     * <ul>
+     * <li>How to Use</li>
+     * <li>About</li>
+     * </ul>
+     */
+    private JMenu createHelpMenu() {
         JMenu help = new JMenu("Help");
-        edit.setMnemonic(KeyEvent.VK_H);
+        help.setMnemonic(KeyEvent.VK_H);
 
         JMenuItem howToUse = new JMenuItem("How to Use");
-        // howToUse.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        howToUse.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         howToUse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-
-                HelpDialog helpDialog = new HelpDialog();
-
-                // TODO: Create in middle of screen, not at a mouse location
-                // offset -_-.
-                java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-                mouseLocation.setLocation(mouseLocation.getX(), mouseLocation.getY() + 20);
-
-                helpDialog.setLocation(mouseLocation);
+                HelpPanelView helpDialog = new HelpPanelView(parentFrame);
                 helpDialog.setVisible(true);
-
             }
         });
 
         JMenuItem aboutProgram = new JMenuItem("About");
         aboutProgram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                JFrame parent = new JFrame();
-                parent.setTitle("About");
-                JOptionPane.showMessageDialog(parent, "<html> Image Labeller v1.1 <br />"
-                        + "A 4th year Human-Computer Interaction project </html>");
+                JOptionPane.showMessageDialog(parentFrame, "<html> Image Labeller v1.1 <br />"
+                        + "A 4th year Human-Computer Interaction project </html>", "About",
+                        JOptionPane.INFORMATION_MESSAGE);
 
             }
         });
@@ -172,8 +218,6 @@ public class MenuBarView extends JMenuBar {
         help.add(howToUse);
         help.add(aboutProgram);
 
-        this.add(file);
-        this.add(edit);
-        this.add(help);
+        return help;
     }
 }

@@ -7,6 +7,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import src.nonui.AppController;
+
 /**
  * Launcher for the application. Sets the {@link UIManager.LookAndFeelInfo} of
  * the application and instantiates the controller.

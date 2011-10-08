@@ -1,4 +1,4 @@
-package src;
+package src.nonui;
 
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
@@ -21,6 +21,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import src.ui.ImagePanelView;
+import src.ui.LabelPanelView;
+import src.ui.MenuBarView;
+import src.ui.ToolboxPanelView;
 import src.utils.LabelIO;
 import src.utils.LabelIO.LabelParseException;
 import src.utils.Point;
@@ -39,7 +43,7 @@ public class AppController {
 
     // The core Swing components that make up the application.
     private final JFrame appFrame = new JFrame("Image Labeller");
-    private final MenuBarView menuBar = new MenuBarView(this);
+    private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final ImagePanelView imagePanel = new ImagePanelView(this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
@@ -545,7 +549,14 @@ public class AppController {
     }
 
     public List<Polygon> getSelectedPolygons() {
-        return labelPanel.getSelectedPolygons();
+        List<String> selectedNames = labelPanel.getSelectedNames();
+        List<Polygon> selectedPolygons = new ArrayList<Polygon>(selectedNames.size());
+
+        for (String name : selectedNames) {
+            selectedPolygons.add(completedPolygons.get(name));
+        }
+
+        return selectedPolygons;
     }
 
     private boolean isSelected(String name) {
