@@ -21,7 +21,14 @@ public class MenuBarView extends JMenuBar {
     private static final long serialVersionUID = 1L;
 
     private JFrame parentFrame;
-    private final AppController controller;;
+    private final AppController controller;
+
+    // Menu items that can be enabled/disabled.
+    private JMenuItem closeProject;
+    private JMenuItem importImage;
+    private JMenuItem openImage;
+    private JMenuItem saveImage;
+    private JMenuItem closeImage;
 
     public MenuBarView(JFrame parentFrame, AppController appController) {
         this.parentFrame = parentFrame;
@@ -66,7 +73,7 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        JMenuItem closeProject = new JMenuItem("Close Project");
+        closeProject = new JMenuItem("Close Project");
         closeProject.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -84,7 +91,7 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        JMenuItem importImage = new JMenuItem("Import Image");
+        importImage = new JMenuItem("Import Image");
         importImage.setMnemonic(KeyEvent.VK_I);
         importImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
         importImage.addActionListener(new ActionListener() {
@@ -94,7 +101,7 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        JMenuItem openImage = new JMenuItem("Open Image");
+        openImage = new JMenuItem("Open Image");
         openImage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -103,7 +110,7 @@ public class MenuBarView extends JMenuBar {
         });
 
         // TODO: Rename this? (it saves labels, not images).
-        JMenuItem saveImage = new JMenuItem("Save Image");
+        saveImage = new JMenuItem("Save Image");
         saveImage.setMnemonic(KeyEvent.VK_S);
         saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         saveImage.addActionListener(new ActionListener() {
@@ -113,7 +120,7 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        JMenuItem closeImage = new JMenuItem("Close Image");
+        closeImage = new JMenuItem("Close Image");
         closeImage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -219,5 +226,25 @@ public class MenuBarView extends JMenuBar {
         help.add(aboutProgram);
 
         return help;
+    }
+
+    public void setCloseProjectEnabled(boolean enabled) {
+        closeProject.setEnabled(enabled);
+    }
+
+    public void setImportImageEnabled(boolean enabled) {
+        importImage.setEnabled(enabled);
+    }
+
+    public void setOpenImageEnabled(boolean enabled) {
+        openImage.setEnabled(enabled);
+    }
+
+    public void setSaveImageEnabled(boolean enabled) {
+        saveImage.setEnabled(enabled);
+    }
+
+    public void setCloseImageEnabled(boolean enabled) {
+        closeImage.setEnabled(enabled);
     }
 }

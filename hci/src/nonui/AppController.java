@@ -75,6 +75,25 @@ public class AppController {
         appFrame.setResizable(false);
 
         loadSettingsFile();
+        setMenuItemsEnabled();
+    }
+
+    /**
+     * Sets whether or not different menu items should be enabled.
+     */
+    private void setMenuItemsEnabled() {
+        boolean projectOpened = currentProjectName != null;
+        boolean imageOpened = currentImageName != null;
+
+        // File menu.
+        menuBar.setCloseProjectEnabled(projectOpened);
+        menuBar.setImportImageEnabled(projectOpened);
+        // TODO: Only allow opening if project has images.
+        menuBar.setOpenImageEnabled(projectOpened);
+        menuBar.setSaveImageEnabled(imageOpened);
+        menuBar.setCloseImageEnabled(imageOpened);
+
+        // TODO: Add edit menu items.
     }
 
     /**
@@ -515,7 +534,6 @@ public class AppController {
     }
 
     public void closeImage() {
-        // TODO: Disable some menu items.
         currentImageName = null;
 
         imagePanel.setImage(null);
@@ -523,6 +541,8 @@ public class AppController {
 
         labelPanel.setAddButtonEnabled(false);
         labelPanel.setLoadButtonEnabled(false);
+
+        setMenuItemsEnabled();
     }
 
     public void highlightSelected(List<String> highlightedNames) {
@@ -578,9 +598,9 @@ public class AppController {
         boolean hasName = false;
 
         File projectsDir = new File(MAIN_FOLDER + "/Projects");
-        if (!projectsDir.exists()) {
-            // TODO: Error somehow.
-            System.err.println("projects dir doesnt exist...");
+        if (!projectsDir.exists() || !projectsDir.mkdir()) {
+            // TODO: Error somehow. This is bad enough that we could crash out.
+            System.err.println("Cannot open Projects directory.");
             return;
         }
 
@@ -630,7 +650,7 @@ public class AppController {
         File labelsFolder = new File(newProjectDir.getAbsolutePath() + "/labels");
         if (!newProjectDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
             // TODO: Error
-            System.err.println("Unable to create dir");
+            System.err.println("Unable to create director for new project.");
             return;
         }
 
@@ -642,10 +662,11 @@ public class AppController {
 
         // Update the .settings file.
         writeToSettingsFile(currentProjectName, "");
+
+        setMenuItemsEnabled();
     }
 
     public void closeProject() {
-        // TODO: Shouldnt be able to close if no project open.
         if (currentProjectName == null) {
             return;
         }
@@ -657,14 +678,16 @@ public class AppController {
 
         // Update the .settings file.
         writeToSettingsFile("", "");
+
+        setMenuItemsEnabled();
     }
 
     public void openProject() {
         // Ask user to choose project.
         File projectsDir = new File(MAIN_FOLDER + "/Projects");
-        if (!projectsDir.exists()) {
+        if (!projectsDir.exists() || !projectsDir.mkdir()) {
             // TODO: Error somehow.
-            System.err.println("projects dir doesnt exist...");
+            System.err.println("Cannot open Projects directory.");
             return;
         }
 
@@ -704,12 +727,14 @@ public class AppController {
 
         // Update settings file.
         writeToSettingsFile(currentProjectName, "");
+
+        setMenuItemsEnabled();
     }
 
     private boolean writeToSettingsFile(String projectName, String imageName) {
         File settingsFile = new File(MAIN_FOLDER + "/.settings");
         if (!settingsFile.canWrite()) {
-            System.err.println("Can't write settings file...");
+            System.err.println("Cannot write to Settings file.");
             return false;
         }
 
@@ -754,9 +779,9 @@ public class AppController {
         // Check for filename conflict. If so, prompt user to overwrite, rename,
         // or cancel.
         File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
-        if (!imagesDirectory.exists()) {
-            // ERROR
-            System.err.println("Images dir doesnt exist");
+        if (!imagesDirectory.exists() || !imagesDirectory.mkdir()) {
+            // TODO: Error
+            System.err.println("Cannot open images directory for project.");
             return;
         }
 
@@ -778,7 +803,6 @@ public class AppController {
         boolean hasName = false;
         while (!hasName) {
             for (int i = 0; i < images.length; i++) {
-                System.out.println(images[i].getName());
                 if (imageName.equals(images[i].getName())) {
                     int result = JOptionPane.showOptionDialog(appFrame,
                             "Cannot import image due to duplicate name.", "Unable to import image",
@@ -812,8 +836,8 @@ public class AppController {
         try {
             copyFile(imageFile, destFile);
         } catch (IOException e) {
-            // FAIL
-            System.err.println("Ioexception");
+            // TODO: Error
+            System.err.println("IOException when importing image.");
             return;
         }
 
@@ -822,6 +846,8 @@ public class AppController {
         currentImageName = imageName;
 
         writeToSettingsFile(currentProjectName, currentImageName);
+
+        setMenuItemsEnabled();
     }
 
     private void copyFile(File sourceFile, File destFile) throws IOException {
@@ -922,6 +948,8 @@ public class AppController {
         currentImageName = newImageName;
 
         writeToSettingsFile(currentProjectName, currentImageName);
+
+        setMenuItemsEnabled();
     }
 
     public void save() {
