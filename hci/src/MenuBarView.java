@@ -76,6 +76,12 @@ public class MenuBarView extends JMenuBar {
         JMenuItem saveImage = new JMenuItem("Save Image");
         saveImage.setMnemonic(KeyEvent.VK_S);
         saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        saveImage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                controller.save();
+            }
+        });
 
         JMenuItem closeImage = new JMenuItem("Close Image");
 

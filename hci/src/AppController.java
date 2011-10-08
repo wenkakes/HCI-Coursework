@@ -802,6 +802,7 @@ public class AppController {
 
         // Open image up, no labels.
         openImage(destFile);
+        currentImageName = imageName;
 
         // TODO: Update settings file.
     }
@@ -897,7 +898,35 @@ public class AppController {
 
         // Open image up
         openImage(new File(imagesDirectory.getAbsoluteFile() + "/" + newImageName));
+        currentImageName = newImageName;
 
         // TODO: Edit settings file.
+    }
+
+    public void save() {
+        if (currentImageName == null) {
+            // TODO: Shouldnt be able to save if no image.
+            return;
+        }
+
+        // Get current image name, turn into labels name.
+        String labelName = removeExtension(currentImageName) + ".labels";
+
+        // Save labels file
+        File labelFile = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/labels/"
+                + labelName);
+        if (labelFile.exists()) {
+            // TODO: Check with user?
+        }
+
+        saveLabels(labelFile);
+    }
+
+    private String removeExtension(String fileName) {
+        int extensionIndex = fileName.lastIndexOf('.');
+        if (extensionIndex == -1) {
+            return fileName;
+        }
+        return fileName.substring(0, extensionIndex);
     }
 }
