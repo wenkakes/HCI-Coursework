@@ -84,8 +84,20 @@ public class MenuBarView extends JMenuBar {
         });
 
         JMenuItem closeImage = new JMenuItem("Close Image");
+        closeImage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                controller.closeImage();
+            }
+        });
 
         JMenuItem exit = new JMenuItem("Exit");
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                System.exit(0);
+            }
+        });
 
         file.add(newProject);
         file.add(closeProject);

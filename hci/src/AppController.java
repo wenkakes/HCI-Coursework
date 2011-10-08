@@ -516,6 +516,9 @@ public class AppController {
     }
 
     public void closeImage() {
+        // TODO: Disable some menu items.
+        currentImageName = null;
+
         imagePanel.setImage(null);
         labelPanel.clear();
 
