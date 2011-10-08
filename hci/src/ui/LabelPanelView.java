@@ -240,6 +240,12 @@ public class LabelPanelView extends JPanel {
      * Deletes all of the polygons.
      */
     public void deleteAllPolygons() {
+        if (listModel.getSize() == 0) {
+            JOptionPane.showMessageDialog(parentFrame, "There are no labels to delete", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         for (int i = 0; i < listModel.getSize(); i++) {
             controller.removePolygon((String) listModel.get(i));
         }

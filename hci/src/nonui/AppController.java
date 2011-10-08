@@ -736,6 +736,10 @@ public class AppController {
     }
 
     public void importImage() {
+        if (currentProjectName == null) {
+            return;
+        }
+
         // User chooses image from file dialog.
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose an image to import");
@@ -878,6 +882,10 @@ public class AppController {
     }
 
     public void openImage() {
+        if (currentProjectName == null) {
+            return;
+        }
+
         // User chooses image
         File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
 
