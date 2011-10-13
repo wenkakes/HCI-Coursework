@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.ToolTipManager;
 import javax.swing.filechooser.FileSystemView;
 
 import src.ui.ImagePanelView;
@@ -75,6 +76,9 @@ public class AppController {
 
         loadSettingsFile();
         setMenuItemsEnabled();
+
+        // Show tooltips fast.
+        ToolTipManager.sharedInstance().setInitialDelay(100);
     }
 
     /**
