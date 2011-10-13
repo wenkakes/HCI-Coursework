@@ -198,6 +198,12 @@ public class LabelPanelView extends JPanel {
             JOptionPane.showMessageDialog(parentFrame,
                     "Blank names are not allowed. The name was not changed.", "Error",
                     JOptionPane.ERROR_MESSAGE);
+        } else if (!name.matches("[a-zA-Z0-9]+")) {
+            JOptionPane.showMessageDialog(parentFrame,
+                    "Only alphanumeric characters are allowed in label names. "
+                            + "The name was not changed.",
+                            "Error",
+                    JOptionPane.ERROR_MESSAGE);
         } else {
             listModel.remove(index);
             listModel.add(index, name);

@@ -448,11 +448,11 @@ public class AppController {
         labelPanel.setAddButtonEnabled(true);
         toolboxPanel.setVisible(false);
 
-        String name = null;
+        String name = "";
         boolean hasName = false;
         while (!hasName) {
             String message = "Label Name";
-            name = JOptionPane.showInputDialog(appFrame, message);
+            name = JOptionPane.showInputDialog(appFrame, message, name);
 
             // TODO: Should this totally cancel, or only cancel the "done"?
             // Occurs if the user hits the cancel option.
@@ -469,6 +469,10 @@ public class AppController {
                         JOptionPane.ERROR_MESSAGE);
             } else if (name.isEmpty()) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (!name.matches("[a-zA-Z0-9]+")) {
+                JOptionPane.showMessageDialog(appFrame,
+                        "Only alphanumeric characters are allowed in label names.", "Error",
                         JOptionPane.ERROR_MESSAGE);
             } else {
                 hasName = true;
