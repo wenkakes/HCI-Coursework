@@ -22,11 +22,13 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileSystemView;
 
 import src.ui.ImagePanelView;
 import src.ui.LabelPanelView;
 import src.ui.MenuBarView;
 import src.ui.ToolboxPanelView;
+import src.utils.DirectoryRestrictedFileSystemView;
 import src.utils.LabelIO;
 import src.utils.LabelIO.LabelParseException;
 import src.utils.Point;
@@ -88,12 +90,12 @@ public class AppController {
         // File menu.
         menuBar.setCloseProjectEnabled(projectOpened);
         menuBar.setImportImageEnabled(projectOpened);
-        // TODO: Only allow opening if project has images.
         menuBar.setOpenImageEnabled(projectOpened);
         menuBar.setSaveImageEnabled(imageOpened);
         menuBar.setCloseImageEnabled(imageOpened);
 
-        // TODO: Add edit menu items.
+        menuBar.setDeleteSelectedLabelEnabled(completedPolygons.size() > 0);
+        menuBar.setDeleteAllLabelsEnabled(completedPolygons.size() > 0);
     }
 
     /**
@@ -264,6 +266,8 @@ public class AppController {
             applicationState = ApplicationState.DEFAULT;
         }
         imagePanel.repaint();
+
+        setMenuItemsEnabled();
     }
 
     /**
@@ -286,8 +290,9 @@ public class AppController {
      * @param file the file to load from
      */
     public void loadLabels() {
-
-        JFileChooser chooser = new JFileChooser();
+        FileSystemView fsv = new DirectoryRestrictedFileSystemView(new File(MAIN_FOLDER
+                + "/Projects/" + currentProjectName + "/labels"));
+        JFileChooser chooser = new JFileChooser(fsv.getHomeDirectory(), fsv);
         int returnValue = chooser.showOpenDialog(appFrame);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File loadFile = chooser.getSelectedFile();
@@ -304,6 +309,8 @@ public class AppController {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+
+        setMenuItemsEnabled();
     }
 
     /**
@@ -466,8 +473,6 @@ public class AppController {
             } else {
                 hasName = true;
             }
-            // imagePanel.setImage(null);
-
         }
 
         currentPolygon.setName(name);
@@ -477,6 +482,8 @@ public class AppController {
         labelPanel.addLabel(name);
 
         imagePanel.repaint();
+
+        setMenuItemsEnabled();
     }
 
     /**
@@ -914,7 +921,6 @@ public class AppController {
 
         // User chooses image
         File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
-
         FileFilter fileFilter = new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -934,18 +940,19 @@ public class AppController {
             imageNames[i] = images[i].getName();
         }
 
-        String newImageName = (String) JOptionPane.showInputDialog(appFrame,
-                "Choose an image to open", "Open Image", JOptionPane.QUESTION_MESSAGE, null,
-                imageNames, imageNames[0]);
 
-        if (newImageName == null) {
+        FileSystemView fsv = new DirectoryRestrictedFileSystemView(imagesDirectory);
+        JFileChooser chooser = new JFileChooser(fsv.getHomeDirectory(), fsv);
+        int result = chooser.showOpenDialog(appFrame);
+        if (result != JFileChooser.APPROVE_OPTION) {
             // User hit cancel.
             return;
         }
 
         // Open image up
-        openImage(new File(imagesDirectory.getAbsoluteFile() + "/" + newImageName));
-        currentImageName = newImageName;
+        File imageFile = chooser.getSelectedFile();
+        openImage(imageFile);
+        currentImageName = imageFile.getName();
 
         writeToSettingsFile(currentProjectName, currentImageName);
 

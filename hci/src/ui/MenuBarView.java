@@ -29,6 +29,8 @@ public class MenuBarView extends JMenuBar {
     private JMenuItem openImage;
     private JMenuItem saveImage;
     private JMenuItem closeImage;
+    private JMenuItem deleteSelected;
+    private JMenuItem deleteAll;
 
     public MenuBarView(JFrame parentFrame, AppController appController) {
         this.parentFrame = parentFrame;
@@ -164,7 +166,7 @@ public class MenuBarView extends JMenuBar {
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
 
-        JMenuItem deleteSelected = new JMenuItem("Delete Selected Label(s)");
+        deleteSelected = new JMenuItem("Delete Selected Label(s)");
         deleteSelected.setMnemonic(KeyEvent.VK_D);
         deleteSelected.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
         deleteSelected.addActionListener(new ActionListener() {
@@ -174,7 +176,7 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        JMenuItem deleteAll = new JMenuItem("Delete All Labels");
+        deleteAll = new JMenuItem("Delete All Labels");
         deleteAll.setMnemonic(KeyEvent.VK_A);
         deleteAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK
                 | ActionEvent.SHIFT_MASK));
@@ -246,5 +248,13 @@ public class MenuBarView extends JMenuBar {
 
     public void setCloseImageEnabled(boolean enabled) {
         closeImage.setEnabled(enabled);
+    }
+
+    public void setDeleteSelectedLabelEnabled(boolean enabled) {
+        deleteSelected.setEnabled(enabled);
+    }
+
+    public void setDeleteAllLabelsEnabled(boolean enabled) {
+        deleteAll.setEnabled(enabled);
     }
 }
