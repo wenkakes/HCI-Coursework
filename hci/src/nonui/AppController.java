@@ -95,6 +95,9 @@ public class AppController {
         menuBar.setSaveImageEnabled(imageOpened);
         menuBar.setCloseImageEnabled(imageOpened);
 
+        // Edit menu.
+        menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
+        menuBar.setRenamePolygonEnabled(completedPolygons.size() > 0);
         menuBar.setDeleteSelectedLabelEnabled(completedPolygons.size() > 0);
         menuBar.setDeleteAllLabelsEnabled(completedPolygons.size() > 0);
     }
@@ -808,5 +811,9 @@ public class AppController {
 
     public void setApplicationState(ApplicationState applicationState) {
         this.applicationState = applicationState;
+    }
+
+    public void renameSelectedPolygon() {
+        labelPanel.renameSelectedPolygon();
     }
 }

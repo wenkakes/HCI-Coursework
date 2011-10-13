@@ -69,13 +69,13 @@ public class LabelPanelView extends JPanel {
 
         // Set up the buttons.
         addButton = createButton(new ImageIcon("hci/icons/small/add.png"), new AddListener(), false);
-        addButton.setToolTipText("Add Polygon");
+        addButton.setToolTipText("Add Label");
         editButton = createButton(new ImageIcon("hci/icons/small/edit.png"), new EditListener(),
                 false);
-        editButton.setToolTipText("Rename Polygon");
+        editButton.setToolTipText("Rename Label");
         deleteButton = createButton(new ImageIcon("hci/icons/small/delete.png"),
                 new DeleteListener(), false);
-        deleteButton.setToolTipText("Delete Polygon");
+        deleteButton.setToolTipText("Delete Label");
         loadButton = createButton("Load Labels", new LoadListener(), false);
 
         JPanel buttonPane = new JPanel();

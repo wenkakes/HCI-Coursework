@@ -29,6 +29,8 @@ public class MenuBarView extends JMenuBar {
     private JMenuItem openImage;
     private JMenuItem saveImage;
     private JMenuItem closeImage;
+    private JMenuItem addPolygon;
+    private JMenuItem renameSelected;
     private JMenuItem deleteSelected;
     private JMenuItem deleteAll;
 
@@ -158,6 +160,8 @@ public class MenuBarView extends JMenuBar {
      * Creates an edit menu with the following options:
      * 
      * <ul>
+     * <li>Add Label</li>
+     * <li>Rename Label</li>
      * <li>Delete Selected Label(s)</li>
      * <li>Delete All Labels</li>
      * </ul>
@@ -165,6 +169,26 @@ public class MenuBarView extends JMenuBar {
     private JMenu createEditMenu() {
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
+        
+        addPolygon = new JMenuItem("Add New Label");
+        addPolygon.setMnemonic(KeyEvent.VK_L);
+        addPolygon.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
+        addPolygon.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.startAddingNewPolygon();
+            }
+        });
+        
+        renameSelected = new JMenuItem("Rename Selected Label");
+        renameSelected.setMnemonic(KeyEvent.VK_R);
+        renameSelected.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+        renameSelected.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.renameSelectedPolygon();
+            }
+        });
 
         deleteSelected = new JMenuItem("Delete Selected Label(s)");
         deleteSelected.setMnemonic(KeyEvent.VK_D);
@@ -187,6 +211,8 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
+        editMenu.add(addPolygon);
+        editMenu.add(renameSelected);
         editMenu.add(deleteSelected);
         editMenu.add(deleteAll);
 
@@ -248,6 +274,14 @@ public class MenuBarView extends JMenuBar {
 
     public void setCloseImageEnabled(boolean enabled) {
         closeImage.setEnabled(enabled);
+    }
+
+    public void setAddPolygonEnabled(boolean enabled) {
+        addPolygon.setEnabled(enabled);
+    }
+
+    public void setRenamePolygonEnabled(boolean enabled) {
+        renameSelected.setEnabled(enabled);
     }
 
     public void setDeleteSelectedLabelEnabled(boolean enabled) {
