@@ -19,6 +19,9 @@ public class ImageController {
     private final AppController appController;
     private ImagePanelView imagePanel;
 
+    // Used when editing points.
+    private Point currentPoint = null;
+
     public ImageController(AppController appController) {
         this.appController = appController;
     }
@@ -121,7 +124,7 @@ public class ImageController {
     public void imageMouseReleased() {
         switch (appController.getApplicationState()) {
             case DEFAULT:
-                appController.setCurrentPoint(null);
+                currentPoint = null;
                 appController.setCurrentPolygon(new Polygon());
                 imagePanel.repaint();
                 break;
@@ -130,7 +133,7 @@ public class ImageController {
                 break;
             case EDITING_POLYGON:
                 // Implement logic for explicit editing.
-                appController.setCurrentPoint(null);
+                currentPoint = null;
                 appController.setCurrentPolygon(new Polygon());
                 break;
             default:
@@ -139,8 +142,26 @@ public class ImageController {
     }
 
     public void imageMouseDrag(int x, int y) {
-        // TODO Auto-generated method stub
-
+        switch (appController.getApplicationState()) {
+            case DEFAULT:
+                // Do nothing
+                break;
+            case ADDING_POLYGON:
+                // Do nothing.
+                break;
+            case EDITING_POLYGON:
+                if (currentPoint != null) {
+                    Point newPoint = new Point(x, y);
+                    if (appController.getCurrentPolygon().replacePoint(currentPoint, newPoint)) {
+                        currentPoint = newPoint;
+                    }
+                    appController.setEditedPolygon(appController.getCurrentPolygon());
+                    imagePanel.repaint();
+                }
+                break;
+            default:
+                // TODO: Throw/show appropriate error.
+        }
     }
 
     private List<Polygon> getSelectedPolygons() {
@@ -242,7 +263,7 @@ public class ImageController {
 
         if (smallestDistance >= 0 && smallestDistance < EDITING_THRESHOLD_DISTANCE) {
             appController.setApplicationState(ApplicationState.EDITING_POLYGON);
-            appController.setCurrentPoint(closestPoint);
+            currentPoint = closestPoint;
             appController.setCurrentPolygon(closestPolygon);
         } else {
             appController.setApplicationState(ApplicationState.DEFAULT);

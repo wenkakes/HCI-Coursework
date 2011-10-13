@@ -54,7 +54,6 @@ public class AppController {
     Polygon currentPolygon = new Polygon();
     Polygon editedPolygon = new Polygon();
     private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
-    private Point currentPoint = null; // Used when moving points.
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
@@ -859,7 +858,7 @@ public class AppController {
         this.currentPolygon = currentPolygon; 
     }
 
-    public void setCurrentPoint(Point currentPoint) {
-        this.currentPoint = currentPoint;
+    public void setEditedPolygon(Polygon polygon) {
+        this.editedPolygon = polygon;
     }
 }
