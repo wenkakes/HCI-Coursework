@@ -17,7 +17,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import src.nonui.AppController;
+import src.nonui.ImageController;
 import src.utils.Point;
 
 /**
@@ -30,13 +30,13 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
     // String to display when there is no image opened for editing.
     private static final String NO_IMAGE_STRING = "Please open an image for editing.";
 
-    private final AppController controller;
+    private final ImageController controller;
 
     // Image that is being worked on.
     private BufferedImage image = null;
 
-    public ImagePanelView(AppController appController) {
-        this.controller = appController;
+    public ImagePanelView(ImageController imageController) {
+        this.controller = imageController;
 
         Dimension panelSize = new Dimension(800, 600);
         setSize(panelSize);

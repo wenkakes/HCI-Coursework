@@ -41,14 +41,13 @@ public class AppController {
     // The main folder for the application.
     private static final String MAIN_FOLDER = System.getProperty("user.home") + "/ImageLabeller";
 
-    // The farthest distance, in pixels, that the user can click from a point
-    // and still 'select' it.
-    private static final double EDITING_THRESHOLD_DISTANCE = 5.0;
+    // The sub-controllers.
+    private final ImageController imageController = new ImageController(this);
 
     // The core Swing components that make up the application.
     private final JFrame appFrame = new JFrame("Image Labeller");
+    private final ImagePanelView imagePanel = new ImagePanelView(imageController);
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
-    private final ImagePanelView imagePanel = new ImagePanelView(this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
 
@@ -76,6 +75,8 @@ public class AppController {
         appFrame.setVisible(true);
         appFrame.setResizable(false);
 
+        imageController.setPanel(imagePanel);
+
         loadSettingsFile();
         setMenuItemsEnabled();
     }
@@ -96,117 +97,6 @@ public class AppController {
 
         menuBar.setDeleteSelectedLabelEnabled(completedPolygons.size() > 0);
         menuBar.setDeleteAllLabelsEnabled(completedPolygons.size() > 0);
-    }
-
-    /**
-     * Called when the image is clicked on.
-     * 
-     * @param x the x-coordinate of the mouse click
-     * @param y the y-coordinate of the mouse click
-     * @param doubleClick whether or not the user is double clicking
-     */
-    public void imageMouseClick(int x, int y, boolean doubleClick) {
-        switch (applicationState) {
-            case DEFAULT:
-                if (doubleClick) {
-                    // Double clicking does nothing in the default state.
-                    return;
-                }
-                imagePanel.repaint();
-                // TODO: Enter explicit editing at this point.
-
-                break;
-            case ADDING_POLYGON:
-                if (doubleClick) {
-                    finishedAddingPolygon();
-                } else {
-                    currentPolygon.addPoint(new Point(x, y));
-                    imagePanel.repaint();
-                }
-                break;
-            case EDITING_POLYGON:
-                // TODO: Implement explicit editing logic.
-                break;
-            default:
-                // TODO: Throw/show appropriate error.
-        }
-    }
-
-    /**
-     * Called when the mouse is dragged over the image.
-     * 
-     * @param x the x coordinate that the mouse is now at
-     * @param y the y coordinate that the mouse is now at
-     */
-    public void imageMouseDrag(int x, int y) {
-        switch (applicationState) {
-            case DEFAULT:
-                // Do nothing
-
-                break;
-            case ADDING_POLYGON:
-                // Do nothing.
-                break;
-            case EDITING_POLYGON:
-                if (currentPoint != null) {
-                    Point newPoint = new Point(x, y);
-                    if (currentPolygon.replacePoint(currentPoint, newPoint)) {
-                        currentPoint = newPoint;
-                    }
-                    editedPolygon = currentPolygon;
-                    imagePanel.repaint();
-                }
-                break;
-            default:
-                // TODO: Throw/show appropriate error.
-        }
-    }
-
-    /**
-     * Called when the mouse is pressed over the image (but not released
-     * immediately, which generates a click instead).
-     * 
-     * @param x the x coordinate where the mouse was pressed
-     * @param y the y coordinate where the mouse was pressed
-     */
-    public void imageMousePress(int x, int y) {
-        switch (applicationState) {
-            case DEFAULT:
-                selectClosestPoint(x, y);
-                break;
-            case ADDING_POLYGON:
-                // Do nothing.
-                break;
-            case EDITING_POLYGON:
-                // Implement explicit editing logic.
-                selectClosestPoint(x, y);
-            default:
-                // TODO: Throw/show appropriate error.
-        }
-    }
-
-    /**
-     * Called when the mouse is released (from a press/drag, not a click) over
-     * the image.
-     */
-    public void imageMouseReleased() {
-        switch (applicationState) {
-            case DEFAULT:
-                currentPoint = null;
-                currentPolygon = new Polygon();
-                imagePanel.repaint();
-                break;
-            case ADDING_POLYGON:
-                // Do nothing.
-                break;
-            case EDITING_POLYGON:
-                // Implement logic for explicit editing.
-                currentPoint = null;
-                currentPolygon = new Polygon();
-                break;
-            default:
-                // TODO: Throw/show appropriate error.
-        }
     }
 
     /**
@@ -342,7 +232,7 @@ public class AppController {
                 // TODO: Throw/show appropriate error, as this shouldn't happen.
                 break;
             case ADDING_POLYGON:
-                finishedAddingPolygon();
+                imageController.finishedAddingPolygon();
                 break;
             case EDITING_POLYGON:
                 // TODO: Implement explicit editing of polygons.
@@ -432,60 +322,16 @@ public class AppController {
      * Called when the user is finished adding the current polygon, either by
      * clicking on the starting point, double-clicking, or clicking the "Done"
      * button on the toolbox.
+     * 
+     * @param newPolygonName
      */
-    private void finishedAddingPolygon() {
-        if (applicationState != ApplicationState.ADDING_POLYGON) {
-            return;
-        }
-
-        if (currentPolygon.getPoints().size() < 3) {
-            JOptionPane.showMessageDialog(appFrame, "A polygon must have 3 or more vertices.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
+    public void finishedAddingPolygon(String newPolygonName) {
         applicationState = ApplicationState.DEFAULT;
+
         labelPanel.setAddButtonEnabled(true);
+        labelPanel.addLabel(newPolygonName);
+
         toolboxPanel.setVisible(false);
-
-        String name = "";
-        boolean hasName = false;
-        while (!hasName) {
-            String message = "Label Name";
-            name = JOptionPane.showInputDialog(appFrame, message, name);
-
-            // TODO: Should this totally cancel, or only cancel the "done"?
-            // Occurs if the user hits the cancel option.
-            if (name == null) {
-                currentPolygon = new Polygon();
-                imagePanel.repaint();
-
-                return;
-            }
-
-            name = name.trim();
-            if (completedPolygons.containsKey(name)) {
-                JOptionPane.showMessageDialog(appFrame, "That name is already in use.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } else if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } else if (!name.matches("[a-zA-Z0-9]+")) {
-                JOptionPane.showMessageDialog(appFrame,
-                        "Only alphanumeric characters are allowed in label names.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } else {
-                hasName = true;
-            }
-        }
-
-        currentPolygon.setName(name);
-        completedPolygons.put(name, currentPolygon);
-        currentPolygon = new Polygon();
-
-        labelPanel.addLabel(name);
-
-        imagePanel.repaint();
 
         setMenuItemsEnabled();
     }
@@ -501,43 +347,6 @@ public class AppController {
         toolboxPanel.setVisible(false);
 
         imagePanel.repaint();
-    }
-
-    /**
-     * Selects the closest point to a given target point.
-     * 
-     * @param x the x coordinate of the target
-     * @param y the y coordinate of the target
-     */
-    private void selectClosestPoint(int x, int y) {
-        Point targetPoint = new Point(x, y);
-        Point closestPoint = null;
-        Polygon closestPolygon = null;
-
-        double smallestDistance = -1;
-
-        for (Polygon polygon : completedPolygons.values()) {
-            for (Point point : polygon.getPoints()) {
-                double distanceToTarget = targetPoint.distanceFrom(point);
-
-                if (distanceToTarget < smallestDistance || smallestDistance < 0) {
-                    if (isSelected(polygon.getName())) {
-                        smallestDistance = distanceToTarget;
-                        closestPoint = point;
-                        closestPolygon = polygon;
-                    }
-                }
-
-            }
-        }
-
-        if (smallestDistance >= 0 && smallestDistance < EDITING_THRESHOLD_DISTANCE) {
-            applicationState = ApplicationState.EDITING_POLYGON;
-            currentPoint = closestPoint;
-            currentPolygon = closestPolygon;
-        } else {
-            applicationState = ApplicationState.DEFAULT;
-        }
     }
 
     public Polygon getPolygon(String name) {
@@ -583,16 +392,6 @@ public class AppController {
         }
 
         return selectedPolygons;
-    }
-
-    private boolean isSelected(String name) {
-        List<Polygon> polygons = getSelectedPolygons();
-        for (Polygon selected : polygons) {
-            if (selected.getName() == name) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public List<Point> getEditedPolygonPoints() {
@@ -1026,5 +825,41 @@ public class AppController {
                     + currentImageName);
             openImage(imageFile);
         }
+    }
+
+    public Map<String, Polygon> getCompletedPolygons() {
+        return completedPolygons;
+    }
+
+    public List<String> getSelectedNames() {
+        return labelPanel.getSelectedNames();
+    }
+
+    public Polygon getCurrentPolygon() {
+        return currentPolygon;
+    }
+
+    public ApplicationState getApplicationState() {
+        return applicationState;
+    }
+
+    public Polygon getEditedPolygon() {
+        return editedPolygon;
+    }
+
+    public JFrame getAppFrame() {
+        return appFrame;
+    }
+
+    public void setApplicationState(ApplicationState applicationState) {
+        this.applicationState = applicationState;
+    }
+
+    public void setCurrentPolygon(Polygon currentPolygon) {
+        this.currentPolygon = currentPolygon; 
+    }
+
+    public void setCurrentPoint(Point currentPoint) {
+        this.currentPoint = currentPoint;
     }
 }
