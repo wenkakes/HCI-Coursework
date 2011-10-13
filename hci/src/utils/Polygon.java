@@ -10,8 +10,9 @@ import java.util.List;
  */
 public class Polygon {
     private String name;
-    private ArrayList<Point> points;
+    private List<Point> points;
     private int pointIndex;
+    private List<String> tags;
 
     public Polygon() {
         this("");
@@ -30,6 +31,8 @@ public class Polygon {
             points.add(point);
         }
         pointIndex = points.size() - 1;
+
+        tags = new ArrayList<String>();
     }
 
     /**
@@ -60,7 +63,7 @@ public class Polygon {
     public List<Point> getPoints() {
         List<Point> subList = new ArrayList<Point>(pointIndex + 1);
 
-        // No need to deep-copy as Points are immutable objects.
+        // No need to deep-copy as Points are immutable.
         for (int i = 0; i <= pointIndex; i++) {
             subList.add(points.get(i));
         }
@@ -125,5 +128,33 @@ public class Polygon {
     @Override
     public String toString() {
         return "Polygon [name=" + name + ", points=" + getPoints() + "]";
+    }
+
+    /**
+     * Adds a tag to the polygon. If the tag is already attached to the polygon,
+     * no action is taken.
+     * 
+     * @param tag the tag to add
+     */
+    public void addTag(String tag) {
+        if (!tags.contains(tag)) {
+            tags.add(tag);
+        }
+    }
+
+    /**
+     * Return a list of the tags attached to the polygon.
+     */
+    public List<String> getTags() {
+        return new ArrayList<String>(tags);
+    }
+
+    /**
+     * Removes a tag from the polygon.
+     * 
+     * @param string the name of the tag to remove
+     */
+    public void removeTag(String tag) {
+        tags.remove(tag);
     }
 }

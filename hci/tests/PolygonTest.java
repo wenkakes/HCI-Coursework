@@ -93,6 +93,30 @@ public class PolygonTest {
         assertFalse(polygon.canRedo());
     }
 
+    @Test
+    public void testTags() {
+        Polygon polygon = createTestPolygon();
+
+        assertEquals(0, polygon.getTags().size());
+
+        polygon.addTag("Tag1");
+        polygon.addTag("Tag2");
+
+        List<String> expectedTags = new ArrayList<String>();
+        expectedTags.add("Tag1");
+        expectedTags.add("Tag2");
+
+        assertEquals(2, polygon.getTags().size());
+        assertEquals(expectedTags, polygon.getTags());
+
+        polygon.removeTag("Tag1");
+
+        expectedTags.remove("Tag1");
+
+        assertEquals(1, polygon.getTags().size());
+        assertEquals(expectedTags, polygon.getTags());
+    }
+
     /**
      * Creates a polygon for use in JUnit tests.
      */
