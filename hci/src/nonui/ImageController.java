@@ -19,7 +19,9 @@ public class ImageController {
     private final AppController appController;
     private ImagePanelView imagePanel;
 
-    // Used when editing points.
+    // Used when adding/editing points.
+    Polygon currentPolygon = new Polygon();
+    Polygon editedPolygon = new Polygon();
     private Point currentPoint = null;
 
     public ImageController(AppController appController) {
@@ -49,12 +51,12 @@ public class ImageController {
     }
 
     public List<Point> getCurrentPolygonPoints() {
-        return appController.getCurrentPolygon().getPoints();
+        return currentPolygon.getPoints();
     }
 
     public List<Point> getEditedPolygonPoints() {
         if (appController.getApplicationState() == ApplicationState.EDITING_POLYGON) {
-            return appController.getEditedPolygon().getPoints();
+            return editedPolygon.getPoints();
         }
 
         return null;
@@ -82,7 +84,7 @@ public class ImageController {
                 if (doubleClick) {
                     finishedAddingPolygon();
                 } else {
-                    appController.getCurrentPolygon().addPoint(new Point(x, y));
+                    currentPolygon.addPoint(new Point(x, y));
                     imagePanel.repaint();
                 }
                 break;
@@ -125,7 +127,7 @@ public class ImageController {
         switch (appController.getApplicationState()) {
             case DEFAULT:
                 currentPoint = null;
-                appController.setCurrentPolygon(new Polygon());
+                currentPolygon = new Polygon();
                 imagePanel.repaint();
                 break;
             case ADDING_POLYGON:
@@ -134,7 +136,7 @@ public class ImageController {
             case EDITING_POLYGON:
                 // Implement logic for explicit editing.
                 currentPoint = null;
-                appController.setCurrentPolygon(new Polygon());
+                currentPolygon = new Polygon();
                 break;
             default:
                 // TODO: Throw/show appropriate error.
@@ -152,10 +154,10 @@ public class ImageController {
             case EDITING_POLYGON:
                 if (currentPoint != null) {
                     Point newPoint = new Point(x, y);
-                    if (appController.getCurrentPolygon().replacePoint(currentPoint, newPoint)) {
+                    if (currentPolygon.replacePoint(currentPoint, newPoint)) {
                         currentPoint = newPoint;
                     }
-                    appController.setEditedPolygon(appController.getCurrentPolygon());
+                    editedPolygon = currentPolygon;
                     imagePanel.repaint();
                 }
                 break;
@@ -187,7 +189,7 @@ public class ImageController {
 
         JFrame appFrame = appController.getAppFrame();
 
-        if (appController.getCurrentPolygon().getPoints().size() < 3) {
+        if (currentPolygon.getPoints().size() < 3) {
             JOptionPane.showMessageDialog(appFrame,
                     "A polygon must have 3 or more vertices.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -202,7 +204,7 @@ public class ImageController {
             // TODO: Should this totally cancel, or only cancel the "done"?
             // Occurs if the user hits the cancel option.
             if (name == null) {
-                appController.setCurrentPolygon(new Polygon());
+                currentPolygon = new Polygon();
                 imagePanel.repaint();
 
                 return;
@@ -224,9 +226,9 @@ public class ImageController {
             }
         }
 
-        appController.getCurrentPolygon().setName(name);
-        appController.getCompletedPolygons().put(name, appController.getCurrentPolygon());
-        appController.setCurrentPolygon(new Polygon());
+        currentPolygon.setName(name);
+        appController.getCompletedPolygons().put(name, currentPolygon);
+        currentPolygon = new Polygon();
 
         appController.finishedAddingPolygon(name);
 
@@ -264,7 +266,7 @@ public class ImageController {
         if (smallestDistance >= 0 && smallestDistance < EDITING_THRESHOLD_DISTANCE) {
             appController.setApplicationState(ApplicationState.EDITING_POLYGON);
             currentPoint = closestPoint;
-            appController.setCurrentPolygon(closestPolygon);
+            currentPolygon = closestPolygon;
         } else {
             appController.setApplicationState(ApplicationState.DEFAULT);
         }
@@ -278,5 +280,24 @@ public class ImageController {
             }
         }
         return false;
+    }
+
+    public void undo() {
+        currentPolygon.removeLastPoint();
+        imagePanel.repaint();
+    }
+
+    public void redo() {
+        currentPolygon.redoPoint();
+        imagePanel.repaint();
+    }
+
+    public Polygon getEditedPolygon() {
+        return editedPolygon;
+    }
+
+    public void cancel() {
+        currentPolygon = new Polygon();
+        imagePanel.repaint();
     }
 }

@@ -51,8 +51,6 @@ public class AppController {
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
 
-    Polygon currentPolygon = new Polygon();
-    Polygon editedPolygon = new Polygon();
     private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
 
     // The application state.
@@ -110,13 +108,6 @@ public class AppController {
     }
 
     /**
-     * Returns a list of the points in the current Polygon.
-     */
-    public List<Point> getCurrentPolygonPoints() {
-        return currentPolygon.getPoints();
-    }
-
-    /**
      * Starts adding a new polygon.
      */
     public void startAddingNewPolygon() {
@@ -151,7 +142,7 @@ public class AppController {
      */
     public void removePolygon(String name) {
         Polygon removedPolygon = completedPolygons.remove(name);
-        if (removedPolygon == editedPolygon) {
+        if (removedPolygon == imageController.getEditedPolygon()) {
             applicationState = ApplicationState.DEFAULT;
         }
         imagePanel.repaint();
@@ -241,26 +232,12 @@ public class AppController {
         }
     }
 
-    // TODO: Rename to "undo", and extend to cover states other than
-    // ADDING_POLYGON.
-    /**
-     * Called when the user wishes to undo their last move when editing a
-     * polygon.
-     */
     public void undoLastVertex() {
-        currentPolygon.removeLastPoint();
-        imagePanel.repaint();
+        imageController.undo();
     }
 
-    // TODO: Rename to "redo", and extend to cover states other than
-    // ADDING_POLYGON.
-    /**
-     * Called when the user wishes to redo their last move when editing a
-     * polygon.
-     */
     public void redoLastVertex() {
-        currentPolygon.redoPoint();
-        imagePanel.repaint();
+        imageController.redo();
     }
 
     /**
@@ -340,12 +317,11 @@ public class AppController {
      */
     private void cancelAddingPolygon() {
         applicationState = ApplicationState.DEFAULT;
-        currentPolygon = new Polygon();
 
         labelPanel.setAddButtonEnabled(true);
         toolboxPanel.setVisible(false);
 
-        imagePanel.repaint();
+        imageController.cancel();
     }
 
     public Polygon getPolygon(String name) {
@@ -366,7 +342,7 @@ public class AppController {
 
     public void highlightSelected(List<String> highlightedNames) {
         if (applicationState == ApplicationState.EDITING_POLYGON
-                && !highlightedNames.contains(editedPolygon.getName())) {
+                && !highlightedNames.contains(imageController.getEditedPolygon().getName())) {
             applicationState = ApplicationState.DEFAULT;
         }
 
@@ -391,14 +367,6 @@ public class AppController {
         }
 
         return selectedPolygons;
-    }
-
-    public List<Point> getEditedPolygonPoints() {
-        if (applicationState == ApplicationState.EDITING_POLYGON) {
-            return editedPolygon.getPoints();
-        }
-
-        return null;
     }
 
     public void newProject() {
@@ -834,16 +802,8 @@ public class AppController {
         return labelPanel.getSelectedNames();
     }
 
-    public Polygon getCurrentPolygon() {
-        return currentPolygon;
-    }
-
     public ApplicationState getApplicationState() {
         return applicationState;
-    }
-
-    public Polygon getEditedPolygon() {
-        return editedPolygon;
     }
 
     public JFrame getAppFrame() {
@@ -852,13 +812,5 @@ public class AppController {
 
     public void setApplicationState(ApplicationState applicationState) {
         this.applicationState = applicationState;
-    }
-
-    public void setCurrentPolygon(Polygon currentPolygon) {
-        this.currentPolygon = currentPolygon; 
-    }
-
-    public void setEditedPolygon(Polygon polygon) {
-        this.editedPolygon = polygon;
     }
 }
