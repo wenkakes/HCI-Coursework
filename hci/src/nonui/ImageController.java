@@ -1,9 +1,13 @@
 package src.nonui;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -76,8 +80,8 @@ public class ImageController {
                     // Double clicking does nothing in the default state.
                     return;
                 }
+                selectClosestPoint(x, y);
                 imagePanel.repaint();
-                // TODO: Enter explicit editing at this point.
 
                 break;
             case ADDING_POLYGON:
@@ -299,5 +303,20 @@ public class ImageController {
     public void cancel() {
         currentPolygon = new Polygon();
         imagePanel.repaint();
+    }
+
+    /**
+     * Sets the image from a file.
+     * 
+     * @param file the file to open the image from
+     */
+    public void setImage(File file) {
+        try {
+            BufferedImage image = ImageIO.read(file);
+            imagePanel.setImage(image);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(appController.getAppFrame(), "Unable to open image.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

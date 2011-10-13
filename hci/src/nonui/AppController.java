@@ -2,7 +2,6 @@ package src.nonui;
 
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -51,6 +49,7 @@ public class AppController {
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
 
+    // The model.
     private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
 
     // The application state.
@@ -191,26 +190,6 @@ public class AppController {
         }
 
         setMenuItemsEnabled();
-    }
-
-    /**
-     * Opens the image from a file.
-     * 
-     * @param file the file to open the image from
-     */
-    public void openImage(File file) {
-        try {
-            BufferedImage image = ImageIO.read(file);
-
-            cancelAddingPolygon();
-            completedPolygons.clear();
-
-            imagePanel.setImage(image);
-            labelPanel.clear();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(appFrame, "Unable to open image.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     /**
@@ -619,12 +598,17 @@ public class AppController {
         }
 
         // Open image up, no labels.
-        openImage(destFile);
+        cancelAddingPolygon();
+        imageController.setImage(destFile);
         currentImageName = imageName;
 
         writeToSettingsFile(currentProjectName, currentImageName);
 
         setMenuItemsEnabled();
+
+        // TODO: STEPHEN
+        completedPolygons.clear();
+        labelPanel.clear();
     }
 
     private void copyFile(File sourceFile, File destFile) throws IOException {
@@ -721,12 +705,16 @@ public class AppController {
 
         // Open image up
         File imageFile = chooser.getSelectedFile();
-        openImage(imageFile);
+        imageController.setImage(imageFile);
         currentImageName = imageFile.getName();
 
         writeToSettingsFile(currentProjectName, currentImageName);
 
         setMenuItemsEnabled();
+
+        // TODO: STEPHEN
+        completedPolygons.clear();
+        labelPanel.clear();
     }
 
     public void save() {
@@ -790,7 +778,11 @@ public class AppController {
         if (imageName != null) {
             File imageFile = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images/"
                     + currentImageName);
-            openImage(imageFile);
+            imageController.setImage(imageFile);
+
+            // TODO: STEPHEN
+            completedPolygons.clear();
+            labelPanel.clear();
         }
     }
 
