@@ -428,4 +428,13 @@ public class LabelPanelView extends JPanel {
         public void mouseEntered(MouseEvent e) {
         }
     }
+
+    public void selectPolygon(String name) {
+        for (int i = 0; i < listModel.size(); i++) {
+            if (name.equals(listModel.get(i))) {
+                labelsList.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
 }

@@ -816,4 +816,8 @@ public class AppController {
     public void renameSelectedPolygon() {
         labelPanel.renameSelectedPolygon();
     }
+
+    public void selectPolygon(Polygon polygon) {
+        labelPanel.selectPolygon(polygon.getName());
+    }
 }

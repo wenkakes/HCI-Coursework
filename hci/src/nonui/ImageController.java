@@ -32,10 +32,18 @@ public class ImageController {
         this.appController = appController;
     }
 
+    /**
+     * Sets the panel that this controller is for.
+     * 
+     * @param imagePanel the panel this controller is for
+     */
     public void setPanel(ImagePanelView imagePanel) {
         this.imagePanel = imagePanel;
     }
 
+    /**
+     * Returns a list of the points of the completed polygons.
+     */
     public List<List<Point>> getCompletedPolygonsPoints() {
         Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();
         List<List<Point>> points = new ArrayList<List<Point>>(completedPolygons.size());
@@ -45,6 +53,9 @@ public class ImageController {
         return points;
     }
 
+    /**
+     * Returns a list of the points of the currently selected polygons.
+     */
     public List<List<Point>> getSelectedPolygonsPoints() {
         List<Polygon> selectedPolygons = getSelectedPolygons();
         List<List<Point>> points = new ArrayList<List<Point>>(selectedPolygons.size());
@@ -54,10 +65,17 @@ public class ImageController {
         return points;
     }
 
+    /**
+     * Returns a list of the points of the polygon that is currently being created.
+     */
     public List<Point> getCurrentPolygonPoints() {
         return currentPolygon.getPoints();
     }
 
+    /**
+     * Returns a list of the points of the polygon that is currently being edited,
+     * or null if no polygon is being edited.
+     */
     public List<Point> getEditedPolygonPoints() {
         if (appController.getApplicationState() == ApplicationState.EDITING_POLYGON) {
             return editedPolygon.getPoints();
@@ -80,9 +98,14 @@ public class ImageController {
                     // Double clicking does nothing in the default state.
                     return;
                 }
-                selectClosestPoint(x, y);
+                
+                Polygon closestPolygon = getClosestPolygon(x, y, EDITING_THRESHOLD_DISTANCE);
+                if (closestPolygon == null) {
+                    return;
+                }
+                appController.selectPolygon(closestPolygon);
+                
                 imagePanel.repaint();
-
                 break;
             case ADDING_POLYGON:
                 if (doubleClick) {
@@ -110,6 +133,12 @@ public class ImageController {
     public void imageMousePress(int x, int y) {
         switch (appController.getApplicationState()) {
             case DEFAULT:
+                Polygon closestPolygon = getClosestPolygon(x, y, EDITING_THRESHOLD_DISTANCE);
+                if (closestPolygon == null) {
+                    return;
+                }
+                appController.selectPolygon(closestPolygon);
+                
                 selectClosestPoint(x, y);
                 break;
             case ADDING_POLYGON:
@@ -147,6 +176,12 @@ public class ImageController {
         }
     }
 
+    /**
+     * Called when the user drags their mouse over the image. 
+     * 
+     * @param x the x coordinate they have dragged to
+     * @param y the y coordinate they have dragged to
+     */
     public void imageMouseDrag(int x, int y) {
         switch (appController.getApplicationState()) {
             case DEFAULT:
@@ -170,6 +205,9 @@ public class ImageController {
         }
     }
 
+    /**
+     * Gets a list of the currently selected polygons.
+     */
     private List<Polygon> getSelectedPolygons() {
         Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();
         List<String> selectedNames = appController.getSelectedNames();
@@ -255,9 +293,8 @@ public class ImageController {
         for (Polygon polygon : appController.getCompletedPolygons().values()) {
             for (Point point : polygon.getPoints()) {
                 double distanceToTarget = targetPoint.distanceFrom(point);
-
                 if (distanceToTarget < smallestDistance || smallestDistance < 0) {
-                    if (isSelected(polygon.getName())) {
+                    if (isSelected(polygon)) {
                         smallestDistance = distanceToTarget;
                         closestPoint = point;
                         closestPolygon = polygon;
@@ -275,31 +312,66 @@ public class ImageController {
             appController.setApplicationState(ApplicationState.DEFAULT);
         }
     }
+    
+    private Polygon getClosestPolygon(int x, int y, double threshold) {
+        Point targetPoint = new Point(x, y);
+        Polygon closestPolygon = null;
 
-    private boolean isSelected(String name) {
-        List<Polygon> polygons = getSelectedPolygons();
-        for (Polygon selected : polygons) {
-            if (selected.getName() == name) {
-                return true;
+        double smallestDistance = -1;
+
+        for (Polygon polygon : appController.getCompletedPolygons().values()) {
+            for (Point point : polygon.getPoints()) {
+                double distanceToTarget = targetPoint.distanceFrom(point);
+                if (distanceToTarget < smallestDistance || smallestDistance < 0) {
+                    smallestDistance = distanceToTarget;
+                    closestPolygon = polygon;
+                }
+
             }
         }
-        return false;
+        
+        if (smallestDistance > -1 && smallestDistance < threshold) {
+            return closestPolygon;
+        } else {
+            return null;
+        }
     }
 
+    /**
+     * Returns true if a given polygon is currently selected.
+     * 
+     * @param polygon the polygon that may be selected
+     */
+    private boolean isSelected(Polygon polygon) {
+        return getSelectedPolygons().contains(polygon);
+    }
+
+    /**
+     * Undoes the last added vertex on the current polygon.
+     */
     public void undo() {
         currentPolygon.removeLastPoint();
         imagePanel.repaint();
     }
 
+    /**
+     * Redoes the last undone vertex on the current polygon.
+     */
     public void redo() {
         currentPolygon.redoPoint();
         imagePanel.repaint();
     }
 
+    /**
+     * Gets the polygon that is currently being edited.
+     */
     public Polygon getEditedPolygon() {
         return editedPolygon;
     }
 
+    /**
+     * Cancels the adding of the current polygon.
+     */
     public void cancel() {
         currentPolygon = new Polygon();
         imagePanel.repaint();
