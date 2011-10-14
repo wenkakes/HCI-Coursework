@@ -249,7 +249,7 @@ public class ImageController {
 
         if (currentPolygon.getPoints().size() < 3) {
             JOptionPane.showMessageDialog(appFrame,
-                    "A polygon must have 3 or more vertices.", "Error", JOptionPane.ERROR_MESSAGE);
+                    "A label must have 3 or more vertices.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 

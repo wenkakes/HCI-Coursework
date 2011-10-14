@@ -57,7 +57,7 @@ public class ToolboxPanelView extends JDialog {
                 controller.toolboxDoneButtonClicked();
             }
         });
-        finishedEditingButton.setToolTipText("Finish editing polygon");
+        finishedEditingButton.setToolTipText("Finish editing label");
 
         JButton undoButton = new JButton(new ImageIcon("hci/icons/undo.png"));
         undoButton.addActionListener(new ActionListener() {
@@ -84,14 +84,14 @@ public class ToolboxPanelView extends JDialog {
                 controller.toolboxCancelButtonClicked();
             }
         });
-        cancelButton.setToolTipText("Cancel editing polygon");
+        cancelButton.setToolTipText("Cancel editing label");
 
         setLayout(new GridLayout(2, 1));
 
         JLabel instructions = new JLabel(
                 "<html><center>"
                         + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + "Click on the image to draw labels.<br />"
+                        + "Click on the image to add points to the label.<br />"
                         + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                         + "Double click (or click \"Done\") to finish.</center></html>");
 

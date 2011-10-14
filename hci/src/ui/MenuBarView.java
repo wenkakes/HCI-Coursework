@@ -24,7 +24,7 @@ public class MenuBarView extends JMenuBar {
     private final AppController controller;
 
     // Menu items that can be enabled/disabled.
-    private JMenuItem closeProject;
+    private JMenuItem closeCollection;
     private JMenuItem importImage;
     private JMenuItem openImage;
     private JMenuItem saveImage;
@@ -53,9 +53,9 @@ public class MenuBarView extends JMenuBar {
      * Creates a file menu with the following options:
      * 
      * <ul>
-     * <li>New Project</li>
-     * <li>Close Project</li>
-     * <li>Open Project</li>
+     * <li>New Collection</li>
+     * <li>Close Collection</li>
+     * <li>Open Collection</li>
      * <li>Import Image</li>
      * <li>Open Image</li>
      * <li>Save Image</li>
@@ -67,31 +67,31 @@ public class MenuBarView extends JMenuBar {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        JMenuItem newProject = new JMenuItem("New Project");
-        newProject.setMnemonic(KeyEvent.VK_N);
-        newProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        newProject.addActionListener(new ActionListener() {
+        JMenuItem newCollection = new JMenuItem("New Collection");
+        newCollection.setMnemonic(KeyEvent.VK_N);
+        newCollection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        newCollection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.newProject();
+                controller.newCollection();
             }
         });
 
-        closeProject = new JMenuItem("Close Project");
-        closeProject.addActionListener(new ActionListener() {
+        closeCollection = new JMenuItem("Close Collection");
+        closeCollection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.closeProject();
+                controller.closeCollection();
             }
         });
 
-        JMenuItem openProject = new JMenuItem("Open Project");
-        openProject.setMnemonic(KeyEvent.VK_O);
-        openProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        openProject.addActionListener(new ActionListener() {
+        JMenuItem openCollection = new JMenuItem("Open Collection");
+        openCollection.setMnemonic(KeyEvent.VK_O);
+        openCollection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        openCollection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.openProject();
+                controller.openCollection();
             }
         });
 
@@ -140,9 +140,9 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        fileMenu.add(newProject);
-        fileMenu.add(closeProject);
-        fileMenu.add(openProject);
+        fileMenu.add(newCollection);
+        fileMenu.add(closeCollection);
+        fileMenu.add(openCollection);
         fileMenu.addSeparator();
 
         fileMenu.add(importImage);
@@ -160,7 +160,7 @@ public class MenuBarView extends JMenuBar {
      * Creates an edit menu with the following options:
      * 
      * <ul>
-     * <li>Add Label</li>
+     * <li>Add New Label</li>
      * <li>Rename Label</li>
      * <li>Delete Selected Label(s)</li>
      * <li>Delete All Labels</li>
@@ -256,8 +256,8 @@ public class MenuBarView extends JMenuBar {
         return help;
     }
 
-    public void setCloseProjectEnabled(boolean enabled) {
-        closeProject.setEnabled(enabled);
+    public void setCloseCollectionEnabled(boolean enabled) {
+        closeCollection.setEnabled(enabled);
     }
 
     public void setImportImageEnabled(boolean enabled) {
