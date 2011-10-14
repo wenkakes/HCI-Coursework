@@ -26,7 +26,7 @@ public class Polygon {
         this.name = name;
 
         // Defensive-copy the input points.
-        points = new ArrayList<Point>(inputPoints.size());
+        points = new ArrayList<Point>();
         for (Point point : inputPoints) {
             points.add(point);
         }
@@ -102,9 +102,9 @@ public class Polygon {
      * there are no points to remove, does nothing.
      */
     public void removeLastPoint() {
-        if (pointIndex > 0) {
+       // if (pointIndex > 0) {
             pointIndex--;
-        }
+       // }
     }
 
     /**
@@ -157,4 +157,10 @@ public class Polygon {
     public void removeTag(String tag) {
         tags.remove(tag);
     }
+
+	public void addPointAt(Point targetPoint, int i) {      
+        points.add(i, targetPoint);
+		pointIndex++;
+
+	}
 }

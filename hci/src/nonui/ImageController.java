@@ -69,7 +69,9 @@ public class ImageController {
      * Returns a list of the points of the polygon that is currently being created.
      */
     public List<Point> getCurrentPolygonPoints() {
-        return currentPolygon.getPoints();
+    	if (currentPolygon != null)
+    		return currentPolygon.getPoints();
+    	return null;
     }
 
     /**
@@ -107,17 +109,27 @@ public class ImageController {
                 
                 imagePanel.repaint();
                 break;
+                
             case ADDING_POLYGON:
                 if (doubleClick) {
                     finishedAddingPolygon();
                 } else {
-                    currentPolygon.addPoint(new Point(x, y));
-                    imagePanel.repaint();
+                	if (checkPolygonClosed(x,y)) {
+                		finishedAddingPolygon();
+                	} else {
+                		currentPolygon.addPoint(new Point(x, y));
+                        imagePanel.repaint();	
+                	}                 
                 }
                 break;
+                
             case EDITING_POLYGON:
                 // TODO: Implement explicit editing logic.
+                if (!selectClosestPoint(x, y)) {
+                	addPt2OldPolygon(x,y);
+                	imagePanel.repaint();
                 break;
+                }
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -146,7 +158,11 @@ public class ImageController {
                 break;
             case EDITING_POLYGON:
                 // Implement explicit editing logic.
-                selectClosestPoint(x, y);
+                if (!selectClosestPoint(x, y)) {
+                	addPt2OldPolygon(x,y);
+                	imagePanel.repaint();
+                break;
+                }
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -248,7 +264,6 @@ public class ImageController {
             if (name == null) {
                 currentPolygon = new Polygon();
                 imagePanel.repaint();
-
                 return;
             }
 
@@ -283,7 +298,7 @@ public class ImageController {
      * @param x the x coordinate of the target
      * @param y the y coordinate of the target
      */
-    private void selectClosestPoint(int x, int y) {
+    private boolean selectClosestPoint(int x, int y) {
         Point targetPoint = new Point(x, y);
         Point closestPoint = null;
         Polygon closestPolygon = null;
@@ -308,9 +323,12 @@ public class ImageController {
             appController.setApplicationState(ApplicationState.EDITING_POLYGON);
             currentPoint = closestPoint;
             currentPolygon = closestPolygon;
+            return true;
         } else {
             appController.setApplicationState(ApplicationState.DEFAULT);
         }
+        
+        return false;
     }
     
     private Polygon getClosestPolygon(int x, int y, double threshold) {
@@ -327,6 +345,62 @@ public class ImageController {
                     closestPolygon = polygon;
                 }
 
+    private void addPt2OldPolygon(int x, int y) {
+    	Point targetPoint = new Point(x, y);
+    	
+    	currentPolygon = null;
+    	
+    	for (Polygon polygon : getSelectedPolygons()) { 	
+    	    		
+	    	List<Point> polygonPoints = polygon.getPoints();
+	    	
+	    	for (int i = 0; i < polygonPoints.size(); i++) {
+	    		Point point1 = polygonPoints.get(i);
+	    		Point point2 = polygonPoints.get((i + 1) % polygonPoints.size());
+	    		
+	    		// y = mx + c
+	    		double m = (double)(point1.getY() - point2.getY()) / (double)(point1.getX() - point2.getX());
+	    		double c = point1.getY() - (double)(m * point1.getX());
+	    		
+	    		// plug new point into equation
+	    		double expectedY = (m * (double) x) + c; 
+	    		double expectedX = ((double) y - c) / m;
+	    			    		
+	    		if (Math.abs(expectedY - (double) y) < EDITING_THRESHOLD_DISTANCE || 
+	    				Math.abs(expectedX - (double) x) < EDITING_THRESHOLD_DISTANCE) {
+	    			
+	    			polygon.addPointAt(targetPoint, ((i+1) % polygonPoints.size()));
+	    			appController.setApplicationState(ApplicationState.EDITING_POLYGON);
+	    			editedPolygon = polygon;
+ 					return;
+	    		}
+	    		
+	        }
+    	}
+    	
+    }
+    
+    private boolean checkPolygonClosed(int x, int y) {
+        Point targetPoint = new Point(x, y);
+
+        if (currentPolygon.getPoints().isEmpty()) {
+        	return false;
+        }
+        
+        double distanceToTarget = targetPoint.distanceFrom(currentPolygon.getPoints().get(0));
+
+        if (distanceToTarget < EDITING_THRESHOLD_DISTANCE) {
+        		return true;
+        }
+        
+        return false;
+    }
+    
+    private boolean isSelected(String name) {
+        List<Polygon> polygons = getSelectedPolygons();
+        for (Polygon selected : polygons) {
+            if (selected.getName() == name) {
+                return true;
             }
         }
         
