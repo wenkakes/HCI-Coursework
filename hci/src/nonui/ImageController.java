@@ -88,8 +88,13 @@ public class ImageController {
                 if (doubleClick) {
                     finishedAddingPolygon();
                 } else {
-                    currentPolygon.addPoint(new Point(x, y));
-                    imagePanel.repaint();
+                	if (checkPolygonClosed(x,y)) {
+                		finishedAddingPolygon();
+                	} else {
+                		currentPolygon.addPoint(new Point(x, y));
+                        imagePanel.repaint();	
+                	}
+                    
                 }
                 break;
             case EDITING_POLYGON:
@@ -276,6 +281,22 @@ public class ImageController {
         }
     }
 
+    private boolean checkPolygonClosed(int x, int y) {
+        Point targetPoint = new Point(x, y);
+
+        if (currentPolygon.getPoints().isEmpty()) {
+        	return false;
+        }
+        
+        double distanceToTarget = targetPoint.distanceFrom(currentPolygon.getPoints().get(0));
+
+        if (distanceToTarget < EDITING_THRESHOLD_DISTANCE) {
+        		return true;
+        }
+        
+        return false;
+    }
+    
     private boolean isSelected(String name) {
         List<Polygon> polygons = getSelectedPolygons();
         for (Polygon selected : polygons) {
