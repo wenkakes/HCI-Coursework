@@ -1,5 +1,6 @@
 package src.nonui;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
 import java.io.BufferedReader;
@@ -20,12 +21,14 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 import javax.swing.filechooser.FileSystemView;
 
 import src.ui.ImagePanelView;
 import src.ui.LabelPanelView;
 import src.ui.MenuBarView;
+import src.ui.ThumbnailView;
 import src.ui.ToolboxPanelView;
 import src.utils.DirectoryRestrictedFileSystemView;
 import src.utils.LabelIO;
@@ -49,6 +52,7 @@ public class AppController {
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
+    private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
 
     // The model.
     private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
@@ -64,7 +68,14 @@ public class AppController {
         appFrame.setLayout(new FlowLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        appFrame.add(imagePanel);
+        JPanel leftPanel = new JPanel();
+        BorderLayout leftPanelLayout = new BorderLayout();
+        leftPanelLayout.setVgap(5);
+        leftPanel.setLayout(leftPanelLayout);
+        leftPanel.add(imagePanel, BorderLayout.CENTER);
+        leftPanel.add(thumbnailPanel, BorderLayout.SOUTH);
+        
+        appFrame.add(leftPanel, BorderLayout.CENTER);
         appFrame.add(labelPanel);
         appFrame.setJMenuBar(menuBar);
 
@@ -73,6 +84,7 @@ public class AppController {
         appFrame.setResizable(false);
 
         imageController.setPanel(imagePanel);
+        imageController.setThumbnailPanel(thumbnailPanel);
 
         loadSettingsFile();
         setMenuItemsEnabled();
