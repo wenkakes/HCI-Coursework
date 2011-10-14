@@ -344,6 +344,15 @@ public class ImageController {
                     smallestDistance = distanceToTarget;
                     closestPolygon = polygon;
                 }
+            }
+        }
+        
+        if (smallestDistance > -1 && smallestDistance < threshold) {
+            return closestPolygon;
+        } else {
+            return null;
+        }
+    }
 
     private void addPt2OldPolygon(int x, int y) {
     	Point targetPoint = new Point(x, y);
@@ -394,21 +403,6 @@ public class ImageController {
         }
         
         return false;
-    }
-    
-    private boolean isSelected(String name) {
-        List<Polygon> polygons = getSelectedPolygons();
-        for (Polygon selected : polygons) {
-            if (selected.getName() == name) {
-                return true;
-            }
-        }
-        
-        if (smallestDistance > -1 && smallestDistance < threshold) {
-            return closestPolygon;
-        } else {
-            return null;
-        }
     }
 
     /**
