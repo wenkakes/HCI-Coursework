@@ -102,9 +102,9 @@ public class Polygon {
      * there are no points to remove, does nothing.
      */
     public void removeLastPoint() {
-       // if (pointIndex > 0) {
+       if (pointIndex >= 0) {
             pointIndex--;
-       // }
+       }
     }
 
     /**
