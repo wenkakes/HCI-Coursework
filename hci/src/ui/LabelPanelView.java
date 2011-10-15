@@ -48,7 +48,7 @@ public class LabelPanelView extends JPanel {
     private final JButton editButton;
     private final JButton loadButton;
     private final JButton deleteButton;
-
+    
     public LabelPanelView(JFrame frame, AppController appController) {
         Border labelBorder = BorderFactory.createTitledBorder("Labels");
         this.setBorder(labelBorder);
@@ -406,6 +406,12 @@ public class LabelPanelView extends JPanel {
             editButton.setEnabled(labelsList.getSelectedIndices().length == 1);
 
             controller.highlightSelected(getSelectedNames());
+            
+            System.out.println("Click!");
+            if (controller.checkTipsOn()) { 
+                System.out.println("Tips are on.");
+            	controller.showTipsDialog();
+            }
 
             if (e.getButton() == MouseEvent.BUTTON3 && labelsList.getSelectedIndices().length == 1) {
                 rightClickMenu.show(LabelPanelView.this, e.getX(), e.getY());

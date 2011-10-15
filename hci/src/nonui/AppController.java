@@ -29,6 +29,7 @@ import src.ui.ImagePanelView;
 import src.ui.LabelPanelView;
 import src.ui.MenuBarView;
 import src.ui.ThumbnailView;
+import src.ui.TipsDialog;
 import src.ui.ToolboxPanelView;
 import src.utils.DirectoryRestrictedFileSystemView;
 import src.utils.LabelIO;
@@ -52,6 +53,7 @@ public class AppController {
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
+    private final TipsDialog tipsDialog = new TipsDialog(appFrame, this);
     private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
 
     // The model.
@@ -836,10 +838,32 @@ public class AppController {
     }
 
 	public void setTipsOn(boolean b) {
-		enableTips = true;
+		
+    	JFrame parent = new JFrame();
+		
+    	if (b) {
+
+        	JOptionPane.showMessageDialog(parent,"Tips are now on.");
+    		
+		} else {
+        	
+        	JOptionPane.showMessageDialog(parent,"<html>Tips are now off. <br />" +
+        			"Remember, you can always turn tips on <br />" +
+        			"again from the Help menu.</html>");
+
+		}
+		
+		enableTips = b;
 	}
 	
 	public boolean checkTipsOn() {
 		return enableTips;
+	}
+
+	public void showTipsDialog() {
+        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
+        tipsDialog.setLocation(mouseLocation);
+		tipsDialog.setVisible(true);
 	}
 }
