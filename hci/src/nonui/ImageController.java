@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import src.ui.ImagePanelView;
+import src.ui.ThumbnailView;
 import src.utils.Point;
 import src.utils.Polygon;
 
@@ -27,6 +28,8 @@ public class ImageController {
     Polygon polygonInCreation = new Polygon(); 
     Polygon polygonInEditing = new Polygon();
     private Point currentPoint = null;
+
+    private ThumbnailView thumbnailPanel;
 
     public ImageController(AppController appController) {
         this.appController = appController;
@@ -262,7 +265,7 @@ public class ImageController {
 
         if (polygonInCreation.getPoints().size() < 3) {
             JOptionPane.showMessageDialog(appFrame,
-                    "A polygon must have 3 or more vertices.", "Error", JOptionPane.ERROR_MESSAGE);
+                    "A label must have 3 or more vertices.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -481,9 +484,14 @@ public class ImageController {
         try {
             BufferedImage image = ImageIO.read(file);
             imagePanel.setImage(image);
+            thumbnailPanel.addImage(image);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(appController.getAppFrame(), "Unable to open image.",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void setThumbnailPanel(ThumbnailView thumbnailPanel) {
+        this.thumbnailPanel = thumbnailPanel;
     }
 }

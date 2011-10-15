@@ -83,11 +83,11 @@ public class ImageLabeller {
             }
         }
 
-        // The Projects directory.
-        File projectsDir = new File(imageLabellerDir.getAbsolutePath() + "/Projects");
-        if (!projectsDir.exists() && !projectsDir.mkdir()) {
-            throw new IOException("Unable to create Projects directory at "
-                    + projectsDir.getAbsolutePath());
+        // The Collections directory.
+        File collectionsDir = new File(imageLabellerDir.getAbsolutePath() + "/Collections");
+        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
+            throw new IOException("Unable to create Collections directory at "
+                    + collectionsDir.getAbsolutePath());
         }
     }
 }

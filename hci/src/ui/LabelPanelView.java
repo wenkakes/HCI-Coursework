@@ -69,7 +69,7 @@ public class LabelPanelView extends JPanel {
 
         // Set up the buttons.
         addButton = createButton(new ImageIcon("hci/icons/small/add.png"), new AddListener(), false);
-        addButton.setToolTipText("Add Label");
+        addButton.setToolTipText("Add New Label");
         editButton = createButton(new ImageIcon("hci/icons/small/edit.png"), new EditListener(),
                 false);
         editButton.setToolTipText("Rename Label");

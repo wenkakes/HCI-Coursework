@@ -1,5 +1,6 @@
 package src.nonui;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
 import java.io.BufferedReader;
@@ -20,12 +21,14 @@ import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 import javax.swing.filechooser.FileSystemView;
 
 import src.ui.ImagePanelView;
 import src.ui.LabelPanelView;
 import src.ui.MenuBarView;
+import src.ui.ThumbnailView;
 import src.ui.ToolboxPanelView;
 import src.utils.DirectoryRestrictedFileSystemView;
 import src.utils.LabelIO;
@@ -49,6 +52,7 @@ public class AppController {
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
+    private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
 
     // The model.
     private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
@@ -56,15 +60,22 @@ public class AppController {
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
 
-    // The current project.
-    private String currentProjectName;
+    // The current collection.
+    private String currentCollectionName;
     private String currentImageName;
 
     public AppController() {
         appFrame.setLayout(new FlowLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        appFrame.add(imagePanel);
+        JPanel leftPanel = new JPanel();
+        BorderLayout leftPanelLayout = new BorderLayout();
+        leftPanelLayout.setVgap(5);
+        leftPanel.setLayout(leftPanelLayout);
+        leftPanel.add(imagePanel, BorderLayout.CENTER);
+        leftPanel.add(thumbnailPanel, BorderLayout.SOUTH);
+        
+        appFrame.add(leftPanel, BorderLayout.CENTER);
         appFrame.add(labelPanel);
         appFrame.setJMenuBar(menuBar);
 
@@ -73,6 +84,7 @@ public class AppController {
         appFrame.setResizable(false);
 
         imageController.setPanel(imagePanel);
+        imageController.setThumbnailPanel(thumbnailPanel);
 
         loadSettingsFile();
         setMenuItemsEnabled();
@@ -85,13 +97,13 @@ public class AppController {
      * Sets whether or not different menu items should be enabled.
      */
     private void setMenuItemsEnabled() {
-        boolean projectOpened = currentProjectName != null;
+        boolean collectionOpened = currentCollectionName != null;
         boolean imageOpened = currentImageName != null;
 
         // File menu.
-        menuBar.setCloseProjectEnabled(projectOpened);
-        menuBar.setImportImageEnabled(projectOpened);
-        menuBar.setOpenImageEnabled(projectOpened);
+        menuBar.setCloseCollectionEnabled(collectionOpened);
+        menuBar.setImportImageEnabled(collectionOpened);
+        menuBar.setOpenImageEnabled(collectionOpened);
         menuBar.setSaveImageEnabled(imageOpened);
         menuBar.setCloseImageEnabled(imageOpened);
 
@@ -177,7 +189,7 @@ public class AppController {
      */
     public void loadLabels() {
         FileSystemView fsv = new DirectoryRestrictedFileSystemView(new File(MAIN_FOLDER
-                + "/Projects/" + currentProjectName + "/labels"));
+                + "/Collections/" + currentCollectionName + "/labels"));
         JFileChooser chooser = new JFileChooser(fsv.getHomeDirectory(), fsv);
         int returnValue = chooser.showOpenDialog(appFrame);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -355,15 +367,15 @@ public class AppController {
         return selectedPolygons;
     }
 
-    public void newProject() {
-        // Prompt for project name.
-        String newProjectName = null;
+    public void newCollection() {
+        // Prompt for collection name.
+        String newCollectionName = null;
         boolean hasName = false;
 
-        File projectsDir = new File(MAIN_FOLDER + "/Projects");
-        if (!projectsDir.exists() && !projectsDir.mkdir()) {
+        File collectionsDir = new File(MAIN_FOLDER + "/Collections");
+        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
             // TODO: Error somehow. This is bad enough that we could crash out.
-            System.err.println("Cannot open Projects directory.");
+            System.err.println("Cannot open Collections directory.");
             return;
         }
 
@@ -373,22 +385,22 @@ public class AppController {
                 return pathname.isDirectory();
             }
         };
-        File directories[] = projectsDir.listFiles(directoryFilter);
+        File directories[] = collectionsDir.listFiles(directoryFilter);
 
         while (!hasName) {
-            String message = "Project Name";
-            newProjectName = JOptionPane.showInputDialog(appFrame, message);
+            String message = "Collection Name";
+            newCollectionName = JOptionPane.showInputDialog(appFrame, message);
 
             hasName = true;
 
             // Occurs if the user hits the cancel option.
-            if (newProjectName == null) {
+            if (newCollectionName == null) {
                 return;
             }
 
-            newProjectName = newProjectName.trim();
+            newCollectionName = newCollectionName.trim();
 
-            if (newProjectName.isEmpty()) {
+            if (newCollectionName.isEmpty()) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 hasName = false;
@@ -397,7 +409,7 @@ public class AppController {
 
             // Check for duplicates.
             for (int i = 0; i < directories.length; i++) {
-                if (newProjectName.equals(directories[i].getName())) {
+                if (newCollectionName.equals(directories[i].getName())) {
                     // TODO: Give the option to overwrite.
                     JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -407,36 +419,37 @@ public class AppController {
             }
         }
 
-        // Create folders for new project.
-        File newProjectDir = new File(projectsDir.getAbsolutePath() + "/" + newProjectName);
-        File imageFolder = new File(newProjectDir.getAbsolutePath() + "/images");
-        File labelsFolder = new File(newProjectDir.getAbsolutePath() + "/labels");
-        if (!newProjectDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
+        // Create folders for new collection.
+        File newCollectionDir = new File(collectionsDir.getAbsolutePath() + "/" 
+                + newCollectionName);
+        File imageFolder = new File(newCollectionDir.getAbsolutePath() + "/images");
+        File labelsFolder = new File(newCollectionDir.getAbsolutePath() + "/labels");
+        if (!newCollectionDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
             // TODO: Error
-            System.err.println("Unable to create director for new project.");
+            System.err.println("Unable to create director for new collection.");
             return;
         }
 
-        // Set the current project.
-        currentProjectName = newProjectName;
+        // Set the current collection.
+        currentCollectionName = newCollectionName;
 
         // Clear everything interface wise, etc.
         closeImage();
 
         // Update the .settings file.
-        writeToSettingsFile(currentProjectName, "");
+        writeToSettingsFile(currentCollectionName, "");
 
         setMenuItemsEnabled();
     }
 
-    public void closeProject() {
-        if (currentProjectName == null) {
+    public void closeCollection() {
+        if (currentCollectionName == null) {
             return;
         }
 
         // TODO: Confirm?
 
-        currentProjectName = null;
+        currentCollectionName = null;
         closeImage();
 
         // Update the .settings file.
@@ -445,12 +458,12 @@ public class AppController {
         setMenuItemsEnabled();
     }
 
-    public void openProject() {
-        // Ask user to choose project.
-        File projectsDir = new File(MAIN_FOLDER + "/Projects");
-        if (!projectsDir.exists() && !projectsDir.mkdir()) {
+    public void openCollection() {
+        // Ask user to choose collection.
+        File collectionsDir = new File(MAIN_FOLDER + "/Collections");
+        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
             // TODO: Error somehow.
-            System.err.println("Cannot open Projects directory.");
+            System.err.println("Cannot open Collections directory.");
             return;
         }
 
@@ -460,41 +473,41 @@ public class AppController {
                 return pathname.isDirectory();
             }
         };
-        File projects[] = projectsDir.listFiles(directoryFilter);
-        if (projects.length == 0) {
-            JOptionPane.showMessageDialog(appFrame, "There are no projects. Please create one.",
+        File collections[] = collectionsDir.listFiles(directoryFilter);
+        if (collections.length == 0) {
+            JOptionPane.showMessageDialog(appFrame, "There are no collections. Please create one.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        String projectNames[] = new String[projects.length];
-        for (int i = 0; i < projectNames.length; i++) {
-            projectNames[i] = projects[i].getName();
+        String collectionNames[] = new String[collections.length];
+        for (int i = 0; i < collectionNames.length; i++) {
+            collectionNames[i] = collections[i].getName();
         }
 
-        String newProjectName = (String) JOptionPane.showInputDialog(appFrame,
-                "Choose a project to open", "Open Project", JOptionPane.QUESTION_MESSAGE, null,
-                projectNames, projectNames[0]);
+        String newCollectionName = (String) JOptionPane.showInputDialog(appFrame,
+                "Choose a collection to open", "Open Collection", JOptionPane.QUESTION_MESSAGE, 
+                null, collectionNames, collectionNames[0]);
 
-        if (newProjectName == null) {
+        if (newCollectionName == null) {
             // User hit cancel.
             return;
         }
 
-        // Close current project.
+        // Close current collection.
         closeImage();
 
-        // Open other project.
+        // Open other collection.
         // TODO: Open images, etc.
-        currentProjectName = newProjectName;
+        currentCollectionName = newCollectionName;
 
         // Update settings file.
-        writeToSettingsFile(currentProjectName, "");
+        writeToSettingsFile(currentCollectionName, "");
 
         setMenuItemsEnabled();
     }
 
-    private boolean writeToSettingsFile(String projectName, String imageName) {
+    private boolean writeToSettingsFile(String collectionName, String imageName) {
         File settingsFile = new File(MAIN_FOLDER + "/.settings");
         if (!settingsFile.canWrite()) {
             System.err.println("Cannot write to Settings file.");
@@ -504,8 +517,8 @@ public class AppController {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
 
-            out.write(projectName);
-            if (!projectName.isEmpty()) {
+            out.write(collectionName);
+            if (!collectionName.isEmpty()) {
                 out.newLine();
 
                 out.write(imageName);
@@ -524,7 +537,7 @@ public class AppController {
     }
 
     public void importImage() {
-        if (currentProjectName == null) {
+        if (currentCollectionName == null) {
             return;
         }
 
@@ -541,10 +554,10 @@ public class AppController {
 
         // Check for filename conflict. If so, prompt user to overwrite, rename,
         // or cancel.
-        File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
+        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images");
         if (!imagesDirectory.exists() && !imagesDirectory.mkdir()) {
             // TODO: Error
-            System.err.println("Cannot open images directory for project.");
+            System.err.println("Cannot open images directory for collection.");
             return;
         }
 
@@ -609,7 +622,7 @@ public class AppController {
         imageController.setImage(destFile);
         currentImageName = imageName;
 
-        writeToSettingsFile(currentProjectName, currentImageName);
+        writeToSettingsFile(currentCollectionName, currentImageName);
 
         setMenuItemsEnabled();
 
@@ -676,12 +689,12 @@ public class AppController {
     }
 
     public void openImage() {
-        if (currentProjectName == null) {
+        if (currentCollectionName == null) {
             return;
         }
 
         // User chooses image
-        File imagesDirectory = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images");
+        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images");
         FileFilter fileFilter = new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -691,7 +704,7 @@ public class AppController {
 
         File images[] = imagesDirectory.listFiles(fileFilter);
         if (images.length == 0) {
-            JOptionPane.showMessageDialog(appFrame, "Project has no images. Please import some.",
+            JOptionPane.showMessageDialog(appFrame, "Collection has no images. Please import some.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -715,7 +728,7 @@ public class AppController {
         imageController.setImage(imageFile);
         currentImageName = imageFile.getName();
 
-        writeToSettingsFile(currentProjectName, currentImageName);
+        writeToSettingsFile(currentCollectionName, currentImageName);
 
         setMenuItemsEnabled();
 
@@ -734,7 +747,7 @@ public class AppController {
         String labelName = removeExtension(currentImageName) + ".labels";
 
         // Save labels file
-        File labelFile = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/labels/"
+        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/labels/"
                 + labelName);
         if (labelFile.exists()) {
             // TODO: Check with user?
@@ -761,13 +774,13 @@ public class AppController {
             return;
         }
 
-        String projectName = null;
+        String collectionName = null;
         String imageName = null;
         BufferedReader in;
 
         try {
             in = new BufferedReader(new FileReader(settingsFile));
-            projectName = in.readLine();
+            collectionName = in.readLine();
         } catch (IOException e) {
             return;
         }
@@ -778,12 +791,12 @@ public class AppController {
             // Image names aren't needed.
         }
 
-        // TODO: Check project exists.
+        // TODO: Check collection exists.
 
-        currentProjectName = projectName;
+        currentCollectionName = collectionName;
         currentImageName = imageName;
         if (imageName != null) {
-            File imageFile = new File(MAIN_FOLDER + "/Projects/" + currentProjectName + "/images/"
+            File imageFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images/"
                     + currentImageName);
             imageController.setImage(imageFile);
 
