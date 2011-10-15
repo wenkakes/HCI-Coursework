@@ -34,18 +34,26 @@ public class TipsDialog extends JDialog {
     	JPanel panel = new JPanel(); 
     	
     	switch (tipNumber) {
+    	
     		case 1:
-    			tipText = "<html><center>You have selected a label. <br />" +
+    			tipText = "<html><center>You have selected a label. <br /><br />" +
     			"Click and drag the points to move them around, or <br />" +
     			"click on the lines between points to add more. <br />" +
     			"To rename the label, click the 'rename' button below the list." +
     			"</center><html>";
+    			
+    			break;
+    			
     		case 2:
-    			tipText = "<html><center>You've just made a label. <br />" +
-    					"You can select this label by clicking on it in the label list.<br />" +
-    					"By selecting the label, you can change its points or name. </center></html>";
+    			tipText = "<html><center>You've just made a label. <br /><br />" +
+    			"You can select this label by clicking on it in the label list.<br />" +
+    			"By selecting the label, you can change its points or name. </center></html>";
+    			
+    			break;
+    			
     		default:
     			// Stuff goes here
+    			break;
     	}
     	
     	JLabel instructions = new JLabel(tipText);
