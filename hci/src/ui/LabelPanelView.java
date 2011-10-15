@@ -415,10 +415,8 @@ public class LabelPanelView extends JPanel {
 
             controller.highlightSelected(getSelectedNames());
             
-            System.out.println("Click!");
             if (controller.checkTipsOn()) { 
-                System.out.println("Tips are on.");
-            	controller.showTipsDialog();
+            	controller.showSelectedLabelTip();
             }
 
             if (e.getButton() == MouseEvent.BUTTON3 && labelsList.getSelectedIndices().length == 1) {

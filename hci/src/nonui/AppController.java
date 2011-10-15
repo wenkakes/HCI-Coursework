@@ -55,7 +55,8 @@ public class AppController {
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
-    private final TipsDialog tipsDialog = new TipsDialog(appFrame, this);
+    private final TipsDialog selectedLabelTip = new TipsDialog(appFrame, this, 1);
+    private final TipsDialog newLabelTip = new TipsDialog(appFrame, this, 2);
     private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
 
     // The application state.
@@ -829,10 +830,18 @@ public class AppController {
 		return enableTips;
 	}
 
-	public void showTipsDialog() {
+	public void showSelectedLabelTip() {
         java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
         mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
-        tipsDialog.setLocation(mouseLocation);
-		tipsDialog.setVisible(true);
+        selectedLabelTip.setLocation(mouseLocation);
+		selectedLabelTip.setVisible(true);
+	}
+
+	public void showNewLabelTip() {
+        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
+        newLabelTip.setLocation(mouseLocation);
+		newLabelTip.setVisible(true);
+		
 	}
 }
