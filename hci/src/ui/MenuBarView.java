@@ -239,11 +239,16 @@ public class MenuBarView extends JMenuBar {
 
             }
         });
-
-        JCheckBoxMenuItem quickTips = new JCheckBoxMenuItem("Enable Quick Tips?");
+       
+        JMenuItem quickTips = new JMenuItem("Enable/Disable Quick Tips?");
         quickTips.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent event) {
-        		controller.setTipsOn(true);
+        		
+        		if (controller.checkTipsOn()) {
+        			controller.setTipsOn(false);
+        		} else {
+        			controller.setTipsOn(true);
+        		}
         	}
         });
         
