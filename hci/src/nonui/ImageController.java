@@ -306,6 +306,11 @@ public class ImageController {
         appController.finishedAddingPolygon(name);
 
         imagePanel.repaint();
+        
+        if (appController.checkTipsOn()) { 
+        	appController.showNewLabelTip();
+        }
+        
     }
 
     /**
