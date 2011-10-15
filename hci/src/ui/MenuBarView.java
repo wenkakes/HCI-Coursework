@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -218,7 +219,7 @@ public class MenuBarView extends JMenuBar {
 
         return editMenu;
     }
-
+    
     /**
      * Creates a help menu with the following options:
      * 
@@ -243,13 +244,21 @@ public class MenuBarView extends JMenuBar {
         JMenuItem aboutProgram = new JMenuItem("About");
         aboutProgram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                JOptionPane.showMessageDialog(parentFrame, "<html> Image Labeller v1.1 <br />"
+                JOptionPane.showMessageDialog(parentFrame, "<html> Image Labeller v1.2 <br />"
                         + "A 4th year Human-Computer Interaction project </html>", "About",
                         JOptionPane.INFORMATION_MESSAGE);
 
             }
         });
 
+        JCheckBoxMenuItem quickTips = new JCheckBoxMenuItem("Enable Quick Tips?");
+        quickTips.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent event) {
+        		controller.setTipsOn(true);
+        	}
+        });
+        
+        help.add(quickTips);
         help.add(howToUse);
         help.add(aboutProgram);
 

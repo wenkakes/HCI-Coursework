@@ -91,7 +91,6 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
             }
 
             List<Point> editedPoints = controller.getEditedPolygonPoints();
-            System.out.println("Found some points we edited!");
             if (editedPoints != null) {
                 drawPolygon(editedPoints, graphics2D, Color.YELLOW);
                 drawLine(editedPoints.get(0), editedPoints.get(editedPoints.size() - 1),

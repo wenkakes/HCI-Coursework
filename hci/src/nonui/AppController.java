@@ -59,6 +59,7 @@ public class AppController {
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
+    private boolean enableTips = true;
 
     // The current collection.
     private String currentCollectionName;
@@ -833,4 +834,12 @@ public class AppController {
     public void selectPolygon(Polygon polygon) {
         labelPanel.selectPolygon(polygon.getName());
     }
+
+	public void setTipsOn(boolean b) {
+		enableTips = true;
+	}
+	
+	public boolean checkTipsOn() {
+		return enableTips;
+	}
 }

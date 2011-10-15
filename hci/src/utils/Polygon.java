@@ -89,19 +89,37 @@ public class Polygon {
     }
 
     public boolean replacePoint(Point oldPoint, Point newPoint) { 	
+    	
     	// Check to see if the old point exists and was not undone
-    	if (points.contains(oldPoint) && points.indexOf(oldPoint) < pointIndex) {
-			if (points.contains(newPoint) && (points.size() > 3)) {
-				if (Math.abs(points.indexOf(newPoint) - points.indexOf(oldPoint)) != 1) {
-					System.out.println("NO MERGING HERE!");
+    	if (points.contains(oldPoint) && points.indexOf(oldPoint) <= pointIndex) {
+    		
+			if (points.contains(newPoint)) {
+
+				int nPoints = getPoints().size();
+				
+				if (nPoints > 3) {
+					
+					System.out.println("Point already exists, and polygon is of size " + nPoints);
+					int dBetweenPts = Math.abs( points.indexOf(newPoint) - points.indexOf(oldPoint) );
+					
+					if ( dBetweenPts == 1 || dBetweenPts == (nPoints - 1) ) {
+
+						System.out.println("OK YOU CAN MERGE - Distance between points = " + dBetweenPts);
+						points.remove(oldPoint);
+						pointIndex--;
+						return true;
+					}
+					
+					System.out.println("NO MERGING HERE - Point too far away!");
+					return false;			
+					
+				} else  {
+					
+					System.out.println("Point already exists, but polygon is of size " + pointIndex);
 					return false;
 				}
-/*				Point newPoint2 = new Point(newPoint.getX() + 1, newPoint.getY());
-				newPoint = newPoint2; */
-				points.remove(oldPoint);
-				pointIndex--;
-				return true;
 			}
+			
 			return Collections.replaceAll(points, oldPoint, newPoint);
     	}
     	

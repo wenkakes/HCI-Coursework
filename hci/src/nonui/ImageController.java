@@ -162,7 +162,7 @@ public class ImageController {
             	// If a point is being selected... select it.
                 // If a point is not being selected, add a new point.
                 if (!selectClosestPoint(x, y)) {
-                	System.out.println("No closest point, add new point instead.");
+                	//System.out.println("No closest point, add new point instead.");
                 	addPt2OldPolygon(x,y);
                 	imagePanel.repaint();
                 	
@@ -339,7 +339,7 @@ public class ImageController {
             appController.setApplicationState(ApplicationState.EDITING_POLYGON);
             currentPoint = closestPoint;
             polygonInEditing = closestPolygon;
-            System.out.println("Yay, we found a polygon!");
+            //System.out.println("Yay, we found a polygon!");
             return true;
         } else {
             appController.setApplicationState(ApplicationState.DEFAULT);
