@@ -386,38 +386,19 @@ public class AppController {
      * 
      * @param name the name of the image to open
      */
-    public void openImage(String name) {
+    public void setCurrentImage(String name) {
+        applicationState = ApplicationState.DEFAULT;
+        
         currentImage = collectionImages.get(name);
         
-        // Do all the setting stuff - clear labels, etc.
         imageController.setImage(currentImage.getImage());
         labelPanel.clear();
         for (Polygon polygon : currentImage.getLabels()) {
             labelPanel.addLabel(polygon.getName());
         }
     }
-
     
-    /**
-     * Sets whether or not different menu items should be enabled.
-     */
-    private void setMenuItemsEnabled() {
-        boolean collectionOpened = currentCollectionName != null;
-        boolean imageOpened = currentImage != null;
-        boolean imageHasLabels = currentImage != null && currentImage.getLabels().size() > 0;
-
-        // File menu.
-        menuBar.setCloseCollectionEnabled(collectionOpened);
-        menuBar.setImportImageEnabled(collectionOpened);
-        menuBar.setSaveImageEnabled(imageOpened);
-        menuBar.setCloseImageEnabled(imageOpened);
-
-        // Edit menu.
-        menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
-        menuBar.setRenamePolygonEnabled(imageHasLabels);
-        menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
-        menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
-    }
+    // ---------------------------------------------------------------------------
 
     /**
      * Returns a list of the points of each completed polygon.
@@ -799,5 +780,26 @@ public class AppController {
 
     public void selectPolygon(Polygon polygon) {
         labelPanel.selectPolygon(polygon.getName());
+    }
+        
+    /**
+     * Sets whether or not different menu items should be enabled.
+     */
+    private void setMenuItemsEnabled() {
+        boolean collectionOpened = currentCollectionName != null;
+        boolean imageOpened = currentImage != null;
+        boolean imageHasLabels = currentImage != null && currentImage.getLabels().size() > 0;
+
+        // File menu.
+        menuBar.setCloseCollectionEnabled(collectionOpened);
+        menuBar.setImportImageEnabled(collectionOpened);
+        menuBar.setSaveImageEnabled(imageOpened);
+        menuBar.setCloseImageEnabled(imageOpened);
+
+        // Edit menu.
+        menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
+        menuBar.setRenamePolygonEnabled(imageHasLabels);
+        menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
+        menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
     }
 }

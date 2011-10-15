@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import src.ui.ImagePanelView;
-import src.ui.ThumbnailView;
 import src.utils.Point;
 import src.utils.Polygon;
 
@@ -25,8 +24,6 @@ public class ImageController {
     Polygon currentPolygon = new Polygon();
     Polygon editedPolygon = new Polygon();
     private Point currentPoint = null;
-
-    private ThumbnailView thumbnailPanel;
 
     public ImageController(AppController appController) {
         this.appController = appController;
@@ -452,9 +449,5 @@ public class ImageController {
      */
     public void setImage(BufferedImage image) {
         imagePanel.setImage(image);
-    }
-
-    public void useImage(String name) {
-        // Grab the labelledimage with name from the list, and set it as the current image.
     }
 }

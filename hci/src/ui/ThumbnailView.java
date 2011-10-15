@@ -92,7 +92,7 @@ public class ThumbnailView extends JPanel {
     }
 
     public void setImage(String name) {
-        appController.openImage(name);
+        appController.setCurrentImage(name);
     }
     
     private class FilmStrip extends JPanel implements MouseListener {
