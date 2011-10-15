@@ -133,6 +133,14 @@ public class LabelPanelView extends JPanel {
         hideLabelList();
     }
 
+
+    public void disableLabelPanel() {
+        clear();
+        
+        setAddButtonEnabled(false);
+        setLoadButtonEnabled(false);
+    }
+
     /**
      * Sets whether or not the add label button should be enabled.
      * 

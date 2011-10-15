@@ -1,13 +1,10 @@
 package src.nonui;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -48,7 +45,7 @@ public class ImageController {
      * Returns a list of the points of the completed polygons.
      */
     public List<List<Point>> getCompletedPolygonsPoints() {
-        Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();
+        Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();        
         List<List<Point>> points = new ArrayList<List<Point>>(completedPolygons.size());
         for (Polygon polygon : completedPolygons.values()) {
             points.add(new ArrayList<Point>(polygon.getPoints()));
@@ -451,20 +448,13 @@ public class ImageController {
     /**
      * Sets the image from a file.
      * 
-     * @param file the file to open the image from
+     * @param bufferedImage the file to open the image from
      */
-    public void setImage(File file) {
-        try {
-            BufferedImage image = ImageIO.read(file);
-            imagePanel.setImage(image);
-            thumbnailPanel.addImage(image);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(appController.getAppFrame(), "Unable to open image.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
+    public void setImage(BufferedImage image) {
+        imagePanel.setImage(image);
     }
 
-    public void setThumbnailPanel(ThumbnailView thumbnailPanel) {
-        this.thumbnailPanel = thumbnailPanel;
+    public void useImage(String name) {
+        // Grab the labelledimage with name from the list, and set it as the current image.
     }
 }

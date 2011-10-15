@@ -3,10 +3,10 @@ package src.nonui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -33,6 +34,7 @@ import src.ui.ToolboxPanelView;
 import src.utils.DirectoryRestrictedFileSystemView;
 import src.utils.LabelIO;
 import src.utils.LabelIO.LabelParseException;
+import src.utils.LabelledImage;
 import src.utils.Point;
 import src.utils.Polygon;
 
@@ -54,15 +56,13 @@ public class AppController {
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
     private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
 
-    // The model.
-    private Map<String, Polygon> completedPolygons = new HashMap<String, Polygon>();
-
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
 
     // The current collection.
-    private String currentCollectionName;
-    private String currentImageName;
+    private String currentCollectionName = null;
+    private LabelledImage currentImage = null;
+    private Map<String, LabelledImage> collectionImages = null;
 
     public AppController() {
         appFrame.setLayout(new FlowLayout());
@@ -84,7 +84,6 @@ public class AppController {
         appFrame.setResizable(false);
 
         imageController.setPanel(imagePanel);
-        imageController.setThumbnailPanel(thumbnailPanel);
 
         loadSettingsFile();
         setMenuItemsEnabled();
@@ -92,34 +91,340 @@ public class AppController {
         // Show tooltips fast.
         ToolTipManager.sharedInstance().setInitialDelay(100);
     }
+    
+    /**
+     * Opens a new collection, prompting the user for a name.
+     */
+    public void newCollection() {
+        File collectionsDir = new File(MAIN_FOLDER + "/Collections");
+        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
+            // TODO: Error somehow. This is bad enough that we could crash out.
+            System.err.println("Cannot open Collections directory.");
+            return;
+        }
+        File directories[] = collectionsDir.listFiles(LabelIO.DIRECTORY_FILTER);
 
+        // Get a name for the new collection.
+        String newCollectionName = "";
+        boolean hasName = false;
+        while (!hasName) {
+            String message = "Collection Name";
+            newCollectionName = JOptionPane.showInputDialog(appFrame, message, newCollectionName);
+
+            // Occurs if the user hits the cancel option.
+            if (newCollectionName == null) {
+                return;
+            }
+
+            newCollectionName = newCollectionName.trim();
+            hasName = true;
+            
+            // TODO: Check for invalid characters.
+            if (newCollectionName.isEmpty()) {
+                JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                hasName = false;
+                continue;
+            }
+
+            // Check for duplicates.
+            for (int i = 0; i < directories.length; i++) {
+                if (newCollectionName.equals(directories[i].getName())) {
+                    // TODO: Give the option to overwrite.
+                    JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    hasName = false;
+                    break;
+                }
+            }
+        }
+
+        // Create folders for new collection.
+        // TODO: Move to IO class?
+        File newCollectionDir = new File(collectionsDir.getAbsolutePath() + "/" 
+                + newCollectionName);
+        File imageFolder = new File(newCollectionDir.getAbsolutePath() + "/images");
+        File labelsFolder = new File(newCollectionDir.getAbsolutePath() + "/labels");
+        if (!newCollectionDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
+            // TODO: Error
+            System.err.println("Unable to create director for new collection.");
+            return;
+        }
+        
+        applicationState = ApplicationState.DEFAULT;
+        currentCollectionName = newCollectionName;
+        currentImage = null;
+        collectionImages = new HashMap<String, LabelledImage>();
+        
+        // Reset the interface.
+        imageController.setImage(null);
+        labelPanel.disableLabelPanel();
+        thumbnailPanel.clear();
+        setMenuItemsEnabled();
+        
+        writeToSettingsFile(currentCollectionName, "");
+    }
+
+    /**
+     * Closes the current collection.
+     */
+    public void closeCollection() {
+        if (currentCollectionName == null) {
+            return;
+        }
+        
+        applicationState = ApplicationState.DEFAULT;
+        currentCollectionName = null;
+        currentImage = null;
+        collectionImages = null;
+        
+        imageController.setImage(null);
+        thumbnailPanel.clear();
+        labelPanel.disableLabelPanel();
+        
+        setMenuItemsEnabled();
+        
+        writeToSettingsFile("", "");
+    }
+    
+    /**
+     * Opens a previously existing collection of the user's choice.
+     */
+    public void openCollection() {
+        File collectionsDir = new File(MAIN_FOLDER + "/Collections");
+        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
+            // TODO: Error somehow. This is bad enough that we could crash out.
+            System.err.println("Cannot open Collections directory.");
+            return;
+        }
+
+        File collections[] = collectionsDir.listFiles(LabelIO.DIRECTORY_FILTER);
+        if (collections.length == 0) {
+            JOptionPane.showMessageDialog(appFrame, "There are no collections. Please create one.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String collectionNames[] = new String[collections.length];
+        for (int i = 0; i < collectionNames.length; i++) {
+            collectionNames[i] = collections[i].getName();
+        }
+
+        // Ask user to choose collection.
+        String openedCollectionName = (String) JOptionPane.showInputDialog(appFrame,
+                "Choose a collection to open", "Open Collection", JOptionPane.QUESTION_MESSAGE, 
+                null, collectionNames, collectionNames[0]);
+
+        if (openedCollectionName == null) {
+            // User hit cancel.
+            return;
+        }
+
+        applicationState = ApplicationState.DEFAULT;
+        currentCollectionName = openedCollectionName;
+        // TODO: Provide a way for user to open a default image?
+        currentImage = null; 
+        collectionImages = LabelIO.openCollection(
+                new File(MAIN_FOLDER + "/Collections/" + currentCollectionName));
+        
+        thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
+        // TODO: Provide a way for user to open a default image?
+        imageController.setImage(null);
+        
+        setMenuItemsEnabled();
+
+        // TODO: Provide a way for user to open a default image?
+        writeToSettingsFile(currentCollectionName, "");
+    }
+
+    /**
+     * Imports an image into the current collection.
+     */
+    public void importImage() {
+        if (currentCollectionName == null) {
+            return;
+        }
+
+        // User chooses image from file dialog.
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Choose an image to import");
+        int returnValue = chooser.showOpenDialog(appFrame);
+        if (returnValue != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File imageFile = chooser.getSelectedFile();
+        String importedImageName = imageFile.getName();
+
+        // Check for filename conflict. If so, prompt user to overwrite, rename,
+        // or cancel.
+        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images");
+        if (!imagesDirectory.exists() && !imagesDirectory.mkdir()) {
+            // TODO: Error
+            System.err.println("Cannot open images directory for collection.");
+            return;
+        }
+        
+        File images[] = imagesDirectory.listFiles(LabelIO.FILE_FILTER);
+        String currentImageNames[] = new String[images.length];
+        for (int i = 0; i < currentImageNames.length; i++) {
+            currentImageNames[i] = images[i].getName();
+        }
+
+        Object[] options = { "Cancel", "Rename New Image", "Overwrite Old Image" };
+
+        // Cannot just use getNameFromUser, as this is a complex case.
+        boolean hasName = false;
+        while (!hasName) {
+            for (int i = 0; i < images.length; i++) {
+                if (importedImageName.equals(currentImageNames[i])) {
+                    int result = JOptionPane.showOptionDialog(appFrame,
+                            "Cannot import image due to duplicate name.",
+                            "Unable to import image",
+                            JOptionPane.YES_NO_CANCEL_OPTION, 
+                            JOptionPane.QUESTION_MESSAGE, 
+                            null,
+                            options, 
+                            options[2]);
+                    
+                    if (result == 0) {
+                        // Cancel.
+                        return;
+                    } else if (result == 1) {
+                        // Rename.
+                        importedImageName = getNameFromUser("Image Name", currentImageNames, false);
+                        if (importedImageName == null) {
+                            // User cancelled.
+                            return;
+                        }
+                        break;
+                    } else {
+                        // Overwrite
+                        // TODO: Delete labels file.
+                        break;
+                    }
+                }
+            }
+
+            hasName = true;
+        }
+
+        // Copy the image over.
+        File destFile = new File(imagesDirectory.getAbsolutePath() + "/" + importedImageName);
+        try {
+            copyFile(imageFile, destFile);
+        } catch (IOException e) {
+            // TODO: Error
+            System.err.println("IOException when importing image.");
+            return;
+        }
+        
+        // TODO: Move to IO class.
+        BufferedImage importedImage;
+        try {
+            importedImage = ImageIO.read(destFile);
+        } catch (IOException e) {
+            System.err.println("error");
+            return;
+        }
+        
+        applicationState = ApplicationState.DEFAULT;
+        currentImage = new LabelledImage(LabelIO.stripExtension(importedImageName), importedImage);
+        collectionImages.put(currentImage.getName(), currentImage);
+        
+        thumbnailPanel.addImage(currentImage);
+        imageController.setImage(currentImage.getImage());
+        labelPanel.clear();
+
+        setMenuItemsEnabled();
+
+        writeToSettingsFile(currentCollectionName, currentImage.getName());
+    }
+
+    /**
+     * Saves the current image.
+     * 
+     * TODO: Should this be "Save collection" and let it save all collections?
+     */
+    public void saveImage() {
+        if (currentImage == null) {
+            return;
+        }
+
+        String labelName = currentImage.getName() + ".labels";
+        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName +
+                "/labels/" + labelName);
+        
+        // TODO: Check with user for overwrite?
+        try {
+            LabelIO.writeLabels(labelFile, currentImage.getLabels());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /**
+     * Closes the current image (but does not remove it from the project.)
+     * 
+     * TODO: Do we still want this?
+     */
+    public void closeImage() {
+        applicationState = ApplicationState.DEFAULT;
+        currentImage = null;
+
+        imagePanel.setImage(null);
+        labelPanel.disableLabelPanel();
+
+        setMenuItemsEnabled();
+        
+        writeToSettingsFile(currentCollectionName, "");
+    }
+    
+    /**
+     * Open one of the collection images.
+     * 
+     * @param name the name of the image to open
+     */
+    public void openImage(String name) {
+        currentImage = collectionImages.get(name);
+        
+        // Do all the setting stuff - clear labels, etc.
+        imageController.setImage(currentImage.getImage());
+        labelPanel.clear();
+        for (Polygon polygon : currentImage.getLabels()) {
+            labelPanel.addLabel(polygon.getName());
+        }
+    }
+
+    
     /**
      * Sets whether or not different menu items should be enabled.
      */
     private void setMenuItemsEnabled() {
         boolean collectionOpened = currentCollectionName != null;
-        boolean imageOpened = currentImageName != null;
+        boolean imageOpened = currentImage != null;
+        boolean imageHasLabels = currentImage != null && currentImage.getLabels().size() > 0;
 
         // File menu.
         menuBar.setCloseCollectionEnabled(collectionOpened);
         menuBar.setImportImageEnabled(collectionOpened);
-        menuBar.setOpenImageEnabled(collectionOpened);
         menuBar.setSaveImageEnabled(imageOpened);
         menuBar.setCloseImageEnabled(imageOpened);
 
         // Edit menu.
         menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
-        menuBar.setRenamePolygonEnabled(completedPolygons.size() > 0);
-        menuBar.setDeleteSelectedLabelEnabled(completedPolygons.size() > 0);
-        menuBar.setDeleteAllLabelsEnabled(completedPolygons.size() > 0);
+        menuBar.setRenamePolygonEnabled(imageHasLabels);
+        menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
+        menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
     }
 
     /**
      * Returns a list of the points of each completed polygon.
      */
     public List<List<Point>> getCompletedPolygonsPoints() {
-        List<List<Point>> points = new ArrayList<List<Point>>(completedPolygons.size());
-        for (Polygon polygon : completedPolygons.values()) {
+        List<List<Point>> points = new ArrayList<List<Point>>(currentImage.getLabels().size());
+        for (Polygon polygon : currentImage.getLabels()) {
             points.add(new ArrayList<Point>(polygon.getPoints()));
         }
         return points;
@@ -146,11 +451,7 @@ public class AppController {
      * @param newName the new name for the polygon
      */
     public void renamePolygon(String oldName, String newName) {
-        Polygon polygon = completedPolygons.remove(oldName);
-        if (polygon != null) {
-            polygon.setName(newName);
-            completedPolygons.put(newName, polygon);
-        }
+        currentImage.renameLabel(oldName, newName);
     }
 
     /**
@@ -159,27 +460,13 @@ public class AppController {
      * @param name the name of the polygon to remove
      */
     public void removePolygon(String name) {
-        Polygon removedPolygon = completedPolygons.remove(name);
+        Polygon removedPolygon = currentImage.removeLabel(name);
         if (removedPolygon == imageController.getEditedPolygon()) {
             applicationState = ApplicationState.DEFAULT;
         }
         imagePanel.repaint();
 
         setMenuItemsEnabled();
-    }
-
-    /**
-     * Saves the current list of polygons to a file.
-     * 
-     * @param file the file to save to
-     */
-    public void saveLabels(File file) {
-        try {
-            LabelIO.writeLabels(file, new ArrayList<Polygon>(completedPolygons.values()));
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     /**
@@ -196,9 +483,9 @@ public class AppController {
             File loadFile = chooser.getSelectedFile();
 
             try {
-                completedPolygons = LabelIO.readLabels(loadFile);
+                currentImage.setLabels(LabelIO.readLabels(loadFile));
                 labelPanel.clear();
-                for (String name : completedPolygons.keySet()) {
+                for (String name : currentImage.getLabelNames()) {
                     labelPanel.addLabel(name);
                 }
                 imagePanel.repaint();
@@ -323,19 +610,7 @@ public class AppController {
     }
 
     public Polygon getPolygon(String name) {
-        return completedPolygons.get(name);
-    }
-
-    public void closeImage() {
-        currentImageName = null;
-
-        imagePanel.setImage(null);
-        labelPanel.clear();
-
-        labelPanel.setAddButtonEnabled(false);
-        labelPanel.setLoadButtonEnabled(false);
-
-        setMenuItemsEnabled();
+        return currentImage.getLabel(name);
     }
 
     public void highlightSelected(List<String> highlightedNames) {
@@ -361,150 +636,10 @@ public class AppController {
         List<Polygon> selectedPolygons = new ArrayList<Polygon>(selectedNames.size());
 
         for (String name : selectedNames) {
-            selectedPolygons.add(completedPolygons.get(name));
+            selectedPolygons.add(currentImage.getLabel(name));
         }
 
         return selectedPolygons;
-    }
-
-    public void newCollection() {
-        // Prompt for collection name.
-        String newCollectionName = null;
-        boolean hasName = false;
-
-        File collectionsDir = new File(MAIN_FOLDER + "/Collections");
-        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
-            // TODO: Error somehow. This is bad enough that we could crash out.
-            System.err.println("Cannot open Collections directory.");
-            return;
-        }
-
-        FileFilter directoryFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        };
-        File directories[] = collectionsDir.listFiles(directoryFilter);
-
-        while (!hasName) {
-            String message = "Collection Name";
-            newCollectionName = JOptionPane.showInputDialog(appFrame, message);
-
-            hasName = true;
-
-            // Occurs if the user hits the cancel option.
-            if (newCollectionName == null) {
-                return;
-            }
-
-            newCollectionName = newCollectionName.trim();
-
-            if (newCollectionName.isEmpty()) {
-                JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                hasName = false;
-                continue;
-            }
-
-            // Check for duplicates.
-            for (int i = 0; i < directories.length; i++) {
-                if (newCollectionName.equals(directories[i].getName())) {
-                    // TODO: Give the option to overwrite.
-                    JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    hasName = false;
-                    break;
-                }
-            }
-        }
-
-        // Create folders for new collection.
-        File newCollectionDir = new File(collectionsDir.getAbsolutePath() + "/" 
-                + newCollectionName);
-        File imageFolder = new File(newCollectionDir.getAbsolutePath() + "/images");
-        File labelsFolder = new File(newCollectionDir.getAbsolutePath() + "/labels");
-        if (!newCollectionDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
-            // TODO: Error
-            System.err.println("Unable to create director for new collection.");
-            return;
-        }
-
-        // Set the current collection.
-        currentCollectionName = newCollectionName;
-
-        // Clear everything interface wise, etc.
-        closeImage();
-
-        // Update the .settings file.
-        writeToSettingsFile(currentCollectionName, "");
-
-        setMenuItemsEnabled();
-    }
-
-    public void closeCollection() {
-        if (currentCollectionName == null) {
-            return;
-        }
-
-        // TODO: Confirm?
-
-        currentCollectionName = null;
-        closeImage();
-
-        // Update the .settings file.
-        writeToSettingsFile("", "");
-
-        setMenuItemsEnabled();
-    }
-
-    public void openCollection() {
-        // Ask user to choose collection.
-        File collectionsDir = new File(MAIN_FOLDER + "/Collections");
-        if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
-            // TODO: Error somehow.
-            System.err.println("Cannot open Collections directory.");
-            return;
-        }
-
-        FileFilter directoryFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        };
-        File collections[] = collectionsDir.listFiles(directoryFilter);
-        if (collections.length == 0) {
-            JOptionPane.showMessageDialog(appFrame, "There are no collections. Please create one.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String collectionNames[] = new String[collections.length];
-        for (int i = 0; i < collectionNames.length; i++) {
-            collectionNames[i] = collections[i].getName();
-        }
-
-        String newCollectionName = (String) JOptionPane.showInputDialog(appFrame,
-                "Choose a collection to open", "Open Collection", JOptionPane.QUESTION_MESSAGE, 
-                null, collectionNames, collectionNames[0]);
-
-        if (newCollectionName == null) {
-            // User hit cancel.
-            return;
-        }
-
-        // Close current collection.
-        closeImage();
-
-        // Open other collection.
-        // TODO: Open images, etc.
-        currentCollectionName = newCollectionName;
-
-        // Update settings file.
-        writeToSettingsFile(currentCollectionName, "");
-
-        setMenuItemsEnabled();
     }
 
     private boolean writeToSettingsFile(String collectionName, String imageName) {
@@ -534,101 +669,6 @@ public class AppController {
         }
 
         return true;
-    }
-
-    public void importImage() {
-        if (currentCollectionName == null) {
-            return;
-        }
-
-        // User chooses image from file dialog.
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Choose an image to import");
-        int returnValue = chooser.showOpenDialog(appFrame);
-        if (returnValue != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-
-        File imageFile = chooser.getSelectedFile();
-        String imageName = imageFile.getName();
-
-        // Check for filename conflict. If so, prompt user to overwrite, rename,
-        // or cancel.
-        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images");
-        if (!imagesDirectory.exists() && !imagesDirectory.mkdir()) {
-            // TODO: Error
-            System.err.println("Cannot open images directory for collection.");
-            return;
-        }
-
-        FileFilter fileFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isFile();
-            }
-        };
-        File images[] = imagesDirectory.listFiles(fileFilter);
-        String imageNames[] = new String[images.length];
-        for (int i = 0; i < imageNames.length; i++) {
-            imageNames[i] = images[i].getName();
-        }
-
-        Object[] options = { "Cancel", "Rename New Image", "Overwrite Old Image" };
-
-        // Cannot just use getNameFromUser, as this is a complex case.
-        boolean hasName = false;
-        while (!hasName) {
-            for (int i = 0; i < images.length; i++) {
-                if (imageName.equals(images[i].getName())) {
-                    int result = JOptionPane.showOptionDialog(appFrame,
-                            "Cannot import image due to duplicate name.", "Unable to import image",
-                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                            options, options[2]);
-                    if (result == 0) {
-                        // Cancel.
-                        return;
-                    } else if (result == 1) {
-                        // Rename
-                        imageName = getNameFromUser("Image Name", imageNames, false);
-                        if (imageName == null) {
-                            // User cancelled.
-                            return;
-                        }
-
-                        break;
-                    } else {
-                        // Overwrite
-                        // TODO: Delete labels file.
-                        break;
-                    }
-                }
-            }
-
-            hasName = true;
-        }
-
-        // Copy the image over.
-        File destFile = new File(imagesDirectory.getAbsolutePath() + "/" + imageName);
-        try {
-            copyFile(imageFile, destFile);
-        } catch (IOException e) {
-            // TODO: Error
-            System.err.println("IOException when importing image.");
-            return;
-        }
-
-        // Open image up, no labels.
-        cancelAddingPolygon();
-        imageController.setImage(destFile);
-        currentImageName = imageName;
-
-        writeToSettingsFile(currentCollectionName, currentImageName);
-
-        setMenuItemsEnabled();
-
-        // TODO: STEPHEN
-        completedPolygons.clear();
-        labelPanel.clear();
     }
 
     private void copyFile(File sourceFile, File destFile) throws IOException {
@@ -688,89 +728,13 @@ public class AppController {
         return name;
     }
 
-    public void openImage() {
-        if (currentCollectionName == null) {
-            return;
-        }
-
-        // User chooses image
-        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images");
-        FileFilter fileFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isFile();
-            }
-        };
-
-        File images[] = imagesDirectory.listFiles(fileFilter);
-        if (images.length == 0) {
-            JOptionPane.showMessageDialog(appFrame, "Collection has no images. Please import some.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String imageNames[] = new String[images.length];
-        for (int i = 0; i < imageNames.length; i++) {
-            imageNames[i] = images[i].getName();
-        }
-
-
-        FileSystemView fsv = new DirectoryRestrictedFileSystemView(imagesDirectory);
-        JFileChooser chooser = new JFileChooser(fsv.getHomeDirectory(), fsv);
-        int result = chooser.showOpenDialog(appFrame);
-        if (result != JFileChooser.APPROVE_OPTION) {
-            // User hit cancel.
-            return;
-        }
-
-        // Open image up
-        File imageFile = chooser.getSelectedFile();
-        imageController.setImage(imageFile);
-        currentImageName = imageFile.getName();
-
-        writeToSettingsFile(currentCollectionName, currentImageName);
-
-        setMenuItemsEnabled();
-
-        // TODO: STEPHEN
-        completedPolygons.clear();
-        labelPanel.clear();
-    }
-
-    public void save() {
-        if (currentImageName == null) {
-            // TODO: Shouldnt be able to save if no image.
-            return;
-        }
-
-        // Get current image name, turn into labels name.
-        String labelName = removeExtension(currentImageName) + ".labels";
-
-        // Save labels file
-        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/labels/"
-                + labelName);
-        if (labelFile.exists()) {
-            // TODO: Check with user?
-        }
-
-        saveLabels(labelFile);
-    }
-
-    private String removeExtension(String fileName) {
-        int extensionIndex = fileName.lastIndexOf('.');
-        if (extensionIndex == -1) {
-            return fileName;
-        }
-        return fileName.substring(0, extensionIndex);
-    }
-
     /**
      * Loads the data from the settings file.
      */
     private void loadSettingsFile() {
         File settingsFile = new File(MAIN_FOLDER + "/.settings");
         if (!settingsFile.exists() || !settingsFile.canRead()) {
-            // Just ignore it.
+            // Just ignore the settings file.
             return;
         }
 
@@ -782,32 +746,35 @@ public class AppController {
             in = new BufferedReader(new FileReader(settingsFile));
             collectionName = in.readLine();
         } catch (IOException e) {
+            // Just ignore the settings file.
             return;
         }
 
         try {
             imageName = in.readLine();
         } catch (IOException e) {
-            // Image names aren't needed.
+            // An image name isn't compulsory, so we can skip this exception.
         }
 
         // TODO: Check collection exists.
-
         currentCollectionName = collectionName;
-        currentImageName = imageName;
-        if (imageName != null) {
-            File imageFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images/"
-                    + currentImageName);
-            imageController.setImage(imageFile);
+        File collectionRoot = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName);
+        collectionImages = LabelIO.openCollection(collectionRoot);
+        thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
+        
+        currentImage = collectionImages.get(imageName);
+        if (currentImage != null) {
+            imageController.setImage(currentImage.getImage());
 
-            // TODO: STEPHEN
-            completedPolygons.clear();
             labelPanel.clear();
+            for (Polygon polygon : currentImage.getLabels()) {
+                labelPanel.addLabel(polygon.getName());
+            }
         }
     }
 
     public Map<String, Polygon> getCompletedPolygons() {
-        return completedPolygons;
+        return (currentImage != null) ? currentImage.getLabelsMap() : null;
     }
 
     public List<String> getSelectedNames() {

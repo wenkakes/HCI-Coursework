@@ -1,6 +1,8 @@
 package src.utils;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
@@ -9,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -27,10 +30,80 @@ import org.w3c.dom.NodeList;
  * Handles label-related IO, including writing labels to a file and reading them
  * back.
  */
+// TODO: Rename.
 public final class LabelIO {
+    public static final FileFilter FILE_FILTER = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isFile();
+        }
+    }; 
+    public static final FileFilter DIRECTORY_FILTER = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory();
+        }
+    }; 
 
     private LabelIO() {
         // Non-instantiable.
+    }
+    
+    public static Map<String, LabelledImage> openCollection(File collectionRoot) {
+        Map<String, LabelledImage> collectionEntries = new HashMap<String, LabelledImage>();
+        
+        File imageDir = new File(collectionRoot.getAbsolutePath() + "/images");
+        File labelsDir = new File(collectionRoot.getAbsolutePath() + "/labels");
+        FileFilter fileFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile();
+            }
+        };
+        
+        File[] imageFiles = imageDir.listFiles(fileFilter);
+        File[] labelFiles = labelsDir.listFiles(fileFilter);
+        
+        if (imageFiles == null || imageFiles.length == 0) {
+            return collectionEntries;
+        }
+        
+        for (int i = 0; i < imageFiles.length; i++) {
+            File imageFile = imageFiles[i];
+            String imageName = stripExtension(imageFile.getName());
+            
+            BufferedImage image;
+            try {
+                image = ImageIO.read(imageFile);
+            } catch (IOException e) {
+                System.err.println("Unable to load image file: " + imageFile.getName());
+                continue;
+            }
+            
+            Map<String, Polygon> labels = null;
+            for (int j = 0; j < labelFiles.length; j++) {
+                File labelFile = labelFiles[j];
+                if (imageName.equals(stripExtension(labelFile.getName()))) {
+                    try {
+                        labels = LabelIO.readLabels(labelFile);
+                    } catch (LabelParseException e) {
+                        System.err.println("Unable to read labels");
+                    }
+                    break;
+                }
+            }
+            
+            LabelledImage labelledImage;
+            if (labels != null) {
+                labelledImage = new LabelledImage(imageName, image, new ArrayList<Polygon>(labels.values()));
+            } else {
+                labelledImage = new LabelledImage(imageName, image);
+            }
+            
+            collectionEntries.put(imageName, labelledImage);
+        }
+        
+        return collectionEntries;
     }
 
     /**
@@ -180,6 +253,14 @@ public final class LabelIO {
         }
 
         return polygons;
+    }
+
+    public static String stripExtension(String name) {
+        int extensionIndex = name.lastIndexOf('.');
+        if (extensionIndex < 0) {
+            return name;
+        }
+        return name.substring(0, extensionIndex);
     }
 
     /**

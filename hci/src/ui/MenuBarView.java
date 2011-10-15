@@ -26,7 +26,6 @@ public class MenuBarView extends JMenuBar {
     // Menu items that can be enabled/disabled.
     private JMenuItem closeCollection;
     private JMenuItem importImage;
-    private JMenuItem openImage;
     private JMenuItem saveImage;
     private JMenuItem closeImage;
     private JMenuItem addPolygon;
@@ -57,7 +56,6 @@ public class MenuBarView extends JMenuBar {
      * <li>Close Collection</li>
      * <li>Open Collection</li>
      * <li>Import Image</li>
-     * <li>Open Image</li>
      * <li>Save Image</li>
      * <li>Close Image</li>
      * <li>Exit</li>
@@ -105,14 +103,6 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        openImage = new JMenuItem("Open Image");
-        openImage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.openImage();
-            }
-        });
-
         // TODO: Rename this? (it saves labels, not images).
         saveImage = new JMenuItem("Save Image");
         saveImage.setMnemonic(KeyEvent.VK_S);
@@ -120,7 +110,7 @@ public class MenuBarView extends JMenuBar {
         saveImage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.save();
+                controller.saveImage();
             }
         });
 
@@ -146,7 +136,6 @@ public class MenuBarView extends JMenuBar {
         fileMenu.addSeparator();
 
         fileMenu.add(importImage);
-        fileMenu.add(openImage);
         fileMenu.add(saveImage);
         fileMenu.add(closeImage);
         fileMenu.addSeparator();
@@ -262,10 +251,6 @@ public class MenuBarView extends JMenuBar {
 
     public void setImportImageEnabled(boolean enabled) {
         importImage.setEnabled(enabled);
-    }
-
-    public void setOpenImageEnabled(boolean enabled) {
-        openImage.setEnabled(enabled);
     }
 
     public void setSaveImageEnabled(boolean enabled) {

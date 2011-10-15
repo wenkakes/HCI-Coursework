@@ -10,15 +10,22 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import src.nonui.AppController;
+import src.utils.LabelledImage;
 
 public class ThumbnailView extends JPanel {
     private static final long serialVersionUID = 1L;
+    
+    private static int COMPONENT_HEIGHT = 130;
+    private static int BUTTON_WIDTH = 40;
+    private static int THUMBNAIL_WIDTH = 175;
     
     private AppController appController;
 
@@ -29,8 +36,8 @@ public class ThumbnailView extends JPanel {
         
         this.appController = appController;
 
-        Dimension buttonSize = new Dimension(40, 100);
-        Dimension middleSize = new Dimension(700,100);
+        Dimension buttonSize = new Dimension(BUTTON_WIDTH, COMPONENT_HEIGHT);
+        Dimension middleSize = new Dimension(700,COMPONENT_HEIGHT);
 
         JButton left = new JButton("<");
         left.setPreferredSize(buttonSize);
@@ -69,56 +76,86 @@ public class ThumbnailView extends JPanel {
         setVisible(true);
     }
     
-    public void addImage(BufferedImage image) {
-        middle.addImage(image);
+    public void addImage(LabelledImage image) {
+        middle.addImage(image.getName(), image.getImage());
+    }
+
+    public void setImages(List<LabelledImage> labelledImages) {
+        clear();
+        for (LabelledImage labelledImage : labelledImages) {
+            middle.addImage(labelledImage.getName(), labelledImage.getImage());
+        }
+    }
+    
+    public void clear() {
+        middle.clear();
+    }
+
+    public void setImage(String name) {
+        appController.openImage(name);
     }
     
     private class FilmStrip extends JPanel implements MouseListener {
         private static final long serialVersionUID = 1L;
         
-        // Storage for the thumbnails. Will probably be very memory hungry, but meh.
-        private final List<BufferedImage> images;
+        // Storage for the thumbnails.
+        private final Map<String, BufferedImage> thumbnails;
         private int index = 0;
         
         public FilmStrip() {
             super();
             
-            images = new ArrayList<BufferedImage>();
+            // Use a linked hashmap to preserve the ordering.
+            thumbnails = new LinkedHashMap<String, BufferedImage>();
             
             this.addMouseListener(this);
         }
 
         @Override
         protected void paintComponent(Graphics g) {
+            List<BufferedImage> images = new ArrayList<BufferedImage>(thumbnails.values());
             int xcoord = 0;
             for (int i = index; i < index + 4 && i < images.size(); i++) {
                 g.drawImage(images.get(i), xcoord, 0, null);
-                xcoord += 175;
+                
+                // Border.
+                g.setColor(Color.black);
+                g.drawRect(xcoord, 0, THUMBNAIL_WIDTH, COMPONENT_HEIGHT);
+                
+                xcoord += THUMBNAIL_WIDTH;
             }
 
             int remainingWidth = this.getWidth() - xcoord;
             g.setColor(Color.gray);
-            g.fillRect(xcoord, 0, remainingWidth, 100);
+            g.fillRect(xcoord, 0, remainingWidth, COMPONENT_HEIGHT);
         }
 
-        public void addImage(BufferedImage image) {
-            // Scale image to have a width of 175.
+        public void addImage(String name, BufferedImage image) {
+            // Scale image to have a height of COMPONENT_HEIGHT and a width of 175.
             int width = image.getWidth();
             int height = image.getHeight();
 
-            if (width > 175) {
-                height = (height * 175) / width;
-                width = 175;
-            } else if (width < 175) {
-                height = (height * width) / 175;
-                width = 175;
+            if (width > THUMBNAIL_WIDTH || height > COMPONENT_HEIGHT) {
+                width = (width > THUMBNAIL_WIDTH) 
+                        ? THUMBNAIL_WIDTH 
+                        : ((width * COMPONENT_HEIGHT) / height);
+                height = (height > COMPONENT_HEIGHT)
+                        ? COMPONENT_HEIGHT
+                        : (height * THUMBNAIL_WIDTH) / width;
+            } else if (width < THUMBNAIL_WIDTH || height < COMPONENT_HEIGHT) {
+                width = (width < THUMBNAIL_WIDTH)
+                        ? THUMBNAIL_WIDTH
+                        : ((width * height) / COMPONENT_HEIGHT);
+                height = (height < COMPONENT_HEIGHT)
+                        ? COMPONENT_HEIGHT
+                        : (height * width) / THUMBNAIL_WIDTH;
             }
             
             BufferedImage imageThumbnail = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_FAST);
             imageThumbnail.getGraphics().drawImage(scaledImage, 0, 0, this);
             
-            images.add(imageThumbnail);
+            thumbnails.put(name, imageThumbnail);
             
             repaint();
         }
@@ -132,6 +169,13 @@ public class ThumbnailView extends JPanel {
             if (index > 0) {
                 index--;
             }
+            repaint();
+        }
+
+        public void clear() {
+            index = 0;
+            thumbnails.clear();
+            
             repaint();
         }
 
@@ -149,10 +193,14 @@ public class ThumbnailView extends JPanel {
             }
             
             // Work out which image was clicked on:
-            int imageIndex = x / 175 + index;
-            if (imageIndex >= images.size()) {
+            int imageIndex = x / THUMBNAIL_WIDTH + index;
+            if (imageIndex >= thumbnails.size()) {
                 return;
             }
+            
+            // Grab the name.
+            List<String> names = new ArrayList<String>(thumbnails.keySet());
+            setImage(names.get(imageIndex));
         }
 
         @Override
