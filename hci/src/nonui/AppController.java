@@ -58,6 +58,7 @@ public class AppController {
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
+    private boolean enableTips = true;
 
     // The current collection.
     private String currentCollectionName = null;
@@ -802,4 +803,12 @@ public class AppController {
         menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
         menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
     }
+
+	public void setTipsOn(boolean b) {
+		enableTips = true;
+	}
+	
+	public boolean checkTipsOn() {
+		return enableTips;
+	}
 }

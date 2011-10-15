@@ -13,16 +13,16 @@ import src.utils.Point;
 import src.utils.Polygon;
 
 public class ImageController {
-    // The farthest distance, in pixels, that the user can click from a point
-    // and still 'select' it.
+	
+    // How far a user can click from a point and still select it (in pixels) 
     private static final double EDITING_THRESHOLD_DISTANCE = 5.0;
-
+    
     private final AppController appController;
     private ImagePanelView imagePanel;
 
     // Used when adding/editing points.
-    Polygon currentPolygon = new Polygon();
-    Polygon editedPolygon = new Polygon();
+    Polygon polygonInCreation = new Polygon(); 
+    Polygon polygonInEditing = new Polygon();
     private Point currentPoint = null;
 
     public ImageController(AppController appController) {
@@ -66,8 +66,8 @@ public class ImageController {
      * Returns a list of the points of the polygon that is currently being created.
      */
     public List<Point> getCurrentPolygonPoints() {
-    	if (currentPolygon != null)
-    		return currentPolygon.getPoints();
+    	if (polygonInCreation != null)
+    		return polygonInCreation.getPoints();
     	return null;
     }
 
@@ -77,7 +77,7 @@ public class ImageController {
      */
     public List<Point> getEditedPolygonPoints() {
         if (appController.getApplicationState() == ApplicationState.EDITING_POLYGON) {
-            return editedPolygon.getPoints();
+            return polygonInEditing.getPoints();
         }
 
         return null;
@@ -91,20 +91,18 @@ public class ImageController {
      * @param doubleClick whether or not the user is double clicking
      */
     public void imageMouseClick(int x, int y, boolean doubleClick) {
+    	System.out.println("State: " + appController.getApplicationState());
         switch (appController.getApplicationState()) {
-            case DEFAULT:
+            
+        	case DEFAULT:
                 if (doubleClick) {
                     // Double clicking does nothing in the default state.
                     return;
                 }
                 
-                Polygon closestPolygon = getClosestPolygon(x, y, EDITING_THRESHOLD_DISTANCE);
-                if (closestPolygon == null) {
-                    return;
-                }
-                appController.selectPolygon(closestPolygon);
-                
-                imagePanel.repaint();
+            	// If an existing point is recognised as being clicked, 
+            	// select it and change the state to EDITING
+                selectClosestPoint(x, y);
                 break;
                 
             case ADDING_POLYGON:
@@ -114,19 +112,21 @@ public class ImageController {
                 	if (checkPolygonClosed(x,y)) {
                 		finishedAddingPolygon();
                 	} else {
-                		currentPolygon.addPoint(new Point(x, y));
+                		polygonInCreation.addPoint(new Point(x, y));
                         imagePanel.repaint();	
                 	}                 
                 }
                 break;
                 
             case EDITING_POLYGON:
-                // TODO: Implement explicit editing logic.
+            	
+                // If a point is being clicked, select this polygon.              
                 if (!selectClosestPoint(x, y)) {
                 	addPt2OldPolygon(x,y);
-                	imagePanel.repaint();
-                break;
+                } else {
+                	
                 }
+            	imagePanel.repaint();
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -141,25 +141,30 @@ public class ImageController {
      */
     public void imageMousePress(int x, int y) {
         switch (appController.getApplicationState()) {
-            case DEFAULT:
-                Polygon closestPolygon = getClosestPolygon(x, y, EDITING_THRESHOLD_DISTANCE);
-                if (closestPolygon == null) {
-                    return;
-                }
-                appController.selectPolygon(closestPolygon);
-                
+            
+        	case DEFAULT:
+            	// If an existing point is recognised as being clicked, 
+            	// select it and change the state to EDITING
                 selectClosestPoint(x, y);
                 break;
+                
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
+                
             case EDITING_POLYGON:
-                // Implement explicit editing logic.
+            	// If a point is being selected... select it.
+                // If a point is not being selected, add a new point.
                 if (!selectClosestPoint(x, y)) {
+                	//System.out.println("No closest point, add new point instead.");
                 	addPt2OldPolygon(x,y);
                 	imagePanel.repaint();
-                break;
+                	
                 }
+                
+                break;
+
+                
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -171,19 +176,23 @@ public class ImageController {
      */
     public void imageMouseReleased() {
         switch (appController.getApplicationState()) {
+        
             case DEFAULT:
                 currentPoint = null;
-                currentPolygon = new Polygon();
+                polygonInCreation = new Polygon();
                 imagePanel.repaint();
                 break;
+                
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
+                
             case EDITING_POLYGON:
                 // Implement logic for explicit editing.
                 currentPoint = null;
-                currentPolygon = new Polygon();
+                polygonInCreation = new Polygon();
                 break;
+                
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -197,22 +206,26 @@ public class ImageController {
      */
     public void imageMouseDrag(int x, int y) {
         switch (appController.getApplicationState()) {
+        
             case DEFAULT:
                 // Do nothing
                 break;
+                
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
+                
             case EDITING_POLYGON:
-                if (currentPoint != null) {
+                if (currentPoint != null && polygonInEditing != null) {
                     Point newPoint = new Point(x, y);
-                    if (currentPolygon.replacePoint(currentPoint, newPoint)) {
+                    if (polygonInEditing.replacePoint(currentPoint, newPoint)) {
+                    	System.out.println("Replaced a point");
                         currentPoint = newPoint;
                     }
-                    editedPolygon = currentPolygon;
                     imagePanel.repaint();
                 }
                 break;
+                
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -244,7 +257,7 @@ public class ImageController {
 
         JFrame appFrame = appController.getAppFrame();
 
-        if (currentPolygon.getPoints().size() < 3) {
+        if (polygonInCreation.getPoints().size() < 3) {
             JOptionPane.showMessageDialog(appFrame,
                     "A label must have 3 or more vertices.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -259,7 +272,7 @@ public class ImageController {
             // TODO: Should this totally cancel, or only cancel the "done"?
             // Occurs if the user hits the cancel option.
             if (name == null) {
-                currentPolygon = new Polygon();
+                polygonInCreation = new Polygon();
                 imagePanel.repaint();
                 return;
             }
@@ -280,9 +293,9 @@ public class ImageController {
             }
         }
 
-        currentPolygon.setName(name);
-        appController.getCompletedPolygons().put(name, currentPolygon);
-        currentPolygon = new Polygon();
+        polygonInCreation.setName(name);
+        appController.getCompletedPolygons().put(name, polygonInCreation);
+        polygonInCreation = new Polygon();
 
         appController.finishedAddingPolygon(name);
 
@@ -319,7 +332,8 @@ public class ImageController {
         if (smallestDistance >= 0 && smallestDistance < EDITING_THRESHOLD_DISTANCE) {
             appController.setApplicationState(ApplicationState.EDITING_POLYGON);
             currentPoint = closestPoint;
-            currentPolygon = closestPolygon;
+            polygonInEditing = closestPolygon;
+            //System.out.println("Yay, we found a polygon!");
             return true;
         } else {
             appController.setApplicationState(ApplicationState.DEFAULT);
@@ -328,6 +342,7 @@ public class ImageController {
         return false;
     }
     
+    /*
     private Polygon getClosestPolygon(int x, int y, double threshold) {
         Point targetPoint = new Point(x, y);
         Polygon closestPolygon = null;
@@ -349,12 +364,12 @@ public class ImageController {
         } else {
             return null;
         }
-    }
+    } */
 
     private void addPt2OldPolygon(int x, int y) {
     	Point targetPoint = new Point(x, y);
     	
-    	currentPolygon = null;
+    	polygonInCreation = null;
     	
     	for (Polygon polygon : getSelectedPolygons()) { 	
     	    		
@@ -375,10 +390,12 @@ public class ImageController {
 	    		if (Math.abs(expectedY - (double) y) < EDITING_THRESHOLD_DISTANCE || 
 	    				Math.abs(expectedX - (double) x) < EDITING_THRESHOLD_DISTANCE) {
 	    			
-	    			polygon.addPointAt(targetPoint, ((i+1) % polygonPoints.size()));
-	    			appController.setApplicationState(ApplicationState.EDITING_POLYGON);
-	    			editedPolygon = polygon;
- 					return;
+	    			if (withinBoundaries(targetPoint, point1, point2) || withinBoundaries(targetPoint, point2, point1)) {
+	    				polygon.addPointAt(targetPoint, ((i+1) % polygonPoints.size()));
+	    				appController.setApplicationState(ApplicationState.EDITING_POLYGON);
+	    				polygonInEditing = polygon;
+	    				return;
+	    			}
 	    		}
 	    		
 	        }
@@ -386,14 +403,24 @@ public class ImageController {
     	
     }
     
-    private boolean checkPolygonClosed(int x, int y) {
+    private boolean withinBoundaries(Point targetPoint, Point point1, Point point2) {
+		if (point1.getX() >= targetPoint.getX() && targetPoint.getX() >= point2.getX()) {
+			if ((point1.getY() >= targetPoint.getY() && targetPoint.getY() >= point2.getY()) ||
+					(point2.getY() >= targetPoint.getY() && targetPoint.getY() >= point1.getY())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean checkPolygonClosed(int x, int y) {
         Point targetPoint = new Point(x, y);
 
-        if (currentPolygon.getPoints().isEmpty()) {
+        if (polygonInCreation.getPoints().isEmpty()) {
         	return false;
         }
         
-        double distanceToTarget = targetPoint.distanceFrom(currentPolygon.getPoints().get(0));
+        double distanceToTarget = targetPoint.distanceFrom(polygonInCreation.getPoints().get(0));
 
         if (distanceToTarget < EDITING_THRESHOLD_DISTANCE) {
         		return true;
@@ -415,7 +442,7 @@ public class ImageController {
      * Undoes the last added vertex on the current polygon.
      */
     public void undo() {
-        currentPolygon.removeLastPoint();
+        polygonInCreation.removeLastPoint();
         imagePanel.repaint();
     }
 
@@ -423,7 +450,7 @@ public class ImageController {
      * Redoes the last undone vertex on the current polygon.
      */
     public void redo() {
-        currentPolygon.redoPoint();
+        polygonInCreation.redoPoint();
         imagePanel.repaint();
     }
 
@@ -431,14 +458,14 @@ public class ImageController {
      * Gets the polygon that is currently being edited.
      */
     public Polygon getEditedPolygon() {
-        return editedPolygon;
+        return polygonInEditing;
     }
 
     /**
      * Cancels the adding of the current polygon.
      */
     public void cancel() {
-        currentPolygon = new Polygon();
+        polygonInCreation = new Polygon();
         imagePanel.repaint();
     }
 
