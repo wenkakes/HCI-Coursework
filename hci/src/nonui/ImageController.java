@@ -13,7 +13,6 @@ import src.utils.Point;
 import src.utils.Polygon;
 
 public class ImageController {
-	
     // How far a user can click from a point and still select it (in pixels) 
     private static final double EDITING_THRESHOLD_DISTANCE = 5.0;
     
@@ -110,7 +109,7 @@ public class ImageController {
                 if (doubleClick) {
                     finishedAddingPolygon();
                 } else {
-                	if (checkPolygonClosed(x,y)) {
+                	if (nearFirstPoint(x,y)) {
                 		finishedAddingPolygon();
                 	} else {
                 		polygonInCreation.addPoint(new Point(x, y));
@@ -123,7 +122,7 @@ public class ImageController {
             	
                 // If a point is being clicked, select this polygon.              
                 if (!selectClosestPoint(x, y)) {
-                	addPt2OldPolygon(x,y);
+                	addPointToCompletedPolygon(x,y);
                 } else {
                 	
                 }
@@ -135,36 +134,28 @@ public class ImageController {
 
     /**
      * Called when the mouse is pressed over the image (but not released
-     * immediately, which generates a click instead).
+     * immediately).
      * 
      * @param x the x coordinate where the mouse was pressed
      * @param y the y coordinate where the mouse was pressed
      */
     public void imageMousePress(int x, int y) {
         switch (appController.getApplicationState()) {
-            
         	case DEFAULT:
-            	// If an existing point is recognised as being clicked, 
-            	// select it and change the state to EDITING
+            	// If the user clicked on an existing point, select it.
                 selectClosestPoint(x, y);
                 break;
-                
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
-                
             case EDITING_POLYGON:
-            	// If a point is being selected... select it.
-                // If a point is not being selected, add a new point.
+            	// The user is either selecting a point on a polygon, or trying to add
+                // a new point to a polygon.
                 if (!selectClosestPoint(x, y)) {
-                	addPt2OldPolygon(x,y);
-                	imagePanel.repaint();
-                	
+                	addPointToCompletedPolygon(x,y);
+                	imagePanel.repaint();                	
                 }
-                
                 break;
-
-                
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -176,23 +167,18 @@ public class ImageController {
      */
     public void imageMouseReleased() {
         switch (appController.getApplicationState()) {
-        
             case DEFAULT:
                 currentPoint = null;
                 polygonInCreation = new Polygon();
                 imagePanel.repaint();
                 break;
-                
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
-                
             case EDITING_POLYGON:
-                // Implement logic for explicit editing.
                 currentPoint = null;
                 polygonInCreation = new Polygon();
                 break;
-                
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -206,17 +192,15 @@ public class ImageController {
      */
     public void imageMouseDrag(int x, int y) {
         switch (appController.getApplicationState()) {
-        
             case DEFAULT:
                 // Do nothing
                 break;
-                
             case ADDING_POLYGON:
                 // Do nothing.
                 break;
-                
             case EDITING_POLYGON:
                 if (currentPoint != null && polygonInEditing != null) {
+                    // Move the point.
                     Point newPoint = new Point(x, y);
                     if (polygonInEditing.replacePoint(currentPoint, newPoint)) {
                         currentPoint = newPoint;
@@ -224,7 +208,6 @@ public class ImageController {
                     imagePanel.repaint();
                 }
                 break;
-                
             default:
                 // TODO: Throw/show appropriate error.
         }
@@ -343,13 +326,18 @@ public class ImageController {
         return false;
     }
 
-    private void addPt2OldPolygon(int x, int y) {
+    /**
+     * Adds a point to the nearest completed polygon.
+     * 
+     * @param x the x coordinate of the point
+     * @param y the y coordinate of the point
+     */
+    private void addPointToCompletedPolygon(int x, int y) {
     	Point targetPoint = new Point(x, y);
     	
     	polygonInCreation = null;
     	
-    	for (Polygon polygon : getSelectedPolygons()) { 	
-    	    		
+    	for (Polygon polygon : getSelectedPolygons()) {
 	    	List<Point> polygonPoints = polygon.getPoints();
 	    	
 	    	for (int i = 0; i < polygonPoints.size(); i++) {
@@ -357,17 +345,17 @@ public class ImageController {
 	    		Point point2 = polygonPoints.get((i + 1) % polygonPoints.size());
 	    		
 	    		// y = mx + c
-	    		double m = (double)(point1.getY() - point2.getY()) / (double)(point1.getX() - point2.getX());
+	    		double m = (double) (point1.getY() - point2.getY()) / (double) (point1.getX() - point2.getX());
 	    		double c = point1.getY() - (double)(m * point1.getX());
 	    		
-	    		// plug new point into equation
+	    		// Plug the new point into the line equation to see what the coordinates should be.
 	    		double expectedY = (m * (double) x) + c; 
 	    		double expectedX = ((double) y - c) / m;
 	    			    		
 	    		if (Math.abs(expectedY - (double) y) < EDITING_THRESHOLD_DISTANCE || 
 	    				Math.abs(expectedX - (double) x) < EDITING_THRESHOLD_DISTANCE) {
-	    			
-	    			if (withinBoundaries(targetPoint, point1, point2) || withinBoundaries(targetPoint, point2, point1)) {
+
+                    if (withinBoundingBox(targetPoint, point1, point2)) {
 	    				polygon.addPointAt(targetPoint, ((i+1) % polygonPoints.size()));
 	    				appController.setApplicationState(ApplicationState.EDITING_POLYGON);
 	    				polygonInEditing = polygon;
@@ -380,30 +368,42 @@ public class ImageController {
     	
     }
     
-    private boolean withinBoundaries(Point targetPoint, Point point1, Point point2) {
-		if (point1.getX() >= targetPoint.getX() && targetPoint.getX() >= point2.getX()) {
-			if ((point1.getY() >= targetPoint.getY() && targetPoint.getY() >= point2.getY()) ||
-					(point2.getY() >= targetPoint.getY() && targetPoint.getY() >= point1.getY())) {
-				return true;
-			}
-		}
-		return false;
+    /**
+     * Checks if a target point is within the bounding box created by two other points.
+     * 
+     * @param targetPoint the target point to check
+     * @param point1 one of the points that define the bounding box
+     * @param point2 the other point that defines the bounding box
+     */
+    private boolean withinBoundingBox(Point targetPoint, Point point1, Point point2) {
+        int left = Math.min(point1.getX(), point2.getX());
+        int right = Math.max(point1.getX(), point2.getX());
+        int top = Math.min(point1.getY(), point2.getY());
+        int bottom = Math.max(point1.getY(), point2.getY());
+        
+        int x = targetPoint.getX();
+        int y = targetPoint.getY();
+        
+        return x >= left && x <= right && y >= top && y <= bottom;
 	}
 
-	private boolean checkPolygonClosed(int x, int y) {
-        Point targetPoint = new Point(x, y);
-
+    
+    /**
+     * Checks if a set of coordinates is near the starting point of the in-progress
+     * polygon.
+     * 
+     * @param x the x coordinate to check
+     * @param y the y coordinate to check
+     */
+	private boolean nearFirstPoint(int x, int y) {
         if (polygonInCreation.getPoints().isEmpty()) {
         	return false;
         }
-        
+
+        Point targetPoint = new Point(x, y);        
         double distanceToTarget = targetPoint.distanceFrom(polygonInCreation.getPoints().get(0));
 
-        if (distanceToTarget < EDITING_THRESHOLD_DISTANCE) {
-        		return true;
-        }
-        
-        return false;
+        return distanceToTarget < EDITING_THRESHOLD_DISTANCE;
     }
 
     /**

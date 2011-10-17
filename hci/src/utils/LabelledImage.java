@@ -13,15 +13,15 @@ public class LabelledImage {
     private Map<String, Polygon> labels;
     
     public LabelledImage(String name, BufferedImage image) {
-        this.name = LabelIO.stripExtension(name);
-        this.imageExtension = LabelIO.getExtension(name);
+        this.name = ApplicationIO.stripExtension(name);
+        this.imageExtension = ApplicationIO.getExtension(name);
         this.image = image;
         this.labels = new HashMap<String, Polygon>();
     }
     
     public LabelledImage(String name, BufferedImage image, List<Polygon> labels) {
-        this.name = LabelIO.stripExtension(name);
-        this.imageExtension = LabelIO.getExtension(name);
+        this.name = ApplicationIO.stripExtension(name);
+        this.imageExtension = ApplicationIO.getExtension(name);
         this.image = image;
         this.labels = listToMap(labels);
     }

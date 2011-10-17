@@ -249,7 +249,7 @@ public class LabelPanelView extends JPanel {
         // Make sure that the selected index is still within the list range.
         labelsList.setSelectedIndex(Math.min(indices[0], listModel.getSize() - 1));
         editButton.setEnabled(labelsList.getSelectedIndices().length == 1);
-        controller.highlightSelected(getSelectedNames());
+        controller.highlightSelected();
 
     }
 
@@ -270,7 +270,7 @@ public class LabelPanelView extends JPanel {
         clear();
 
         // TODO: This call shouldnt be necessary.
-        controller.highlightSelected(getSelectedNames());
+        controller.highlightSelected();
     }
 
     /**
@@ -400,7 +400,7 @@ public class LabelPanelView extends JPanel {
     private class LoadListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            controller.loadLabels();
+            controller.importLabels();
         }
     }
 
@@ -413,7 +413,7 @@ public class LabelPanelView extends JPanel {
             // Only allow renaming of single items at once.
             editButton.setEnabled(labelsList.getSelectedIndices().length == 1);
 
-            controller.highlightSelected(getSelectedNames());
+            controller.highlightSelected();
             
             if (controller.areTipsOn()) { 
             	controller.showSelectedLabelTip();

@@ -4,15 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,7 +18,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
-import javax.swing.filechooser.FileSystemView;
 
 import src.ui.ImagePanelView;
 import src.ui.LabelPanelView;
@@ -34,9 +26,8 @@ import src.ui.ThumbnailView;
 import src.ui.TipsDialog;
 import src.ui.TipsDialog.TipType;
 import src.ui.ToolboxPanelView;
-import src.utils.DirectoryRestrictedFileSystemView;
-import src.utils.LabelIO;
-import src.utils.LabelIO.LabelParseException;
+import src.utils.ApplicationIO;
+import src.utils.ApplicationIO.LabelParseException;
 import src.utils.LabelledImage;
 import src.utils.Point;
 import src.utils.Polygon;
@@ -95,7 +86,7 @@ public class AppController {
         imageController.setPanel(imagePanel);
 
         loadSettingsFile();
-        setMenuItemsEnabled();
+        setMenuItemsState();
 
         // Show tooltips fast.
         ToolTipManager.sharedInstance().setInitialDelay(100);
@@ -111,7 +102,8 @@ public class AppController {
             System.err.println("Cannot open Collections directory.");
             return;
         }
-        File directories[] = collectionsDir.listFiles(LabelIO.DIRECTORY_FILTER);
+        File directories[] = collectionsDir.listFiles(ApplicationIO.DIRECTORY_FILTER);
+        
 
         // Get a name for the new collection.
         String newCollectionName = "";
@@ -169,9 +161,9 @@ public class AppController {
         imageController.setImage(null);
         labelPanel.disableLabelPanel();
         thumbnailPanel.clear();
-        setMenuItemsEnabled();
+        setMenuItemsState();
         
-        writeToSettingsFile(currentCollectionName, "");
+        ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
 
     /**
@@ -191,9 +183,9 @@ public class AppController {
         thumbnailPanel.clear();
         labelPanel.disableLabelPanel();
         
-        setMenuItemsEnabled();
+        setMenuItemsState();
         
-        writeToSettingsFile("", "");
+        ApplicationIO.writeToSettingsFile(MAIN_FOLDER, "", "");
     }
     
     /**
@@ -207,7 +199,7 @@ public class AppController {
             return;
         }
 
-        File collections[] = collectionsDir.listFiles(LabelIO.DIRECTORY_FILTER);
+        File collections[] = collectionsDir.listFiles(ApplicationIO.DIRECTORY_FILTER);
         if (collections.length == 0) {
             JOptionPane.showMessageDialog(appFrame, "There are no collections. Please create one.",
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -233,17 +225,16 @@ public class AppController {
         currentCollectionName = openedCollectionName;
         // TODO: Provide a way for user to open a default image?
         currentImage = null; 
-        collectionImages = LabelIO.openCollection(
+        collectionImages = ApplicationIO.openCollection(
                 new File(MAIN_FOLDER + "/Collections/" + currentCollectionName));
         
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
-        // TODO: Provide a way for user to open a default image?
         imageController.setImage(null);
         
-        setMenuItemsEnabled();
+        setMenuItemsState();
 
         // TODO: Provide a way for user to open a default image?
-        writeToSettingsFile(currentCollectionName, "");
+        ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
 
     /**
@@ -274,10 +265,14 @@ public class AppController {
      */
     public void saveImage() {
         if (currentImage != null) {
-            if (saveImage(currentImage)) {
-                JOptionPane.showMessageDialog(appFrame, "The current image was saved.", 
-                        "Images Saved", JOptionPane.INFORMATION_MESSAGE);
+            try {
+                ApplicationIO.saveImage(MAIN_FOLDER, currentCollectionName, currentImage);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(appFrame, "Unable to save image.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
+            JOptionPane.showMessageDialog(appFrame, "The current image was saved.", 
+                    "Images Saved", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -291,13 +286,21 @@ public class AppController {
         
         boolean savedOkay = true;
         for (LabelledImage labelledImage : collectionImages.values()) {
-            savedOkay = saveImage(labelledImage);
+            try {
+                ApplicationIO.saveImage(MAIN_FOLDER, currentCollectionName, labelledImage);
+            } catch (IOException e) {
+                // Just send one warning for multiple failed images.
+                savedOkay = false;   
+            } 
         }
         
         if (savedOkay) {
             JOptionPane.showMessageDialog(appFrame, "All images were saved.", "Images Saved",
                     JOptionPane.INFORMATION_MESSAGE);
-        } 
+        } else {
+            JOptionPane.showMessageDialog(appFrame, "Error while trying to save images. " 
+                    + "Some images may not have been saved.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -325,9 +328,9 @@ public class AppController {
         imagePanel.setImage(null);
         labelPanel.disableLabelPanel();
         
-        setMenuItemsEnabled();
+        setMenuItemsState();
         
-        writeToSettingsFile(currentCollectionName, "");
+        ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
 
     /**
@@ -349,6 +352,17 @@ public class AppController {
      */
     public void renameSelectedPolygon() {
         labelPanel.renameSelectedPolygon();
+    }
+
+    
+    /**
+     * Renames a polygon.
+     * 
+     * @param oldName the old name for the polygon
+     * @param newName the new name for the polygon
+     */
+    public void renamePolygon(String oldName, String newName) {
+        currentImage.renameLabel(oldName, newName);
     }
 
     /**
@@ -392,11 +406,8 @@ public class AppController {
         menuBar.setTipsEnabled(tipsEnabled);
     }
     
-    // ---------------------------------------------------------------------------
-
-    
     /**
-     * Open one of the collection images.
+     * Opens one of the collection images to the main editor panel.
      * 
      * @param name the name of the image to open
      */
@@ -411,29 +422,9 @@ public class AppController {
             labelPanel.addLabel(polygon.getName());
         }
         
-        setMenuItemsEnabled();
-        writeToSettingsFile(currentCollectionName, currentImage.getName());
-    }
-    
-    /**
-     * Returns a list of the points of each completed polygon.
-     */
-    public List<List<Point>> getCompletedPolygonsPoints() {
-        List<List<Point>> points = new ArrayList<List<Point>>(currentImage.getLabels().size());
-        for (Polygon polygon : currentImage.getLabels()) {
-            points.add(new ArrayList<Point>(polygon.getPoints()));
-        }
-        return points;
-    }
-
-    /**
-     * Renames a polygon.
-     * 
-     * @param oldName the old name for the polygon
-     * @param newName the new name for the polygon
-     */
-    public void renamePolygon(String oldName, String newName) {
-        currentImage.renameLabel(oldName, newName);
+        setMenuItemsState();
+        ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, 
+                currentImage.getName());
     }
 
     /**
@@ -448,37 +439,34 @@ public class AppController {
         }
         imagePanel.repaint();
 
-        setMenuItemsEnabled();
+        setMenuItemsState();
     }
 
-    // TODO: Change to import labels.
     /**
-     * Loads in a new list of polygons from a file.
+     * Imports a list of labels from a file.
      * 
      * @param file the file to load from
      */
-    public void loadLabels() {
-        FileSystemView fsv = new DirectoryRestrictedFileSystemView(new File(MAIN_FOLDER
-                + "/Collections/" + currentCollectionName + "/labels"));
-        JFileChooser chooser = new JFileChooser(fsv.getHomeDirectory(), fsv);
+    public void importLabels() {
+        JFileChooser chooser = new JFileChooser();
         int returnValue = chooser.showOpenDialog(appFrame);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File loadFile = chooser.getSelectedFile();
 
             try {
-                currentImage.setLabels(LabelIO.readLabels(loadFile));
+                currentImage.setLabels(ApplicationIO.readLabels(loadFile));
                 labelPanel.clear();
                 for (String name : currentImage.getLabelNames()) {
                     labelPanel.addLabel(name);
                 }
                 imagePanel.repaint();
             } catch (LabelParseException e) {
-                JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
+                JOptionPane.showMessageDialog(appFrame, "Unable to parse chosen file.", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         }
 
-        setMenuItemsEnabled();
+        setMenuItemsState();
     }
 
     /**
@@ -500,58 +488,24 @@ public class AppController {
         }
     }
 
+    /**
+     * Undoes the last added vertex.
+     */
     public void undoLastVertex() {
         imageController.undo();
     }
 
+    /**
+     * Redoes the last "undone" vertex.
+     */
     public void redoLastVertex() {
         imageController.redo();
     }
 
     /**
-     * Called when the "Cancel" button on the toolbar is clicked.
-     */
-    public void toolboxCancelButtonClicked() {
-        switch (applicationState) {
-            case DEFAULT:
-                // TODO: Throw/show appropriate error, as this shouldn't happen.
-                break;
-            case ADDING_POLYGON:
-                cancelAddingPolygon();
-                break;
-            case EDITING_POLYGON:
-                // TODO: Implement explicit editing of polygons.
-                break;
-            default:
-                // TODO: Throw/show appropriate error.
-        }
-    }
-
-    /**
-     * Called when the toolbox window is closed.
-     */
-    public void toolboxWindowClosed() {
-        switch (applicationState) {
-            case DEFAULT:
-                // TODO: Throw/show appropriate error, as this shouldn't happen.
-                break;
-            case ADDING_POLYGON:
-                cancelAddingPolygon();
-                break;
-            case EDITING_POLYGON:
-                // TODO: Implement explicit editing of polygons.
-                break;
-            default:
-                // TODO: Throw/show appropriate error.
-        }
-    }
-
-    /**
-     * Called when the user is finished adding the current polygon, either by
-     * clicking on the starting point, double-clicking, or clicking the "Done"
-     * button on the toolbox.
+     * Called when the user is finished adding the current polygon.
      * 
-     * @param newPolygonName
+     * @param newPolygonName the name of the new polygon
      */
     public void finishedAddingPolygon(String newPolygonName) {
         applicationState = ApplicationState.DEFAULT;
@@ -561,13 +515,13 @@ public class AppController {
 
         toolboxPanel.setVisible(false);
 
-        setMenuItemsEnabled();
+        setMenuItemsState();
     }
 
     /**
      * Called when the user cancels the polygon that they are currently adding.
      */
-    private void cancelAddingPolygon() {
+    public void cancelAddingPolygon() {
         applicationState = ApplicationState.DEFAULT;
 
         labelPanel.setAddButtonEnabled(true);
@@ -576,68 +530,93 @@ public class AppController {
         imageController.cancel();
     }
 
-    public void highlightSelected(List<String> highlightedNames) {
+    /**
+     * Highlights the currently selected labels on the main image.
+     */
+    public void highlightSelected() {
+        // Selecting a label normally resets any editing the user is doing,
+        // unless they have re-selected a label that was already selected.
         if (applicationState == ApplicationState.EDITING_POLYGON
-                && !highlightedNames.contains(imageController.getEditedPolygon().getName())) {
+                && !getSelectedNames().contains(imageController.getEditedPolygon().getName())) {
             applicationState = ApplicationState.DEFAULT;
         }
 
+        // Calling repaint forces the ImageController to fetch the currently selected
+        // labels and draw them on.
         imagePanel.repaint();
     }
-
-    private boolean writeToSettingsFile(String collectionName, String imageName) {
-        File settingsFile = new File(MAIN_FOLDER + "/.settings");
-        if (!settingsFile.canWrite()) {
-            System.err.println("Cannot write to Settings file.");
-            return false;
+    
+    /**
+     * Returns a list of the points of each completed polygon.
+     */
+    public List<List<Point>> getCompletedPolygonsPoints() {
+        List<List<Point>> points = new ArrayList<List<Point>>(currentImage.getLabels().size());
+        for (Polygon polygon : currentImage.getLabels()) {
+            points.add(new ArrayList<Point>(polygon.getPoints()));
         }
-
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
-
-            out.write(collectionName);
-            if (!collectionName.isEmpty()) {
-                out.newLine();
-
-                out.write(imageName);
-                if (!imageName.isEmpty()) {
-                    out.newLine();
-                }
-            }
-            out.close();
-        } catch (IOException e) {
-            // TODO: Error
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
+        return points;
     }
 
-    private void copyFile(File sourceFile, File destFile) throws IOException {
-        FileChannel source = null;
-        FileChannel destination = null;
-
-        try {
-            if (!destFile.exists()) {
-                destFile.createNewFile();
-            }
-
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
-
+    // TODO: Remove the call to this.
+    /**
+     * Returns the map of the completed polygons.
+     */
+    public Map<String, Polygon> getCompletedPolygons() {
+        return (currentImage != null) ? currentImage.getLabelsMap() : null;
     }
 
+    /**
+     * Returns the names of the currently selected labels.
+     */
+    public List<String> getSelectedNames() {
+        return labelPanel.getSelectedNames();
+    }
+
+    /**
+     * Returns the current application state.
+     */
+    public ApplicationState getApplicationState() {
+        return applicationState;
+    }
+
+    /**
+     * Sets the current application state.
+     * 
+     * @param applicationState the state to set
+     */
+    public void setApplicationState(ApplicationState applicationState) {
+        this.applicationState = applicationState;
+    }
+
+    /**
+     * Shows the tooltip for when the user selects a label.
+     */
+	public void showSelectedLabelTip() {
+        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
+        selectedLabelTip.setLocation(mouseLocation);
+		selectedLabelTip.setVisible(true);
+	}
+
+	/**
+	 * Shows the tooltip for when the user adds a new label.
+	 */
+	public void showNewLabelTip() {
+        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
+        newLabelTip.setLocation(mouseLocation);
+		newLabelTip.setVisible(true);
+		
+	}
+	
+    /**
+     * Requests a name from the user, disallowing a set of "taken" names and
+     * disallowing empty names as well if requested.
+     * 
+     * @param message the message to display to the user when asking for the name
+     * @param takenNames the set of disallowed choices
+     * @param allowEmpty whether or not to allow empty names
+     */
     private String getNameFromUser(String message, Collection<String> takenNames, 
             boolean allowEmpty) {
         String chosenName = null;
@@ -652,7 +631,7 @@ public class AppController {
             }
 
             // Strip any extension from the name.
-            chosenName = LabelIO.stripExtension(chosenName.trim());
+            chosenName = ApplicationIO.stripExtension(chosenName.trim());
             if (chosenName.isEmpty() && !allowEmpty) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
                         JOptionPane.ERROR_MESSAGE);
@@ -674,105 +653,6 @@ public class AppController {
     }
 
     /**
-     * Loads the data from the settings file.
-     */
-    private void loadSettingsFile() {
-        File settingsFile = new File(MAIN_FOLDER + "/.settings");
-        if (!settingsFile.exists() || !settingsFile.canRead()) {
-            // Just ignore the settings file.
-            return;
-        }
-
-        String collectionName = null;
-        String imageName = null;
-        BufferedReader in;
-
-        try {
-            in = new BufferedReader(new FileReader(settingsFile));
-            collectionName = in.readLine();
-        } catch (IOException e) {
-            // Just ignore the settings file.
-            return;
-        }
-
-        try {
-            imageName = in.readLine();
-        } catch (IOException e) {
-            // An image name isn't compulsory, so we can skip this exception.
-        }
-
-        // TODO: Check collection exists.
-        currentCollectionName = collectionName;
-        File collectionRoot = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName);
-        collectionImages = LabelIO.openCollection(collectionRoot);
-        thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
-        
-        currentImage = collectionImages.get(imageName);
-        if (currentImage != null) {
-            imageController.setImage(currentImage.getImage());
-
-            labelPanel.clear();
-            for (Polygon polygon : currentImage.getLabels()) {
-                labelPanel.addLabel(polygon.getName());
-            }
-        }
-    }
-
-    public Map<String, Polygon> getCompletedPolygons() {
-        return (currentImage != null) ? currentImage.getLabelsMap() : null;
-    }
-
-    public List<String> getSelectedNames() {
-        return labelPanel.getSelectedNames();
-    }
-
-    public ApplicationState getApplicationState() {
-        return applicationState;
-    }
-
-    public void setApplicationState(ApplicationState applicationState) {
-        this.applicationState = applicationState;
-    }
-        
-    /**
-     * Sets whether or not different menu items should be enabled.
-     */
-    private void setMenuItemsEnabled() {
-        boolean collectionOpened = currentCollectionName != null;
-        boolean collectionhasImages = collectionImages != null && collectionImages.size() > 0;
-        boolean imageOpened = currentImage != null;
-        boolean imageHasLabels = imageOpened && currentImage.getLabels().size() > 0;
-
-        // File menu.
-        menuBar.setCloseCollectionEnabled(collectionOpened);
-        menuBar.setImportImageEnabled(collectionOpened);
-        menuBar.setSaveImageEnabled(imageOpened);
-        menuBar.setSaveAllImagesEnabled(collectionhasImages);
-        menuBar.setRemoveImageEnabled(imageOpened);
-
-        // Edit menu.
-        menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
-        menuBar.setRenamePolygonEnabled(imageHasLabels);
-        menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
-        menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
-    }
-
-	public void showSelectedLabelTip() {
-        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-        mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
-        selectedLabelTip.setLocation(mouseLocation);
-		selectedLabelTip.setVisible(true);
-	}
-
-	public void showNewLabelTip() {
-        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-        mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
-        newLabelTip.setLocation(mouseLocation);
-		newLabelTip.setVisible(true);
-		
-	}
-	
-    /**
      * Imports an image from a given file into the current collection, and sets that image
      * as the currently editing image.
      *  
@@ -786,8 +666,8 @@ public class AppController {
         
         // Check for filename conflict. If so, prompt user to overwrite, rename,
         // or cancel.
-        String importedImageName = LabelIO.stripExtension(imageFile.getName());
-        String extension = LabelIO.getExtension(imageFile.getName());
+        String importedImageName = ApplicationIO.stripExtension(imageFile.getName());
+        String extension = ApplicationIO.getExtension(imageFile.getName());
         
         if (collectionImages.get(importedImageName) != null) {
             String[] options = { "Cancel", "Rename New Image", "Overwrite Old Image" };
@@ -823,19 +703,19 @@ public class AppController {
         File destFile = new File(imagesDirectory.getAbsolutePath() + "/" + importedImageName + 
                 extension);
         try {
-            copyFile(imageFile, destFile);
+            ApplicationIO.copyFile(imageFile, destFile);
         } catch (IOException e) {
             // TODO: Error
-            System.err.println("IOException when importing image.");
+            System.err.println("Unable to import image.");
             return;
         }
         
-        // TODO: Move to IO class.
         BufferedImage importedImage;
         try {
             importedImage = ImageIO.read(destFile);
         } catch (IOException e) {
-            System.err.println("error");
+            // TODO: Error better.
+            System.err.println("Unable to import image.");
             return;
         }
         
@@ -847,29 +727,60 @@ public class AppController {
         imageController.setImage(currentImage.getImage());
         labelPanel.clear();
 
-        setMenuItemsEnabled();
+        setMenuItemsState();
 
-        writeToSettingsFile(currentCollectionName, currentImage.getName());
+        ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, 
+                currentImage.getName());
     }
 
     /**
-     * Saves a {@link LabelledImage}.
-     * 
-     * @param labelledImage the image to save
+     * Loads the data from the settings file.
      */
-    private boolean saveImage(LabelledImage labelledImage) {
-        String labelName = labelledImage.getName() + ".labels";
-        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName +
-                "/labels/" + labelName);
-        
-        try {
-            LabelIO.writeLabels(labelFile, labelledImage.getLabels());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
+    private void loadSettingsFile() {
+        // Oh what I would do for a Pair class in Java...
+        List<String> collectionInformation = ApplicationIO.loadSettingsFile(MAIN_FOLDER);
+        if (collectionInformation == null) {
+            // Failed to read settings file - just ignore it.
+            return;
         }
+
+        // TODO: Check collection exists.
+        currentCollectionName = collectionInformation.get(0);
+        File collectionRoot = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName);
+        collectionImages = ApplicationIO.openCollection(collectionRoot);
+        thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         
-        return true;
+        currentImage = collectionImages.get(collectionInformation.get(1));
+        if (currentImage != null) {
+            imageController.setImage(currentImage.getImage());
+
+            labelPanel.clear();
+            for (Polygon polygon : currentImage.getLabels()) {
+                labelPanel.addLabel(polygon.getName());
+            }
+        }
+    }
+        
+    /**
+     * Decides whether or not different menu items should be enabled.
+     */
+    private void setMenuItemsState() {
+        boolean collectionOpened = currentCollectionName != null;
+        boolean collectionhasImages = collectionImages != null && collectionImages.size() > 0;
+        boolean imageOpened = currentImage != null;
+        boolean imageHasLabels = imageOpened && currentImage.getLabels().size() > 0;
+
+        // File menu.
+        menuBar.setCloseCollectionEnabled(collectionOpened);
+        menuBar.setImportImageEnabled(collectionOpened);
+        menuBar.setSaveImageEnabled(imageOpened);
+        menuBar.setSaveAllImagesEnabled(collectionhasImages);
+        menuBar.setRemoveImageEnabled(imageOpened);
+
+        // Edit menu.
+        menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
+        menuBar.setRenamePolygonEnabled(imageHasLabels);
+        menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
+        menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
     }
 }

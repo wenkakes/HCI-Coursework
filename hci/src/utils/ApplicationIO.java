@@ -1,10 +1,16 @@
 package src.utils;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +33,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Handles label-related IO, including writing labels to a file and reading them
+ * Handles application-related IO, including writing labels to a file and reading them
  * back.
  */
-// TODO: Rename.
-public final class LabelIO {
+public final class ApplicationIO {
     public static final FileFilter FILE_FILTER = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
@@ -45,10 +50,132 @@ public final class LabelIO {
         }
     }; 
 
-    private LabelIO() {
+    private ApplicationIO() {
         // Non-instantiable.
     }
     
+
+    /**
+     * Saves a {@link LabelledImage}.
+     * 
+     * @param labelledImage the image to save
+     */
+    public static void saveImage(String rootDirectory, String collectionName, 
+            LabelledImage labelledImage) throws IOException {
+        String labelName = labelledImage.getName() + ".labels";
+        File labelFile = new File(rootDirectory + "/Collections/" + collectionName +
+                "/labels/" + labelName);
+        
+        writeLabels(labelFile, labelledImage.getLabels());
+    }
+    
+    /**
+     * Copies a file from one location to another.
+     * 
+     * @param sourceFile the source file to copy from
+     * @param destFile the destination file to copy to
+     * 
+     * @throws IOException if an IO-related exception occurs while trying to copy
+     */
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            if (!destFile.exists()) {
+                destFile.createNewFile();
+            }
+
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+        }
+    }
+    
+    /**
+     * Writes a given collection name and image name to the settings file.
+     * 
+     * @param rootDirectory the location of the root ImageLabeller directory
+     * @param collectionName the name of the collection to write
+     * @param imageName the name of the image to write
+     */
+    public static boolean writeToSettingsFile(String rootDirectory, String collectionName, 
+            String imageName) {
+        File settingsFile = new File(rootDirectory + "/.settings");
+        if (!settingsFile.canWrite()) {
+            // TODO: Log better.
+            System.err.println("Cannot write to Settings file.");
+            return false;
+        }
+
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(settingsFile, false));
+
+            out.write(collectionName);
+            if (!collectionName.isEmpty()) {
+                out.newLine();
+                out.write(imageName);
+                if (!imageName.isEmpty()) {
+                    out.newLine();
+                }
+            }
+            out.close();
+        } catch (IOException e) {
+            // TODO: Log better
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Loads data from the setting file, returning a pair of the collection
+     * name and (optionally) the image name.
+     * 
+     * @param rootDirectory the location of the root ImageLabeller directory
+     * 
+     * @return a list of the collection name and either the image name if it
+     *         exists, or null otherwise
+     */
+    public static List<String> loadSettingsFile(String rootDirectory) {
+        File settingsFile = new File(rootDirectory + "/.settings");
+        if (!settingsFile.exists() || !settingsFile.canRead()) {
+            return null;
+        }
+        
+        String collectionName;
+        String imageName;
+
+        BufferedReader in;
+        try {
+            in = new BufferedReader(new FileReader(settingsFile));
+            collectionName = in.readLine();
+        } catch (IOException e) {
+            return null;
+        }
+
+        try {
+            imageName = in.readLine();
+        } catch (IOException e) {
+            // An image name isn't compulsory, so we can ignore this exception.
+            imageName = null;
+        }
+        
+        List<String> collectionInformation = new ArrayList<String>(2);
+        collectionInformation.add(collectionName);
+        collectionInformation.add(imageName);
+        
+        return collectionInformation;
+    }
+
     public static Map<String, LabelledImage> openCollection(File collectionRoot) {
         Map<String, LabelledImage> collectionEntries = new HashMap<String, LabelledImage>();
         
@@ -86,7 +213,7 @@ public final class LabelIO {
                 File labelFile = labelFiles[j];
                 if (imageName.equals(stripExtension(labelFile.getName()))) {
                     try {
-                        labels = LabelIO.readLabels(labelFile);
+                        labels = ApplicationIO.readLabels(labelFile);
                     } catch (LabelParseException e) {
                         System.err.println("Unable to read labels");
                     }
@@ -274,7 +401,7 @@ public final class LabelIO {
     }
 
     /**
-     * Represents an error that occurs while parsing the label file.
+     * Represents an error that occurs while parsing a label file.
      */
     public static class LabelParseException extends ParseException {
         private static final long serialVersionUID = 1L;

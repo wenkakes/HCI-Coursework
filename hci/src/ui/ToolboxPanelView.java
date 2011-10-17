@@ -81,7 +81,7 @@ public class ToolboxPanelView extends JDialog {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.toolboxCancelButtonClicked();
+                controller.cancelAddingPolygon();
             }
         });
         cancelButton.setToolTipText("Cancel editing label");
@@ -129,7 +129,7 @@ public class ToolboxPanelView extends JDialog {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            controller.toolboxWindowClosed();
+            controller.cancelAddingPolygon();
         }
 
         @Override
