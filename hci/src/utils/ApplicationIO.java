@@ -14,6 +14,7 @@ import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -177,7 +178,7 @@ public final class ApplicationIO {
     }
 
     public static Map<String, LabelledImage> openCollection(File collectionRoot) {
-        Map<String, LabelledImage> collectionEntries = new HashMap<String, LabelledImage>();
+        Map<String, LabelledImage> collectionEntries = new LinkedHashMap<String, LabelledImage>();
         
         File imageDir = new File(collectionRoot.getAbsolutePath() + "/images");
         File labelsDir = new File(collectionRoot.getAbsolutePath() + "/labels");

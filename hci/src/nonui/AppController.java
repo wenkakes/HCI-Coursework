@@ -8,9 +8,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -158,7 +160,7 @@ public class AppController {
         applicationState = ApplicationState.DEFAULT;
         currentCollectionName = newCollectionName;
         currentImage = null;
-        collectionImages = new HashMap<String, LabelledImage>();
+        collectionImages = new LinkedHashMap<String, LabelledImage>();
         
         // Reset the interface.
         imageController.setImage(null);
@@ -226,13 +228,16 @@ public class AppController {
 
         applicationState = ApplicationState.DEFAULT;
         currentCollectionName = openedCollectionName;
-        // TODO: Provide a way for user to open a default image?
-        currentImage = null; 
         collectionImages = ApplicationIO.openCollection(
                 new File(MAIN_FOLDER + "/Collections/" + currentCollectionName));
-        
+        currentImage = (collectionImages.size() > 0) ? getLastCollectionImage() : null; 
+
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
-        imageController.setImage(null);
+        if (collectionImages.size() > 0) {
+            setCurrentImage(currentImage.getName());
+        } else {
+            imageController.setImage(null);
+        }
         
         setUIComponentsState();
 
@@ -418,6 +423,9 @@ public class AppController {
         applicationState = ApplicationState.DEFAULT;
         
         currentImage = collectionImages.get(name);
+        if (currentImage == null) {
+            return;
+        }
         
         imageController.setImage(currentImage.getImage());
         thumbnailPanel.setThumbnailImage(currentImage.getName());
@@ -755,6 +763,11 @@ public class AppController {
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         
         currentImage = collectionImages.get(collectionInformation.get(1));
+        // If the settings file didn't specify an image, try and load a default.
+        if (currentImage == null && collectionImages.size() > 0) {
+            currentImage = getLastCollectionImage();
+        }
+        
         if (currentImage != null) {
             setCurrentImage(currentImage.getName());
 
@@ -764,7 +777,21 @@ public class AppController {
             }
         }
     }
+     
+    /**
+     * Helper method to get the last element of the collection. Makes some sense to iterate over
+     * a map in this case because we use a LinkedHashMap.
+     */
+    private LabelledImage getLastCollectionImage() {
+        LabelledImage image = null;
+        Iterator<Entry<String, LabelledImage>> i = collectionImages.entrySet().iterator();
+        while (i.hasNext()) {
+            image = i.next().getValue();
+        }
         
+        return image;
+    }
+
     /**
      * Sets the state of various UI components.
      */
