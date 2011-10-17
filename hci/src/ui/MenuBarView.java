@@ -29,7 +29,6 @@ public class MenuBarView extends JMenuBar {
     private JMenuItem saveAllImages;
     private JMenuItem saveImage;
     private JMenuItem removeImage;
-    private JMenuItem closeImage;
     private JMenuItem addPolygon;
     private JMenuItem renameSelected;
     private JMenuItem deleteSelected;
@@ -58,9 +57,8 @@ public class MenuBarView extends JMenuBar {
      * <li>Close Collection</li>
      * <li>Open Collection</li>
      * <li>Import Image</li>
-     * <li>Save Image</li>
+     * <li>Save Current Image</li>
      * <li>Save All Images</li>
-     * <li>Close Image</li>
      * <li>Remove Image from Collection</li>
      * <li>Exit</li>
      * </ul>
@@ -108,7 +106,7 @@ public class MenuBarView extends JMenuBar {
         });
 
         // TODO: Rename this? (it saves labels, not images).
-        saveImage = new JMenuItem("Save Image");
+        saveImage = new JMenuItem("Save Current Image");
         saveImage.setMnemonic(KeyEvent.VK_S);
         saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         saveImage.addActionListener(new ActionListener() {
@@ -138,14 +136,6 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        closeImage = new JMenuItem("Close Image");
-        closeImage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.closeImage();
-            }
-        });
-
         JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(new ActionListener() {
             @Override
@@ -162,7 +152,6 @@ public class MenuBarView extends JMenuBar {
         fileMenu.add(importImage);
         fileMenu.add(saveImage);
         fileMenu.add(saveAllImages);
-        fileMenu.add(closeImage);
         fileMenu.add(removeImage);
         fileMenu.addSeparator();
 
@@ -298,10 +287,6 @@ public class MenuBarView extends JMenuBar {
 
     public void setSaveAllImagesEnabled(boolean enabled) {
         saveAllImages.setEnabled(enabled);
-    }
-
-    public void setCloseImageEnabled(boolean enabled) {
-        closeImage.setEnabled(enabled);
     }
 
     public void setRemoveImageEnabled(boolean enabled) {

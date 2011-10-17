@@ -756,7 +756,6 @@ public class AppController {
         menuBar.setImportImageEnabled(collectionOpened);
         menuBar.setSaveImageEnabled(imageOpened);
         menuBar.setSaveAllImagesEnabled(collectionhasImages);
-        menuBar.setCloseImageEnabled(imageOpened);
         menuBar.setRemoveImageEnabled(imageOpened);
 
         // Edit menu.
