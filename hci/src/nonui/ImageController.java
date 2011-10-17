@@ -91,7 +91,6 @@ public class ImageController {
      * @param doubleClick whether or not the user is double clicking
      */
     public void imageMouseClick(int x, int y, boolean doubleClick) {
-    	System.out.println("State: " + appController.getApplicationState());
         switch (appController.getApplicationState()) {
             
         	case DEFAULT:
@@ -156,7 +155,6 @@ public class ImageController {
             	// If a point is being selected... select it.
                 // If a point is not being selected, add a new point.
                 if (!selectClosestPoint(x, y)) {
-                	//System.out.println("No closest point, add new point instead.");
                 	addPt2OldPolygon(x,y);
                 	imagePanel.repaint();
                 	
@@ -219,7 +217,6 @@ public class ImageController {
                 if (currentPoint != null && polygonInEditing != null) {
                     Point newPoint = new Point(x, y);
                     if (polygonInEditing.replacePoint(currentPoint, newPoint)) {
-                    	System.out.println("Replaced a point");
                         currentPoint = newPoint;
                     }
                     imagePanel.repaint();
@@ -338,7 +335,6 @@ public class ImageController {
             appController.setApplicationState(ApplicationState.EDITING_POLYGON);
             currentPoint = closestPoint;
             polygonInEditing = closestPolygon;
-            //System.out.println("Yay, we found a polygon!");
             return true;
         } else {
             appController.setApplicationState(ApplicationState.DEFAULT);
@@ -346,30 +342,6 @@ public class ImageController {
         
         return false;
     }
-    
-    /*
-    private Polygon getClosestPolygon(int x, int y, double threshold) {
-        Point targetPoint = new Point(x, y);
-        Polygon closestPolygon = null;
-
-        double smallestDistance = -1;
-
-        for (Polygon polygon : appController.getCompletedPolygons().values()) {
-            for (Point point : polygon.getPoints()) {
-                double distanceToTarget = targetPoint.distanceFrom(point);
-                if (distanceToTarget < smallestDistance || smallestDistance < 0) {
-                    smallestDistance = distanceToTarget;
-                    closestPolygon = polygon;
-                }
-            }
-        }
-        
-        if (smallestDistance > -1 && smallestDistance < threshold) {
-            return closestPolygon;
-        } else {
-            return null;
-        }
-    } */
 
     private void addPt2OldPolygon(int x, int y) {
     	Point targetPoint = new Point(x, y);

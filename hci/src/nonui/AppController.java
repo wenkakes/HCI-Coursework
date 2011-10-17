@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,97 +253,16 @@ public class AppController {
         // User chooses image from file dialog.
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Choose an image to import");
+        chooser.setMultiSelectionEnabled(true);
         int returnValue = chooser.showOpenDialog(appFrame);
         if (returnValue != JFileChooser.APPROVE_OPTION) {
             return;
         }
 
-        File imageFile = chooser.getSelectedFile();
-        String importedImageName = imageFile.getName();
-
-        // Check for filename conflict. If so, prompt user to overwrite, rename,
-        // or cancel.
-        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + "/images");
-        if (!imagesDirectory.exists() && !imagesDirectory.mkdir()) {
-            // TODO: Error
-            System.err.println("Cannot open images directory for collection.");
-            return;
+        File[] imageFiles = chooser.getSelectedFiles();
+        for (int i = 0; i < imageFiles.length; i++) {
+            importImageFile(imageFiles[i]);
         }
-        
-        File images[] = imagesDirectory.listFiles(LabelIO.FILE_FILTER);
-        String currentImageNames[] = new String[images.length];
-        for (int i = 0; i < currentImageNames.length; i++) {
-            currentImageNames[i] = images[i].getName();
-        }
-
-        Object[] options = { "Cancel", "Rename New Image", "Overwrite Old Image" };
-
-        // Cannot just use getNameFromUser, as this is a complex case.
-        boolean hasName = false;
-        while (!hasName) {
-            for (int i = 0; i < images.length; i++) {
-                if (importedImageName.equals(currentImageNames[i])) {
-                    int result = JOptionPane.showOptionDialog(appFrame,
-                            "Cannot import image due to duplicate name.",
-                            "Unable to import image",
-                            JOptionPane.YES_NO_CANCEL_OPTION, 
-                            JOptionPane.QUESTION_MESSAGE, 
-                            null,
-                            options, 
-                            options[2]);
-                    
-                    if (result == 0) {
-                        // Cancel.
-                        return;
-                    } else if (result == 1) {
-                        // Rename.
-                        importedImageName = getNameFromUser("Image Name", currentImageNames, false);
-                        if (importedImageName == null) {
-                            // User cancelled.
-                            return;
-                        }
-                        break;
-                    } else {
-                        // Overwrite
-                        // TODO: Delete labels file.
-                        break;
-                    }
-                }
-            }
-
-            hasName = true;
-        }
-
-        // Copy the image over.
-        File destFile = new File(imagesDirectory.getAbsolutePath() + "/" + importedImageName);
-        try {
-            copyFile(imageFile, destFile);
-        } catch (IOException e) {
-            // TODO: Error
-            System.err.println("IOException when importing image.");
-            return;
-        }
-        
-        // TODO: Move to IO class.
-        BufferedImage importedImage;
-        try {
-            importedImage = ImageIO.read(destFile);
-        } catch (IOException e) {
-            System.err.println("error");
-            return;
-        }
-        
-        applicationState = ApplicationState.DEFAULT;
-        currentImage = new LabelledImage(LabelIO.stripExtension(importedImageName), importedImage);
-        collectionImages.put(currentImage.getName(), currentImage);
-        
-        thumbnailPanel.addImage(currentImage);
-        imageController.setImage(currentImage.getImage());
-        labelPanel.clear();
-
-        setMenuItemsEnabled();
-
-        writeToSettingsFile(currentCollectionName, currentImage.getName());
     }
 
     /**
@@ -680,20 +600,22 @@ public class AppController {
 
     }
 
-    private String getNameFromUser(String message, String[] disallowedNames, boolean allowEmpty) {
-        String name = null;
+    private String getNameFromUser(String message, Collection<String> takenNames, 
+            boolean allowEmpty) {
+        String chosenName = null;
         boolean hasName = false;
 
         while (!hasName) {
-            name = JOptionPane.showInputDialog(appFrame, message);
+            chosenName = JOptionPane.showInputDialog(appFrame, message);
 
-            if (name == null) {
+            if (chosenName == null) {
                 // User cancelled.
                 return null;
             }
 
-            name = name.trim();
-            if (name.isEmpty() && !allowEmpty) {
+            // Strip any extension from the name.
+            chosenName = LabelIO.stripExtension(chosenName.trim());
+            if (chosenName.isEmpty() && !allowEmpty) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 continue;
@@ -701,8 +623,8 @@ public class AppController {
 
             // Check for duplicates.
             hasName = true;
-            for (int i = 0; i < disallowedNames.length; i++) {
-                if (name.equals(disallowedNames[i])) {
+            for (String name : takenNames) {
+                if (chosenName.equals(name)) {
                     JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     hasName = false;
@@ -710,7 +632,7 @@ public class AppController {
             }
         }
 
-        return name;
+        return chosenName;
     }
 
     /**
@@ -844,4 +766,84 @@ public class AppController {
 		newLabelTip.setVisible(true);
 		
 	}
+	
+    /**
+     * Imports an image from a given file into the current collection, and sets that image
+     * as the currently editing image.
+     *  
+     * @param imageFile the file to import
+     */
+    private void importImageFile(File imageFile) {
+        File imagesDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
+                "/images");
+        File labelsDirectory = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
+                "/labels");
+        
+        // Check for filename conflict. If so, prompt user to overwrite, rename,
+        // or cancel.
+        String importedImageName = LabelIO.stripExtension(imageFile.getName());
+        String extension = LabelIO.getExtension(imageFile.getName());
+        
+        if (collectionImages.get(importedImageName) != null) {
+            String[] options = { "Cancel", "Rename New Image", "Overwrite Old Image" };
+            
+            int result = JOptionPane.showOptionDialog(appFrame, 
+                    "Cannot import image \"" + importedImageName + "\" due to duplicate name.",
+                    "Unable to import image", JOptionPane.YES_NO_CANCEL_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+            
+            if (result == 0) {
+                // User cancelled.
+                return;
+            } else if (result == 1) {
+                // User choose to rename.
+                importedImageName = getNameFromUser("Image Name", collectionImages.keySet(), false);
+                if (importedImageName == null) {
+                    // User cancelled.
+                    return;
+                }
+            } else {
+                // User choose to overwrite.
+                collectionImages.remove(importedImageName);
+                thumbnailPanel.removeThumbnail(importedImageName);
+                File labelFile = new File(labelsDirectory.getAbsolutePath() + "/" +
+                        importedImageName + ".labels");
+                if (labelFile.exists()) {
+                    labelFile.delete();
+                }
+            }
+        }
+
+        // Copy the image into the collection folder.
+        File destFile = new File(imagesDirectory.getAbsolutePath() + "/" + importedImageName + 
+                extension);
+        try {
+            copyFile(imageFile, destFile);
+        } catch (IOException e) {
+            // TODO: Error
+            System.err.println("IOException when importing image.");
+            return;
+        }
+        
+        // TODO: Move to IO class.
+        BufferedImage importedImage;
+        try {
+            importedImage = ImageIO.read(destFile);
+        } catch (IOException e) {
+            System.err.println("error");
+            return;
+        }
+        
+        applicationState = ApplicationState.DEFAULT;
+        currentImage = new LabelledImage(LabelIO.stripExtension(importedImageName), importedImage);
+        collectionImages.put(currentImage.getName(), currentImage);
+        
+        thumbnailPanel.addImage(currentImage);
+        imageController.setImage(currentImage.getImage());
+        labelPanel.clear();
+
+        setMenuItemsEnabled();
+
+        writeToSettingsFile(currentCollectionName, currentImage.getName());
+    }
 }

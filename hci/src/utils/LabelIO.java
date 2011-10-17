@@ -263,6 +263,14 @@ public final class LabelIO {
         return name.substring(0, extensionIndex);
     }
 
+    public static String getExtension(String name) {
+        int extensionIndex = name.lastIndexOf('.');
+        if (extensionIndex < 0) {
+            return "";
+        }
+        return name.substring(extensionIndex, name.length());
+    }
+
     /**
      * Represents an error that occurs while parsing the label file.
      */

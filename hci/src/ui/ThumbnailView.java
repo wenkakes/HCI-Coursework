@@ -94,6 +94,10 @@ public class ThumbnailView extends JPanel {
     public void setImage(String name) {
         appController.setCurrentImage(name);
     }
+
+    public void removeThumbnail(String name) {
+        middle.removeThumbnail(name);
+    }
     
     private class FilmStrip extends JPanel implements MouseListener {
         private static final long serialVersionUID = 1L;
@@ -179,7 +183,13 @@ public class ThumbnailView extends JPanel {
             repaint();
         }
 
-        public boolean withinBounds(int x, int y) {
+        public void removeThumbnail(String name) {
+            thumbnails.remove(name);
+            
+            repaint();
+        }
+
+        private boolean withinBounds(int x, int y) {
             return x >= 0 && x <= this.getWidth() && y >= 0 && y <= this.getHeight();
         }
 
