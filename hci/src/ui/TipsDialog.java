@@ -9,11 +9,9 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import src.nonui.AppController;
-
 
 public class TipsDialog extends JDialog {
 
@@ -21,34 +19,31 @@ public class TipsDialog extends JDialog {
 	private AppController controller;
 	String tipText;
 	
-    public TipsDialog(JFrame parentFrame, AppController appController, int tipNumber) {
+    public TipsDialog(JFrame parentFrame, AppController appController, TipType tipType) {
         super(parentFrame);
 
         this.controller = appController;
-        initUI(tipNumber);
+        initUI(tipType);
     }
 
-    private void initUI(int tipNumber) {
+    private void initUI(TipType tipType) {
     	setLayout(new GridLayout(2, 1));
 
     	JPanel panel = new JPanel(); 
     	
-    	switch (tipNumber) {
-    	
-    		case 1:
+    	switch (tipType) {
+    		case SELECTED_LABEL:
     			tipText = "<html><center>You have selected a label. <br /><br />" +
     			"Click and drag the points to move them around, or <br />" +
     			"click on the lines between points to add more. <br />" +
     			"To rename the label, click the 'rename' button below the list." +
     			"</center><html>";
-    			
     			break;
     			
-    		case 2:
+    		case CREATED_LABEL:
     			tipText = "<html><center>You've just made a label. <br /><br />" +
     			"You can select this label by clicking on it in the label list.<br />" +
     			"By selecting the label, you can change its points or name. </center></html>";
-    			
     			break;
     			
     		default:
@@ -98,4 +93,8 @@ public class TipsDialog extends JDialog {
         return buttons;
     }
 
+    public enum TipType {
+        SELECTED_LABEL,
+        CREATED_LABEL
+    }
 }

@@ -32,6 +32,7 @@ import src.ui.LabelPanelView;
 import src.ui.MenuBarView;
 import src.ui.ThumbnailView;
 import src.ui.TipsDialog;
+import src.ui.TipsDialog.TipType;
 import src.ui.ToolboxPanelView;
 import src.utils.DirectoryRestrictedFileSystemView;
 import src.utils.LabelIO;
@@ -56,8 +57,9 @@ public class AppController {
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
     private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
-    private final TipsDialog selectedLabelTip = new TipsDialog(appFrame, this, 1);
-    private final TipsDialog newLabelTip = new TipsDialog(appFrame, this, 2);
+    private final TipsDialog selectedLabelTip = new TipsDialog(appFrame, this, 
+            TipType.SELECTED_LABEL);
+    private final TipsDialog newLabelTip = new TipsDialog(appFrame, this, TipType.CREATED_LABEL);
     private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
 
     // The application state.
