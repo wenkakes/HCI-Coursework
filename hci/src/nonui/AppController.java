@@ -355,19 +355,6 @@ public class AppController {
         setMenuItemsEnabled();
         writeToSettingsFile(currentCollectionName, currentImage.getName());
     }
-    
-    // ---------------------------------------------------------------------------
-
-    /**
-     * Returns a list of the points of each completed polygon.
-     */
-    public List<List<Point>> getCompletedPolygonsPoints() {
-        List<List<Point>> points = new ArrayList<List<Point>>(currentImage.getLabels().size());
-        for (Polygon polygon : currentImage.getLabels()) {
-            points.add(new ArrayList<Point>(polygon.getPoints()));
-        }
-        return points;
-    }
 
     /**
      * Starts adding a new polygon.
@@ -381,6 +368,26 @@ public class AppController {
         mouseLocation.setLocation(mouseLocation.getX(), mouseLocation.getY() + 20);
         toolboxPanel.setLocation(mouseLocation);
         toolboxPanel.setVisible(true);
+    }
+
+    /**
+     * Renames the currently selected polygon.
+     */
+    public void renameSelectedPolygon() {
+        labelPanel.renameSelectedPolygon();
+    }
+    
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Returns a list of the points of each completed polygon.
+     */
+    public List<List<Point>> getCompletedPolygonsPoints() {
+        List<List<Point>> points = new ArrayList<List<Point>>(currentImage.getLabels().size());
+        for (Polygon polygon : currentImage.getLabels()) {
+            points.add(new ArrayList<Point>(polygon.getPoints()));
+        }
+        return points;
     }
 
     /**
@@ -732,10 +739,6 @@ public class AppController {
 
     public void setApplicationState(ApplicationState applicationState) {
         this.applicationState = applicationState;
-    }
-
-    public void renameSelectedPolygon() {
-        labelPanel.renameSelectedPolygon();
     }
 
     public void selectPolygon(Polygon polygon) {
