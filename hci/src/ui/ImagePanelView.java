@@ -1,5 +1,6 @@
 package src.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -7,6 +8,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -236,6 +239,11 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
      * @param colour the colour to make the line
      */
     private static void drawLine(Point p1, Point p2, Graphics2D graphics2d, Color colour) {
+        Stroke stroke = new BasicStroke(2.0f);
+        graphics2d.setStroke(stroke);
+        graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        
         Color originalColour = graphics2d.getColor();
         graphics2d.setColor(colour);
         graphics2d.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
