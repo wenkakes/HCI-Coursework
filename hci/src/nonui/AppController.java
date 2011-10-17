@@ -38,6 +38,9 @@ import src.utils.Polygon;
 public class AppController {
     // The main folder for the application.
     private static final String MAIN_FOLDER = System.getProperty("user.home") + "/ImageLabeller";
+    
+    private static final String NO_COLLECTION = "Please create or open a collection.";
+    private static final String NO_IMAGES = "Please import an image to label.";
 
     // The application frame.
     private final JFrame appFrame = new JFrame("Image Labeller");
@@ -86,7 +89,7 @@ public class AppController {
         imageController.setPanel(imagePanel);
 
         loadSettingsFile();
-        setMenuItemsState();
+        setUIComponentsState();
 
         // Show tooltips fast.
         ToolTipManager.sharedInstance().setInitialDelay(100);
@@ -161,7 +164,7 @@ public class AppController {
         imageController.setImage(null);
         labelPanel.disableLabelPanel();
         thumbnailPanel.clear();
-        setMenuItemsState();
+        setUIComponentsState();
         
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
@@ -183,7 +186,7 @@ public class AppController {
         thumbnailPanel.clear();
         labelPanel.disableLabelPanel();
         
-        setMenuItemsState();
+        setUIComponentsState();
         
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, "", "");
     }
@@ -231,7 +234,7 @@ public class AppController {
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         imageController.setImage(null);
         
-        setMenuItemsState();
+        setUIComponentsState();
 
         // TODO: Provide a way for user to open a default image?
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
@@ -328,7 +331,7 @@ public class AppController {
         imagePanel.setImage(null);
         labelPanel.disableLabelPanel();
         
-        setMenuItemsState();
+        setUIComponentsState();
         
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
@@ -423,7 +426,7 @@ public class AppController {
             labelPanel.addLabel(polygon.getName());
         }
         
-        setMenuItemsState();
+        setUIComponentsState();
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, 
                 currentImage.getName());
     }
@@ -440,7 +443,7 @@ public class AppController {
         }
         imagePanel.repaint();
 
-        setMenuItemsState();
+        setUIComponentsState();
     }
 
     /**
@@ -467,7 +470,7 @@ public class AppController {
             }
         }
 
-        setMenuItemsState();
+        setUIComponentsState();
     }
 
     /**
@@ -516,7 +519,7 @@ public class AppController {
 
         toolboxPanel.setVisible(false);
 
-        setMenuItemsState();
+        setUIComponentsState();
     }
 
     /**
@@ -728,7 +731,7 @@ public class AppController {
         imageController.setImage(currentImage.getImage());
         labelPanel.clear();
 
-        setMenuItemsState();
+        setUIComponentsState();
 
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, 
                 currentImage.getName());
@@ -763,9 +766,9 @@ public class AppController {
     }
         
     /**
-     * Decides whether or not different menu items should be enabled.
+     * Sets the state of various UI components.
      */
-    private void setMenuItemsState() {
+    private void setUIComponentsState() {
         boolean collectionOpened = currentCollectionName != null;
         boolean collectionhasImages = collectionImages != null && collectionImages.size() > 0;
         boolean imageOpened = currentImage != null;
@@ -783,5 +786,12 @@ public class AppController {
         menuBar.setRenamePolygonEnabled(imageHasLabels);
         menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
         menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
+        
+        // Image default text.
+        if (!collectionOpened) {
+            imageController.setDefaultText(NO_COLLECTION);
+        } else {
+            imageController.setDefaultText(NO_IMAGES);
+        }
     }
 }

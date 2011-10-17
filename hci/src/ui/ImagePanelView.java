@@ -30,14 +30,14 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
-    // String to display when there is no image opened for editing.
-    private static final String NO_IMAGE_STRING = "Please open an image for editing.";
-
     private final ImageController controller;
 
     // Image that is being worked on.
     private BufferedImage image = null;
 
+    // The text to show if there is no image.
+    private String defaultText = "";
+    
     public ImagePanelView(ImageController imageController) {
         this.controller = imageController;
 
@@ -63,14 +63,14 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
 
         if (image == null) {
             FontMetrics fm = getFontMetrics(getFont());
-            Rectangle2D textsize = fm.getStringBounds(NO_IMAGE_STRING, g);
+            Rectangle2D textsize = fm.getStringBounds(defaultText, g);
             int textWidth = new Double(textsize.getWidth()).intValue();
             int textHeight = new Double(textsize.getHeight()).intValue();
 
             int xPos = (getWidth() - textWidth) / 2;
             int yPos = (getHeight() - textHeight) / 2 + fm.getAscent();
             g.setFont(new Font(getFont().getFamily(), getFont().getStyle(), 16));
-            g.drawString(NO_IMAGE_STRING, xPos, yPos);
+            g.drawString(defaultText, xPos, yPos);
         } else {
             g.drawImage(image, 0, 0, null);
 
@@ -193,6 +193,10 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         }
 
         repaint();
+    }
+    
+    public void setDefaultText(String text) {
+        defaultText = text;
     }
 
     /**

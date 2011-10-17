@@ -314,6 +314,15 @@ public class ImageController {
     }
 
     /**
+     * Sets the default text for the image panel.
+     * 
+     * @param text the text to display
+     */
+    public void setDefaultText(String text) {
+        imagePanel.setDefaultText(text);
+    }
+
+    /**
      * Gets a list of the currently selected polygons.
      */
     private List<Polygon> getSelectedPolygons() {
