@@ -46,7 +46,7 @@ public class LabelPanelView extends JPanel {
 
     private final JButton addButton;
     private final JButton editButton;
-    private final JButton loadButton;
+    private final JButton importButton;
     private final JButton deleteButton;
     
     public LabelPanelView(JFrame frame, AppController appController) {
@@ -76,7 +76,7 @@ public class LabelPanelView extends JPanel {
         deleteButton = createButton(new ImageIcon("hci/icons/small/delete.png"),
                 new DeleteListener(), false);
         deleteButton.setToolTipText("Delete Label");
-        loadButton = createButton("Load Labels", new LoadListener(), false);
+        importButton = createButton("Import Labels", new LoadListener(), false);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -89,9 +89,9 @@ public class LabelPanelView extends JPanel {
         // This panel is shown if there are no labels.
         JPanel noLabelsPane = new JPanel();
         noLabelsPane.add(new JLabel(
-                "<html>You don't seem to have any labels currently. <br /> Add or load some "
+                "<html>You don't seem to have any labels. <br /> Add or import some "
                         + "labels?</html>"));
-        noLabelsPane.add(loadButton);
+        noLabelsPane.add(importButton);
 
         labelListPane = new JPanel(new CardLayout());
         labelListPane.add(noLabelsPane, "NOLABELS");
@@ -174,7 +174,7 @@ public class LabelPanelView extends JPanel {
      * @param enabled whether to enable or disable the load labels button
      */
     public void setLoadButtonEnabled(boolean enabled) {
-        loadButton.setEnabled(enabled);
+        importButton.setEnabled(enabled);
     }
 
     /**
