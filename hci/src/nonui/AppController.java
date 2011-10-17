@@ -80,7 +80,7 @@ public class AppController {
         leftPanel.add(imagePanel, BorderLayout.CENTER);
         leftPanel.add(thumbnailPanel, BorderLayout.SOUTH);
         
-        appFrame.add(leftPanel, BorderLayout.CENTER);
+        appFrame.add(leftPanel);
         appFrame.add(labelPanel);
         appFrame.setJMenuBar(menuBar);
 
