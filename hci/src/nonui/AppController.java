@@ -62,7 +62,7 @@ public class AppController {
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
-    private boolean enableTips = true;
+    private boolean tipsEnabled = true;
 
     // The current collection.
     private String currentCollectionName = null;
@@ -366,6 +366,47 @@ public class AppController {
     public void renameSelectedPolygon() {
         labelPanel.renameSelectedPolygon();
     }
+
+    /**
+     * Deletes the currently selected polygons.
+     */
+    public void deleteSelectedPolygons() {
+        labelPanel.deleteSelectedPolygons();
+        imagePanel.repaint();
+    }
+
+    /**
+     * Deletes all of the polygons.
+     */
+    public void deleteAllPolygons() {
+        labelPanel.deleteAllPolygons();
+        imagePanel.repaint();
+    }
+    
+    /**
+     * Checks if the user has tips enabled or not.
+     */
+    public boolean areTipsOn() {
+        return tipsEnabled;
+    }
+
+    /**
+     * Sets whether or not tips are enabled.
+     * 
+     * @param enabled whether to enable tips or not
+     */
+    public void setTipsEnabled(boolean enabled) {
+        if (enabled) {
+            JOptionPane.showMessageDialog(appFrame, "Tips are now on.");
+        } else {
+            JOptionPane.showMessageDialog(appFrame, "<html>Tips are now off. <br />" +
+                    "Remember, you can always turn tips on <br />" +
+                    "again from the Help menu.</html>");
+        }
+        
+        tipsEnabled = enabled;
+        menuBar.setTipsEnabled(tipsEnabled);
+    }
     
     // ---------------------------------------------------------------------------
 
@@ -497,22 +538,6 @@ public class AppController {
             default:
                 // TODO: Throw/show appropriate error.
         }
-    }
-
-    /**
-     * Deletes all of the polygons.
-     */
-    public void deleteAllPolygons() {
-        labelPanel.deleteAllPolygons();
-        imagePanel.repaint();
-    }
-
-    /**
-     * Deletes the currently selected polygons.
-     */
-    public void deleteSelectedPolygons() {
-        labelPanel.deleteSelectedPolygons();
-        imagePanel.repaint();
     }
 
     /**
@@ -757,29 +782,6 @@ public class AppController {
         menuBar.setDeleteSelectedLabelEnabled(imageHasLabels);
         menuBar.setDeleteAllLabelsEnabled(imageHasLabels);
     }
-
-	public void setTipsOn(boolean b) {
-		
-    	JFrame parent = new JFrame();
-		
-    	if (b) {
-
-        	JOptionPane.showMessageDialog(parent,"Tips are now on.");
-    		
-		} else {
-        	
-        	JOptionPane.showMessageDialog(parent,"<html>Tips are now off. <br />" +
-        			"Remember, you can always turn tips on <br />" +
-        			"again from the Help menu.</html>");
-
-		}
-		
-		enableTips = b;
-	}
-	
-	public boolean checkTipsOn() {
-		return enableTips;
-	}
 
 	public void showSelectedLabelTip() {
         java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();

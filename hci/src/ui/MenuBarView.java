@@ -34,6 +34,9 @@ public class MenuBarView extends JMenuBar {
     private JMenuItem deleteSelected;
     private JMenuItem deleteAll;
 
+    // Quicktips needs to be a field so its text can be changed.
+    private JMenuItem quickTips;
+
     public MenuBarView(JFrame parentFrame, AppController appController) {
         this.parentFrame = parentFrame;
         this.controller = appController;
@@ -254,14 +257,15 @@ public class MenuBarView extends JMenuBar {
             }
         });
        
-        JMenuItem quickTips = new JMenuItem("Enable/Disable Quick Tips?");
+        quickTips = new JMenuItem("Disable Quick Tips?");
         quickTips.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent event) {
-        		
-        		if (controller.checkTipsOn()) {
-        			controller.setTipsOn(false);
+        		if (controller.areTipsOn()) {
+        		    setTipsEnabled(true);
+        			controller.setTipsEnabled(false);
         		} else {
-        			controller.setTipsOn(true);
+                    setTipsEnabled(false);
+        			controller.setTipsEnabled(true);
         		}
         	}
         });
@@ -307,5 +311,10 @@ public class MenuBarView extends JMenuBar {
 
     public void setDeleteAllLabelsEnabled(boolean enabled) {
         deleteAll.setEnabled(enabled);
+    }
+    
+    public void setTipsEnabled(boolean enabled) {
+        String text = (enabled) ? "Disable" : "Enable";
+        quickTips.setText(text + " Quick Tips");
     }
 }

@@ -298,7 +298,7 @@ public class ImageController {
 
         imagePanel.repaint();
         
-        if (appController.checkTipsOn()) { 
+        if (appController.areTipsOn()) { 
         	appController.showNewLabelTip();
         }
         

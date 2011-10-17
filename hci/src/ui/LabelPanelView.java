@@ -415,7 +415,7 @@ public class LabelPanelView extends JPanel {
 
             controller.highlightSelected(getSelectedNames());
             
-            if (controller.checkTipsOn()) { 
+            if (controller.areTipsOn()) { 
             	controller.showSelectedLabelTip();
             }
 

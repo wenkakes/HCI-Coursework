@@ -87,7 +87,7 @@ public class TipsDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-            	controller.setTipsOn(false);
+            	controller.setTipsEnabled(false);
                 setVisible(false);
             }
         });
