@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -27,6 +26,7 @@ public class MenuBarView extends JMenuBar {
     // Menu items that can be enabled/disabled.
     private JMenuItem closeCollection;
     private JMenuItem importImage;
+    private JMenuItem saveAllImages;
     private JMenuItem saveImage;
     private JMenuItem closeImage;
     private JMenuItem addPolygon;
@@ -114,6 +114,17 @@ public class MenuBarView extends JMenuBar {
                 controller.saveImage();
             }
         });
+        
+        saveAllImages = new JMenuItem("Save All Images");
+        saveAllImages.setMnemonic(KeyEvent.VK_A);
+        saveAllImages.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 
+                ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+        saveAllImages.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.saveAllImages();
+            }
+        });
 
         closeImage = new JMenuItem("Close Image");
         closeImage.addActionListener(new ActionListener() {
@@ -138,6 +149,7 @@ public class MenuBarView extends JMenuBar {
 
         fileMenu.add(importImage);
         fileMenu.add(saveImage);
+        fileMenu.add(saveAllImages);
         fileMenu.add(closeImage);
         fileMenu.addSeparator();
 
@@ -269,6 +281,10 @@ public class MenuBarView extends JMenuBar {
 
     public void setSaveImageEnabled(boolean enabled) {
         saveImage.setEnabled(enabled);
+    }
+
+    public void setSaveAllImagesEnabled(boolean enabled) {
+        saveAllImages.setEnabled(enabled);
     }
 
     public void setCloseImageEnabled(boolean enabled) {

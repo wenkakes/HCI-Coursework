@@ -267,25 +267,33 @@ public class AppController {
 
     /**
      * Saves the current image.
-     * 
-     * TODO: Should this be "Save collection" and let it save all collections?
      */
     public void saveImage() {
-        if (currentImage == null) {
+        if (currentImage != null) {
+            if (saveImage(currentImage)) {
+                JOptionPane.showMessageDialog(appFrame, "The current image was saved.", 
+                        "Images Saved", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Saves all of the images in the current collection.
+     */
+    public void saveAllImages() {
+        if (collectionImages.size() == 0) {
             return;
         }
-
-        String labelName = currentImage.getName() + ".labels";
-        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName +
-                "/labels/" + labelName);
         
-        // TODO: Check with user for overwrite?
-        try {
-            LabelIO.writeLabels(labelFile, currentImage.getLabels());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        boolean savedOkay = true;
+        for (LabelledImage labelledImage : collectionImages.values()) {
+            savedOkay = saveImage(labelledImage);
         }
+        
+        if (savedOkay) {
+            JOptionPane.showMessageDialog(appFrame, "All images were saved.", "Images Saved",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } 
     }
     
     /**
@@ -720,6 +728,7 @@ public class AppController {
         menuBar.setCloseCollectionEnabled(collectionOpened);
         menuBar.setImportImageEnabled(collectionOpened);
         menuBar.setSaveImageEnabled(imageOpened);
+        menuBar.setSaveAllImagesEnabled(collectionImages.size() > 0);
         menuBar.setCloseImageEnabled(imageOpened);
 
         // Edit menu.
@@ -845,5 +854,26 @@ public class AppController {
         setMenuItemsEnabled();
 
         writeToSettingsFile(currentCollectionName, currentImage.getName());
+    }
+
+    /**
+     * Saves a {@link LabelledImage}.
+     * 
+     * @param labelledImage the image to save
+     */
+    private boolean saveImage(LabelledImage labelledImage) {
+        String labelName = labelledImage.getName() + ".labels";
+        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName +
+                "/labels/" + labelName);
+        
+        try {
+            LabelIO.writeLabels(labelFile, labelledImage.getLabels());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(appFrame, e.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        return true;
     }
 }
