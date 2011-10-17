@@ -17,7 +17,7 @@ public class TipsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private AppController controller;
-	String tipText;
+	private String tipText;
 	
     public TipsDialog(JFrame parentFrame, AppController appController, TipType tipType) {
         super(parentFrame);
@@ -26,6 +26,11 @@ public class TipsDialog extends JDialog {
         initUI(tipType);
     }
 
+    /**
+     * Sets up the tip dialog.
+     * 
+     * @param tipType the type of tip to show text for
+     */
     private void initUI(TipType tipType) {
     	setLayout(new GridLayout(2, 1));
 
@@ -65,8 +70,10 @@ public class TipsDialog extends JDialog {
     	
 	}
     
-    protected JPanel createButtonPanel() {
-   	
+    /**
+     * Creates the button panel for the dialog.
+     */
+    private JPanel createButtonPanel() {
     	JPanel buttons = new JPanel();
     	
         final JButton okButton = new JButton("OK");
@@ -81,7 +88,6 @@ public class TipsDialog extends JDialog {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
             	controller.setTipsEnabled(false);
                 setVisible(false);
             }
@@ -93,6 +99,9 @@ public class TipsDialog extends JDialog {
         return buttons;
     }
 
+    /**
+     * An enum for the different types of tips.
+     */
     public enum TipType {
         SELECTED_LABEL,
         CREATED_LABEL
