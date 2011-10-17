@@ -8,17 +8,20 @@ import java.util.Map;
 
 public class LabelledImage {
     private final String name;
+    private final String imageExtension;
     private final BufferedImage image;
     private Map<String, Polygon> labels;
     
     public LabelledImage(String name, BufferedImage image) {
-        this.name = name;
+        this.name = LabelIO.stripExtension(name);
+        this.imageExtension = LabelIO.getExtension(name);
         this.image = image;
         this.labels = new HashMap<String, Polygon>();
     }
     
     public LabelledImage(String name, BufferedImage image, List<Polygon> labels) {
-        this.name = name;
+        this.name = LabelIO.stripExtension(name);
+        this.imageExtension = LabelIO.getExtension(name);
         this.image = image;
         this.labels = listToMap(labels);
     }
@@ -94,5 +97,9 @@ public class LabelledImage {
     public Map<String, Polygon> getLabelsMap() {
         // TODO: Temporary method.
         return labels;
+    }
+
+    public String getExtension() {
+        return imageExtension;
     }
 }

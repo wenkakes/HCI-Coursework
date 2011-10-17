@@ -28,6 +28,7 @@ public class MenuBarView extends JMenuBar {
     private JMenuItem importImage;
     private JMenuItem saveAllImages;
     private JMenuItem saveImage;
+    private JMenuItem removeImage;
     private JMenuItem closeImage;
     private JMenuItem addPolygon;
     private JMenuItem renameSelected;
@@ -58,7 +59,9 @@ public class MenuBarView extends JMenuBar {
      * <li>Open Collection</li>
      * <li>Import Image</li>
      * <li>Save Image</li>
+     * <li>Save All Images</li>
      * <li>Close Image</li>
+     * <li>Remove Image from Collection</li>
      * <li>Exit</li>
      * </ul>
      */
@@ -125,6 +128,15 @@ public class MenuBarView extends JMenuBar {
                 controller.saveAllImages();
             }
         });
+        
+        removeImage = new JMenuItem("Remove Image from Collection");
+        removeImage.setMnemonic(KeyEvent.VK_D);
+        removeImage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.removeImage();
+            }
+        });
 
         closeImage = new JMenuItem("Close Image");
         closeImage.addActionListener(new ActionListener() {
@@ -151,6 +163,7 @@ public class MenuBarView extends JMenuBar {
         fileMenu.add(saveImage);
         fileMenu.add(saveAllImages);
         fileMenu.add(closeImage);
+        fileMenu.add(removeImage);
         fileMenu.addSeparator();
 
         fileMenu.add(exit);
@@ -289,6 +302,10 @@ public class MenuBarView extends JMenuBar {
 
     public void setCloseImageEnabled(boolean enabled) {
         closeImage.setEnabled(enabled);
+    }
+
+    public void setRemoveImageEnabled(boolean enabled) {
+        removeImage.setEnabled(enabled);
     }
 
     public void setAddPolygonEnabled(boolean enabled) {

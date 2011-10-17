@@ -312,6 +312,29 @@ public class AppController {
         
         writeToSettingsFile(currentCollectionName, "");
     }
+
+    /**
+     * Removes the current image from the collection.
+     */
+    public void removeImage() {
+        if (currentImage == null) {
+            return;
+        }
+        
+        LabelledImage removedImage = collectionImages.remove(currentImage.getName());
+        thumbnailPanel.removeThumbnail(removedImage.getName());
+        closeImage();
+        
+        File imageFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
+                "/images/" + removedImage.getName() + removedImage.getExtension());
+        File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
+                "/labels/" + removedImage.getName() + ".labels");
+        if (!imageFile.delete() || !labelFile.delete()) {
+            // TODO: Warn user.
+        }
+        
+        setMenuItemsEnabled();
+    }
     
     /**
      * Open one of the collection images.
@@ -328,6 +351,9 @@ public class AppController {
         for (Polygon polygon : currentImage.getLabels()) {
             labelPanel.addLabel(polygon.getName());
         }
+        
+        setMenuItemsEnabled();
+        writeToSettingsFile(currentCollectionName, currentImage.getName());
     }
     
     // ---------------------------------------------------------------------------
@@ -730,6 +756,7 @@ public class AppController {
         menuBar.setSaveImageEnabled(imageOpened);
         menuBar.setSaveAllImagesEnabled(collectionImages.size() > 0);
         menuBar.setCloseImageEnabled(imageOpened);
+        menuBar.setRemoveImageEnabled(imageOpened);
 
         // Edit menu.
         menuBar.setAddPolygonEnabled(imageOpened && applicationState == ApplicationState.DEFAULT);
@@ -844,7 +871,7 @@ public class AppController {
         }
         
         applicationState = ApplicationState.DEFAULT;
-        currentImage = new LabelledImage(LabelIO.stripExtension(importedImageName), importedImage);
+        currentImage = new LabelledImage(importedImageName + extension, importedImage);
         collectionImages.put(currentImage.getName(), currentImage);
         
         thumbnailPanel.addImage(currentImage);

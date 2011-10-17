@@ -71,6 +71,7 @@ public final class LabelIO {
         for (int i = 0; i < imageFiles.length; i++) {
             File imageFile = imageFiles[i];
             String imageName = stripExtension(imageFile.getName());
+            String extension = getExtension(imageFile.getName());
             
             BufferedImage image;
             try {
@@ -95,9 +96,10 @@ public final class LabelIO {
             
             LabelledImage labelledImage;
             if (labels != null) {
-                labelledImage = new LabelledImage(imageName, image, new ArrayList<Polygon>(labels.values()));
+                labelledImage = new LabelledImage(imageName + extension, image, 
+                        new ArrayList<Polygon>(labels.values()));
             } else {
-                labelledImage = new LabelledImage(imageName, image);
+                labelledImage = new LabelledImage(imageName + extension, image);
             }
             
             collectionEntries.put(imageName, labelledImage);
