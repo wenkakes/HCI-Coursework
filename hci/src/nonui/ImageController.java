@@ -18,6 +18,7 @@ public class ImageController {
     private static final double EDITING_THRESHOLD_DISTANCE = 5.0;
     
     private final AppController appController;
+    private JFrame appFrame;
     private ImagePanelView imagePanel;
 
     // Used when adding/editing points.
@@ -25,8 +26,9 @@ public class ImageController {
     Polygon polygonInEditing = new Polygon();
     private Point currentPoint = null;
 
-    public ImageController(AppController appController) {
+    public ImageController(AppController appController, JFrame appFrame) {
         this.appController = appController;
+        this.appFrame = appFrame;
     }
 
     /**
@@ -251,8 +253,6 @@ public class ImageController {
         if (appController.getApplicationState() != ApplicationState.ADDING_POLYGON) {
             return;
         }
-
-        JFrame appFrame = appController.getAppFrame();
 
         if (polygonInCreation.getPoints().size() < 3) {
             JOptionPane.showMessageDialog(appFrame,

@@ -48,11 +48,13 @@ public class AppController {
     // The main folder for the application.
     private static final String MAIN_FOLDER = System.getProperty("user.home") + "/ImageLabeller";
 
+    // The application frame.
+    private final JFrame appFrame = new JFrame("Image Labeller");
+    
     // The sub-controllers.
-    private final ImageController imageController = new ImageController(this);
+    private final ImageController imageController = new ImageController(this, appFrame);
 
     // The core Swing components that make up the application.
-    private final JFrame appFrame = new JFrame("Image Labeller");
     private final ImagePanelView imagePanel = new ImagePanelView(imageController);
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
@@ -327,26 +329,6 @@ public class AppController {
         
         writeToSettingsFile(currentCollectionName, "");
     }
-    
-    /**
-     * Open one of the collection images.
-     * 
-     * @param name the name of the image to open
-     */
-    public void setCurrentImage(String name) {
-        applicationState = ApplicationState.DEFAULT;
-        
-        currentImage = collectionImages.get(name);
-        
-        imageController.setImage(currentImage.getImage());
-        labelPanel.clear();
-        for (Polygon polygon : currentImage.getLabels()) {
-            labelPanel.addLabel(polygon.getName());
-        }
-        
-        setMenuItemsEnabled();
-        writeToSettingsFile(currentCollectionName, currentImage.getName());
-    }
 
     /**
      * Starts adding a new polygon.
@@ -412,6 +394,27 @@ public class AppController {
     
     // ---------------------------------------------------------------------------
 
+    
+    /**
+     * Open one of the collection images.
+     * 
+     * @param name the name of the image to open
+     */
+    public void setCurrentImage(String name) {
+        applicationState = ApplicationState.DEFAULT;
+        
+        currentImage = collectionImages.get(name);
+        
+        imageController.setImage(currentImage.getImage());
+        labelPanel.clear();
+        for (Polygon polygon : currentImage.getLabels()) {
+            labelPanel.addLabel(polygon.getName());
+        }
+        
+        setMenuItemsEnabled();
+        writeToSettingsFile(currentCollectionName, currentImage.getName());
+    }
+    
     /**
      * Returns a list of the points of each completed polygon.
      */
@@ -448,6 +451,7 @@ public class AppController {
         setMenuItemsEnabled();
     }
 
+    // TODO: Change to import labels.
     /**
      * Loads in a new list of polygons from a file.
      * 
@@ -572,10 +576,6 @@ public class AppController {
         imageController.cancel();
     }
 
-    public Polygon getPolygon(String name) {
-        return currentImage.getLabel(name);
-    }
-
     public void highlightSelected(List<String> highlightedNames) {
         if (applicationState == ApplicationState.EDITING_POLYGON
                 && !highlightedNames.contains(imageController.getEditedPolygon().getName())) {
@@ -583,26 +583,6 @@ public class AppController {
         }
 
         imagePanel.repaint();
-    }
-
-    public List<List<Point>> getSelectedPolygonsPoints() {
-        List<Polygon> selectedPolygons = getSelectedPolygons();
-        List<List<Point>> points = new ArrayList<List<Point>>(selectedPolygons.size());
-        for (Polygon selectedPolygon : selectedPolygons) {
-            points.add(selectedPolygon.getPoints());
-        }
-        return points;
-    }
-
-    public List<Polygon> getSelectedPolygons() {
-        List<String> selectedNames = labelPanel.getSelectedNames();
-        List<Polygon> selectedPolygons = new ArrayList<Polygon>(selectedNames.size());
-
-        for (String name : selectedNames) {
-            selectedPolygons.add(currentImage.getLabel(name));
-        }
-
-        return selectedPolygons;
     }
 
     private boolean writeToSettingsFile(String collectionName, String imageName) {
@@ -750,16 +730,8 @@ public class AppController {
         return applicationState;
     }
 
-    public JFrame getAppFrame() {
-        return appFrame;
-    }
-
     public void setApplicationState(ApplicationState applicationState) {
         this.applicationState = applicationState;
-    }
-
-    public void selectPolygon(Polygon polygon) {
-        labelPanel.selectPolygon(polygon.getName());
     }
         
     /**
