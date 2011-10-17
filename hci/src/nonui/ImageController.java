@@ -21,8 +21,8 @@ public class ImageController {
     private ImagePanelView imagePanel;
 
     // Used when adding/editing points.
-    Polygon polygonInCreation = new Polygon(); 
-    Polygon polygonInEditing = new Polygon();
+    private Polygon polygonInCreation = new Polygon(); 
+    private Polygon polygonInEditing = new Polygon();
     private Point currentPoint = null;
 
     public ImageController(AppController appController, JFrame appFrame) {
@@ -214,20 +214,6 @@ public class ImageController {
     }
 
     /**
-     * Gets a list of the currently selected polygons.
-     */
-    private List<Polygon> getSelectedPolygons() {
-        Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();
-        List<String> selectedNames = appController.getSelectedNames();
-        List<Polygon> selectedPolygons = new ArrayList<Polygon>(selectedNames.size());
-
-        for (String name : selectedNames) {
-            selectedPolygons.add(completedPolygons.get(name));
-        }
-        return selectedPolygons;
-    }
-
-    /**
      * Called when the user is finished adding the current polygon, either by
      * clicking on the starting point, double-clicking, or clicking the "Done"
      * button on the toolbox.
@@ -285,6 +271,60 @@ public class ImageController {
         	appController.showNewLabelTip();
         }
         
+    }
+
+    /**
+     * Undoes the last added vertex on the current polygon.
+     */
+    public void undo() {
+        polygonInCreation.removeLastPoint();
+        imagePanel.repaint();
+    }
+
+    /**
+     * Redoes the last undone vertex on the current polygon.
+     */
+    public void redo() {
+        polygonInCreation.redoPoint();
+        imagePanel.repaint();
+    }
+
+    /**
+     * Gets the polygon that is currently being edited.
+     */
+    public Polygon getEditedPolygon() {
+        return polygonInEditing;
+    }
+
+    /**
+     * Cancels the adding of the current polygon.
+     */
+    public void cancel() {
+        polygonInCreation = new Polygon();
+        imagePanel.repaint();
+    }
+
+    /**
+     * Sets the image from a file.
+     * 
+     * @param bufferedImage the file to open the image from
+     */
+    public void setImage(BufferedImage image) {
+        imagePanel.setImage(image);
+    }
+
+    /**
+     * Gets a list of the currently selected polygons.
+     */
+    private List<Polygon> getSelectedPolygons() {
+        Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();
+        List<String> selectedNames = appController.getSelectedNames();
+        List<Polygon> selectedPolygons = new ArrayList<Polygon>(selectedNames.size());
+
+        for (String name : selectedNames) {
+            selectedPolygons.add(completedPolygons.get(name));
+        }
+        return selectedPolygons;
     }
 
     /**
@@ -413,45 +453,5 @@ public class ImageController {
      */
     private boolean isSelected(Polygon polygon) {
         return getSelectedPolygons().contains(polygon);
-    }
-
-    /**
-     * Undoes the last added vertex on the current polygon.
-     */
-    public void undo() {
-        polygonInCreation.removeLastPoint();
-        imagePanel.repaint();
-    }
-
-    /**
-     * Redoes the last undone vertex on the current polygon.
-     */
-    public void redo() {
-        polygonInCreation.redoPoint();
-        imagePanel.repaint();
-    }
-
-    /**
-     * Gets the polygon that is currently being edited.
-     */
-    public Polygon getEditedPolygon() {
-        return polygonInEditing;
-    }
-
-    /**
-     * Cancels the adding of the current polygon.
-     */
-    public void cancel() {
-        polygonInCreation = new Polygon();
-        imagePanel.repaint();
-    }
-
-    /**
-     * Sets the image from a file.
-     * 
-     * @param bufferedImage the file to open the image from
-     */
-    public void setImage(BufferedImage image) {
-        imagePanel.setImage(image);
     }
 }

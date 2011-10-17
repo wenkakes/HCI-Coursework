@@ -1,9 +1,12 @@
 package src.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -98,6 +101,10 @@ public class ThumbnailView extends JPanel {
     public void removeThumbnail(String name) {
         middle.removeThumbnail(name);
     }
+
+    public void setThumbnailImage(String name) {
+        middle.setThumbnailImage(name);
+    }
     
     private class FilmStrip extends JPanel implements MouseListener {
         private static final long serialVersionUID = 1L;
@@ -105,6 +112,7 @@ public class ThumbnailView extends JPanel {
         // Storage for the thumbnails.
         private final Map<String, BufferedImage> thumbnails;
         private int index = 0;
+        private int selectedIndex = -1;
         
         public FilmStrip() {
             super();
@@ -115,6 +123,19 @@ public class ThumbnailView extends JPanel {
             this.addMouseListener(this);
         }
 
+        public void setThumbnailImage(String imageName) {
+            int index = 0;
+            for (String name : thumbnails.keySet()) {
+                if (name.equals(imageName)) {
+                    break;
+                }
+                index++;
+            }
+            
+            selectedIndex = index;
+            repaint();
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             List<BufferedImage> images = new ArrayList<BufferedImage>(thumbnails.values());
@@ -123,8 +144,17 @@ public class ThumbnailView extends JPanel {
                 g.drawImage(images.get(i), xcoord, 0, null);
                 
                 // Border.
-                g.setColor(Color.black);
-                g.drawRect(xcoord, 0, THUMBNAIL_WIDTH, COMPONENT_HEIGHT);
+                if (i == selectedIndex) {
+                    Graphics2D graphics2d = (Graphics2D) g;
+                    Stroke originalStroke = graphics2d.getStroke();
+                    graphics2d.setStroke(new BasicStroke(5.0f));
+                    g.setColor(Color.RED);
+                    g.drawRect(xcoord, 0, THUMBNAIL_WIDTH, COMPONENT_HEIGHT);
+                    graphics2d.setStroke(originalStroke);
+                } else {
+                    g.setColor(Color.BLACK);
+                    g.drawRect(xcoord, 0, THUMBNAIL_WIDTH, COMPONENT_HEIGHT);
+                }
                 
                 xcoord += THUMBNAIL_WIDTH;
             }
@@ -160,6 +190,7 @@ public class ThumbnailView extends JPanel {
             imageThumbnail.getGraphics().drawImage(scaledImage, 0, 0, this);
             
             thumbnails.put(name, imageThumbnail);
+            selectedIndex = thumbnails.size() - 1;
             
             repaint();
         }
@@ -183,8 +214,20 @@ public class ThumbnailView extends JPanel {
             repaint();
         }
 
-        public void removeThumbnail(String name) {
-            thumbnails.remove(name);
+        public void removeThumbnail(String thumbnailName) {
+            int index = 0;
+            for (String name : thumbnails.keySet()) {
+                if (name.equals(thumbnailName)) {
+                    break;
+                }
+                index++;
+            }
+            
+            if (selectedIndex == index) {
+                selectedIndex = -1;
+            }
+            
+            thumbnails.remove(thumbnailName);
             
             repaint();
         }
@@ -211,6 +254,9 @@ public class ThumbnailView extends JPanel {
             // Grab the name.
             List<String> names = new ArrayList<String>(thumbnails.keySet());
             setImage(names.get(imageIndex));
+            
+            selectedIndex = imageIndex;
+            repaint();
         }
 
         @Override

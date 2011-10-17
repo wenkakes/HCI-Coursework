@@ -417,6 +417,7 @@ public class AppController {
         currentImage = collectionImages.get(name);
         
         imageController.setImage(currentImage.getImage());
+        thumbnailPanel.setThumbnailImage(currentImage.getName());
         labelPanel.clear();
         for (Polygon polygon : currentImage.getLabels()) {
             labelPanel.addLabel(polygon.getName());
@@ -752,7 +753,7 @@ public class AppController {
         
         currentImage = collectionImages.get(collectionInformation.get(1));
         if (currentImage != null) {
-            imageController.setImage(currentImage.getImage());
+            setCurrentImage(currentImage.getName());
 
             labelPanel.clear();
             for (Polygon polygon : currentImage.getLabels()) {
