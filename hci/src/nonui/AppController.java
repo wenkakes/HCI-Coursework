@@ -295,23 +295,6 @@ public class AppController {
                     JOptionPane.INFORMATION_MESSAGE);
         } 
     }
-    
-    /**
-     * Closes the current image (but does not remove it from the project.)
-     * 
-     * TODO: Do we still want this?
-     */
-    public void closeImage() {
-        applicationState = ApplicationState.DEFAULT;
-        currentImage = null;
-
-        imagePanel.setImage(null);
-        labelPanel.disableLabelPanel();
-
-        setMenuItemsEnabled();
-        
-        writeToSettingsFile(currentCollectionName, "");
-    }
 
     /**
      * Removes the current image from the collection.
@@ -320,10 +303,11 @@ public class AppController {
         if (currentImage == null) {
             return;
         }
+
+        applicationState = ApplicationState.DEFAULT;
         
         LabelledImage removedImage = collectionImages.remove(currentImage.getName());
         thumbnailPanel.removeThumbnail(removedImage.getName());
-        closeImage();
         
         File imageFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
                 "/images/" + removedImage.getName() + removedImage.getExtension());
@@ -333,7 +317,13 @@ public class AppController {
             // TODO: Warn user.
         }
         
+        currentImage = null;
+        imagePanel.setImage(null);
+        labelPanel.disableLabelPanel();
+        
         setMenuItemsEnabled();
+        
+        writeToSettingsFile(currentCollectionName, "");
     }
     
     /**
