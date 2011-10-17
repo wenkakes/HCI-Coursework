@@ -124,20 +124,25 @@ public class ThumbnailView extends JPanel {
         }
 
         public void setThumbnailImage(String imageName) {
-            int index = 0;
+            selectedIndex = 0;
             for (String name : thumbnails.keySet()) {
                 if (name.equals(imageName)) {
                     break;
                 }
-                index++;
+                selectedIndex++;
+            }
+
+            // If we need to move the normal index, do so. Bit naughty to do it here though...
+            if (selectedIndex < thumbnails.size() &&
+                    (index < (selectedIndex - 3) || index > selectedIndex)) {
+                index = Math.max(0, selectedIndex - 3);
             }
             
-            selectedIndex = index;
             repaint();
         }
 
         @Override
-        protected void paintComponent(Graphics g) {
+        protected void paintComponent(Graphics g) {            
             List<BufferedImage> images = new ArrayList<BufferedImage>(thumbnails.values());
             int xcoord = 0;
             for (int i = index; i < index + 4 && i < images.size(); i++) {
@@ -191,6 +196,12 @@ public class ThumbnailView extends JPanel {
             
             thumbnails.put(name, imageThumbnail);
             selectedIndex = thumbnails.size() - 1;
+
+            // If we need to move the normal index, do so. Bit naughty to do it here though...
+            if (selectedIndex < thumbnails.size() &&
+                    (index < (selectedIndex - 3) || index > selectedIndex)) {
+                index = Math.max(0, selectedIndex - 3);
+            }
             
             repaint();
         }
@@ -256,6 +267,13 @@ public class ThumbnailView extends JPanel {
             setImage(names.get(imageIndex));
             
             selectedIndex = imageIndex;
+
+            // If we need to move the normal index, do so. Bit naughty to do it here though...
+            if (selectedIndex < thumbnails.size() &&
+                    (index < (selectedIndex - 3) || index > selectedIndex)) {
+                index = Math.max(0, selectedIndex - 3);
+            }
+            
             repaint();
         }
 

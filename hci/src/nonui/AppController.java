@@ -332,8 +332,14 @@ public class AppController {
             // TODO: Warn user.
         }
         
-        currentImage = null;
-        imagePanel.setImage(null);
+        if (collectionImages.size() > 0) {
+            // TODO: Should probably select a smarter image than just "the last one".
+            currentImage = getLastCollectionImage();
+            setCurrentImage(currentImage.getName());
+        } else {
+            currentImage = null;
+            imagePanel.setImage(null);
+        }
         labelPanel.disableLabelPanel();
         
         setUIComponentsState();
@@ -725,6 +731,9 @@ public class AppController {
         BufferedImage importedImage;
         try {
             importedImage = ImageIO.read(destFile);
+            if (importedImage == null) {
+                throw new IOException();
+            }
         } catch (IOException e) {
             // TODO: Error better.
             System.err.println("Unable to import image.");
