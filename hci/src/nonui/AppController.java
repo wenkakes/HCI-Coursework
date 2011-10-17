@@ -747,14 +747,15 @@ public class AppController {
      */
     private void setMenuItemsEnabled() {
         boolean collectionOpened = currentCollectionName != null;
+        boolean collectionhasImages = collectionImages != null && collectionImages.size() > 0;
         boolean imageOpened = currentImage != null;
-        boolean imageHasLabels = currentImage != null && currentImage.getLabels().size() > 0;
+        boolean imageHasLabels = imageOpened && currentImage.getLabels().size() > 0;
 
         // File menu.
         menuBar.setCloseCollectionEnabled(collectionOpened);
         menuBar.setImportImageEnabled(collectionOpened);
         menuBar.setSaveImageEnabled(imageOpened);
-        menuBar.setSaveAllImagesEnabled(collectionImages.size() > 0);
+        menuBar.setSaveAllImagesEnabled(collectionhasImages);
         menuBar.setCloseImageEnabled(imageOpened);
         menuBar.setRemoveImageEnabled(imageOpened);
 
