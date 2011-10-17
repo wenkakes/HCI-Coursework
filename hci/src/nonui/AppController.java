@@ -2,6 +2,7 @@ package src.nonui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
@@ -59,6 +61,7 @@ public class AppController {
             TipType.SELECTED_LABEL);
     private final TipsDialog newLabelTip = new TipsDialog(appFrame, this, TipType.CREATED_LABEL);
     private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
+    private final JLabel collectionLabel = new JLabel("Collection Name");
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
@@ -72,11 +75,16 @@ public class AppController {
     public AppController() {
         appFrame.setLayout(new FlowLayout());
         appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        Font collectionLabelFont = new Font("Serif", Font.PLAIN, 16);
+        collectionLabel.setFont(collectionLabelFont);
+        collectionLabel.setVisible(false);
 
         JPanel leftPanel = new JPanel();
         BorderLayout leftPanelLayout = new BorderLayout();
         leftPanelLayout.setVgap(5);
         leftPanel.setLayout(leftPanelLayout);
+        leftPanel.add(collectionLabel, BorderLayout.NORTH);
         leftPanel.add(imagePanel, BorderLayout.CENTER);
         leftPanel.add(thumbnailPanel, BorderLayout.SOUTH);
         
@@ -809,6 +817,12 @@ public class AppController {
         boolean collectionhasImages = collectionImages != null && collectionImages.size() > 0;
         boolean imageOpened = currentImage != null;
         boolean imageHasLabels = imageOpened && currentImage.getLabels().size() > 0;
+        
+        // Main screen components.
+        collectionLabel.setVisible(collectionOpened);
+        if (collectionOpened) {
+            collectionLabel.setText(currentCollectionName);
+        }
 
         // File menu.
         menuBar.setCloseCollectionEnabled(collectionOpened);
