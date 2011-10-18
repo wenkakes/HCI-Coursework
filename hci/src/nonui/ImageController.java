@@ -119,12 +119,9 @@ public class ImageController {
                 break;
                 
             case EDITING_POLYGON:
-            	
                 // If a point is being clicked, select this polygon.              
                 if (!selectClosestPoint(x, y)) {
                 	addPointToCompletedPolygon(x,y);
-                } else {
-                	
                 }
             	imagePanel.repaint();
             default:
@@ -406,6 +403,7 @@ public class ImageController {
 	    				polygon.addPointAt(targetPoint, ((i+1) % polygonPoints.size()));
 	    				appController.setApplicationState(ApplicationState.EDITING_POLYGON);
 	    				polygonInEditing = polygon;
+	    				currentPoint = targetPoint;
 	    				return;
 	    			}
 	    		}
