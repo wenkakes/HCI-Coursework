@@ -47,7 +47,7 @@ public class ToolboxPanelView extends JDialog {
     private void initUI() {
         setLayout(new FlowLayout());
 
-        JButton finishedEditingButton = new JButton("Done");
+        JButton finishedEditingButton = new JButton(new ImageIcon("hci/icons/done.png"));
         finishedEditingButton.setMnemonic(KeyEvent.VK_N);
         finishedEditingButton.setSize(50, 20);
         finishedEditingButton.setEnabled(true);
@@ -57,7 +57,7 @@ public class ToolboxPanelView extends JDialog {
                 controller.toolboxDoneButtonClicked();
             }
         });
-        finishedEditingButton.setToolTipText("Finish editing label");
+        finishedEditingButton.setToolTipText("Done");
 
         JButton undoButton = new JButton(new ImageIcon("hci/icons/undo.png"));
         undoButton.addActionListener(new ActionListener() {
@@ -77,14 +77,14 @@ public class ToolboxPanelView extends JDialog {
         });
         redoButton.setToolTipText("Redo");
 
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(new ImageIcon("hci/icons/cancel.png"));
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 controller.cancelAddingPolygon();
             }
         });
-        cancelButton.setToolTipText("Cancel editing label");
+        cancelButton.setToolTipText("Cancel");
 
         setLayout(new GridLayout(2, 1));
 

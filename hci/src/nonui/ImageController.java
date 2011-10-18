@@ -412,7 +412,6 @@ public class ImageController {
 	    		
 	        }
     	}
-    	
     }
     
     /**
