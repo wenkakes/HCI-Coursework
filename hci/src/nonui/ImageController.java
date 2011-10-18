@@ -140,7 +140,9 @@ public class ImageController {
         switch (appController.getApplicationState()) {
         	case DEFAULT:
             	// If the user clicked on an existing point, select it.
-                selectClosestPoint(x, y);
+                if (!selectClosestPoint(x, y)) {
+                    addPointToCompletedPolygon(x, y);
+                }
                 break;
             case ADDING_POLYGON:
                 // Do nothing.
@@ -414,7 +416,8 @@ public class ImageController {
     }
     
     /**
-     * Checks if a target point is within the bounding box created by two other points.
+     * Checks if a target point is within the bounding box created by two other points (with
+     * a little leeway.)
      * 
      * @param targetPoint the target point to check
      * @param point1 one of the points that define the bounding box
@@ -429,7 +432,7 @@ public class ImageController {
         int x = targetPoint.getX();
         int y = targetPoint.getY();
         
-        return x >= left && x <= right && y >= top && y <= bottom;
+        return x >= (left - 2) && x <= (right + 2) && y >= (top - 2) && y <= (bottom + 2);
 	}
 
     
