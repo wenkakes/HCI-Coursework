@@ -238,8 +238,6 @@ public class ImageController {
             // TODO: Should this totally cancel, or only cancel the "done"?
             // Occurs if the user hits the cancel option.
             if (name == null) {
-                polygonInCreation = new Polygon();
-                imagePanel.repaint();
                 return;
             }
 
@@ -250,7 +248,7 @@ public class ImageController {
             } else if (name.isEmpty()) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
                         JOptionPane.ERROR_MESSAGE);
-            } else if (!name.matches("[a-zA-Z0-9]+")) {
+            } else if (!name.matches("[a-zA-Z0-9 ]+")) {
                 JOptionPane.showMessageDialog(appFrame,
                         "Only alphanumeric characters are allowed in label names.", "Error",
                         JOptionPane.ERROR_MESSAGE);
