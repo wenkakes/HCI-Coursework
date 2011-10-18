@@ -61,7 +61,7 @@ public class AppController {
             TipType.SELECTED_LABEL);
     private final TipsDialog newLabelTip = new TipsDialog(appFrame, this, TipType.CREATED_LABEL);
     private final ThumbnailView thumbnailPanel = new ThumbnailView(this);
-    private final JLabel collectionLabel = new JLabel("Collection Name");
+    private final JLabel collectionLabel = new JLabel(" ");
 
     // The application state.
     private ApplicationState applicationState = ApplicationState.DEFAULT;
@@ -78,7 +78,6 @@ public class AppController {
         
         Font collectionLabelFont = new Font("Serif", Font.PLAIN, 16);
         collectionLabel.setFont(collectionLabelFont);
-        collectionLabel.setVisible(false);
 
         JPanel leftPanel = new JPanel();
         BorderLayout leftPanelLayout = new BorderLayout();
@@ -819,9 +818,11 @@ public class AppController {
         boolean imageHasLabels = imageOpened && currentImage.getLabels().size() > 0;
         
         // Main screen components.
-        collectionLabel.setVisible(collectionOpened);
         if (collectionOpened) {
             collectionLabel.setText(currentCollectionName);
+        } else {
+            // A completely empty label will cause it to not be displayed.
+            collectionLabel.setText(" ");
         }
 
         // File menu.
