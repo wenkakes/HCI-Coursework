@@ -18,12 +18,23 @@ public class TipsDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private AppController controller;
 	private String tipText;
+	private boolean seenTip;
 	
     public TipsDialog(JFrame parentFrame, AppController appController, TipType tipType) {
         super(parentFrame);
 
         this.controller = appController;
+        this.seenTip = false;
         initUI(tipType);
+    }
+    
+    // BEANSCENE
+    public boolean beenSeen() {
+        return seenTip;
+    }
+    
+    public void setTipSeen() {
+        seenTip = true;
     }
 
     /**

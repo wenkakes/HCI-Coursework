@@ -617,21 +617,30 @@ public class AppController {
      * Shows the tooltip for when the user selects a label.
      */
 	public void showSelectedLabelTip() {
+	    if (selectedLabelTip.beenSeen()) {
+	        return;
+	    }
+	    
         java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
         mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
         selectedLabelTip.setLocation(mouseLocation);
 		selectedLabelTip.setVisible(true);
+		selectedLabelTip.setTipSeen();
 	}
 
 	/**
 	 * Shows the tooltip for when the user adds a new label.
 	 */
 	public void showNewLabelTip() {
+	    if (newLabelTip.beenSeen()) {
+	        return;
+	    }
+	    
         java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
         mouseLocation.setLocation(mouseLocation.getX() - 200, mouseLocation.getY() + 20);
         newLabelTip.setLocation(mouseLocation);
 		newLabelTip.setVisible(true);
-		
+		newLabelTip.setTipSeen();
 	}
 	
     /**
