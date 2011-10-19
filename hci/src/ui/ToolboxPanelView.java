@@ -23,9 +23,16 @@ public class ToolboxPanelView extends JPanel {
     // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
+    private static final String ENABLED_TEXT = "<html><center>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click on the image to add"
+            + " points to the label.<br /></center></html>";
+    private static final String DISABLED_TEXT = "<html><center>&nbsp;&nbsp;&nbsp;&nbsp;"
+            + "Click on the Add New Label button to start adding points.<br /></center></html>";
+
     // The controller.
     private final AppController controller;
 
+    private JLabel instructions;
     private JButton finishedEditingButton;
     private JButton undoButton;
     private JButton redoButton;
@@ -84,10 +91,7 @@ public class ToolboxPanelView extends JPanel {
         });
         cancelButton.setToolTipText("Cancel");
 
-        JLabel instructions = new JLabel(
-                "<html><center>"
-                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + "Click on the image to add points to the label.<br /></center></html>");
+        instructions = new JLabel(DISABLED_TEXT);
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -112,12 +116,16 @@ public class ToolboxPanelView extends JPanel {
         undoButton.setEnabled(true);
         redoButton.setEnabled(true);
         cancelButton.setEnabled(true);
+
+        instructions.setText(ENABLED_TEXT);
     }
 
     public void disableToolbox() {
         finishedEditingButton.setEnabled(false);
         undoButton.setEnabled(false);
         redoButton.setEnabled(false);
-        cancelButton.setEnabled(false);        
+        cancelButton.setEnabled(false);   
+
+        instructions.setText(DISABLED_TEXT);
     }
 }
