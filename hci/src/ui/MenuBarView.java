@@ -250,7 +250,7 @@ public class MenuBarView extends JMenuBar {
         JMenuItem aboutProgram = new JMenuItem("About");
         aboutProgram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                JOptionPane.showMessageDialog(parentFrame, "<html> Image Labeller v1.2 <br />"
+                JOptionPane.showMessageDialog(parentFrame, "<html> Image Labeller v1.3 <br />"
                         + "A 4th year Human-Computer Interaction project </html>", "About",
                         JOptionPane.INFORMATION_MESSAGE);
 
