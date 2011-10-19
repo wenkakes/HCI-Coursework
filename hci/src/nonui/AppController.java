@@ -3,6 +3,7 @@ package src.nonui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.MouseInfo;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -56,7 +57,7 @@ public class AppController {
     private final ImagePanelView imagePanel = new ImagePanelView(imageController);
     private final MenuBarView menuBar = new MenuBarView(appFrame, this);
     private final LabelPanelView labelPanel = new LabelPanelView(appFrame, this);
-    private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(appFrame, this);
+    private final ToolboxPanelView toolboxPanel = new ToolboxPanelView(this);
     private final TipsDialog selectedLabelTip = new TipsDialog(appFrame, this, 
             TipType.SELECTED_LABEL);
     private final TipsDialog newLabelTip = new TipsDialog(appFrame, this, TipType.CREATED_LABEL);
@@ -87,8 +88,15 @@ public class AppController {
         leftPanel.add(imagePanel, BorderLayout.CENTER);
         leftPanel.add(thumbnailPanel, BorderLayout.SOUTH);
         
+        JPanel rightPanel = new JPanel();
+        GridLayout rightPanelLayout = new GridLayout(2, 1);
+        rightPanelLayout.setVgap(10);
+        rightPanel.setLayout(rightPanelLayout);
+        rightPanel.add(labelPanel);
+        rightPanel.add(toolboxPanel);
+        
         appFrame.add(leftPanel);
-        appFrame.add(labelPanel);
+        appFrame.add(rightPanel);
         appFrame.setJMenuBar(menuBar);
 
         appFrame.pack();
@@ -170,6 +178,7 @@ public class AppController {
         collectionImages = new LinkedHashMap<String, LabelledImage>();
         
         // Reset the interface.
+        cancelAddingPolygon();
         imageController.setImage(null);
         labelPanel.disableLabelPanel();
         thumbnailPanel.clear();
@@ -193,6 +202,7 @@ public class AppController {
         
         imageController.setImage(null);
         thumbnailPanel.clear();
+        cancelAddingPolygon();
         labelPanel.disableLabelPanel();
         
         setUIComponentsState();
@@ -238,6 +248,7 @@ public class AppController {
         collectionImages = ApplicationIO.openCollection(
                 new File(MAIN_FOLDER + "/Collections/" + currentCollectionName));
         currentImage = (collectionImages.size() > 0) ? getLastCollectionImage() : null; 
+        cancelAddingPolygon();
 
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         if (collectionImages.size() > 0) {
@@ -348,6 +359,7 @@ public class AppController {
             imagePanel.setImage(null);
         }
         labelPanel.disableLabelPanel();
+        cancelAddingPolygon();
         
         setUIComponentsState();
         
@@ -361,11 +373,10 @@ public class AppController {
         applicationState = ApplicationState.ADDING_POLYGON;
 
         labelPanel.setAddButtonEnabled(false);
-
-        java.awt.Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-        mouseLocation.setLocation(mouseLocation.getX(), mouseLocation.getY() + 20);
-        toolboxPanel.setLocation(mouseLocation);
-        toolboxPanel.setVisible(true);
+        
+        toolboxPanel.enableToolbox();
+        
+        setUIComponentsState();
     }
 
     /**
@@ -446,7 +457,8 @@ public class AppController {
         for (Polygon polygon : currentImage.getLabels()) {
             labelPanel.addLabel(polygon.getName());
         }
-        
+
+        cancelAddingPolygon();
         setUIComponentsState();
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, 
                 currentImage.getName());
@@ -490,6 +502,7 @@ public class AppController {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+        cancelAddingPolygon();
 
         setUIComponentsState();
     }
@@ -538,7 +551,7 @@ public class AppController {
         labelPanel.setAddButtonEnabled(true);
         labelPanel.addLabel(newPolygonName);
 
-        toolboxPanel.setVisible(false);
+        toolboxPanel.disableToolbox();
 
         setUIComponentsState();
     }
@@ -550,7 +563,8 @@ public class AppController {
         applicationState = ApplicationState.DEFAULT;
 
         labelPanel.setAddButtonEnabled(true);
-        toolboxPanel.setVisible(false);
+        
+        toolboxPanel.disableToolbox();
 
         imageController.cancel();
     }
@@ -763,6 +777,7 @@ public class AppController {
         thumbnailPanel.addImage(currentImage);
         imageController.setImage(currentImage.getImage());
         labelPanel.clear();
+        cancelAddingPolygon();
 
         setUIComponentsState();
 
@@ -827,12 +842,15 @@ public class AppController {
         boolean imageHasLabels = imageOpened && currentImage.getLabels().size() > 0;
         
         // Main screen components.
+        StringBuilder sb = new StringBuilder();
         if (collectionOpened) {
-            collectionLabel.setText(currentCollectionName);
-        } else {
-            // A completely empty label will cause it to not be displayed.
-            collectionLabel.setText(" ");
+            sb.append(currentCollectionName);
         }
+        if (imageOpened) {
+            sb.append(" : ");
+            sb.append(currentImage.getName());
+        }
+        collectionLabel.setText(sb.toString());
 
         // File menu.
         menuBar.setCloseCollectionEnabled(collectionOpened);

@@ -1,43 +1,39 @@
 package src.ui;
 
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import src.nonui.AppController;
 
 /**
- * View for the toolbox floating panel.
- * 
- * Actually a subclass of JDialog, in order to get the right interaction with
- * the main frame.
+ * View for the toolbox panel.
  */
-public class ToolboxPanelView extends JDialog {
-    // JDialog is serializable, so we need some ID to avoid compiler warnings.
+public class ToolboxPanelView extends JPanel {
+    // JPanel is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
     // The controller.
     private final AppController controller;
 
-    public ToolboxPanelView(JFrame parentFrame, AppController appController) {
-        super(parentFrame);
+    private JButton finishedEditingButton;
+    private JButton undoButton;
+    private JButton redoButton;
+    private JButton cancelButton;
 
+    public ToolboxPanelView(AppController appController) {
         this.controller = appController;
 
-        addWindowListener(new ToolboxWindowListener(controller));
         initUI();
     }
 
@@ -45,9 +41,11 @@ public class ToolboxPanelView extends JDialog {
      * Sets up the UI for the toolbox.
      */
     private void initUI() {
-        setLayout(new FlowLayout());
+        Border toolboxBorder = BorderFactory.createTitledBorder("Toolbox");
+        setBorder(toolboxBorder);
+        setLayout(new GridLayout(2, 1));
 
-        JButton finishedEditingButton = new JButton(new ImageIcon("hci/icons/done.png"));
+        finishedEditingButton = new JButton(new ImageIcon("hci/icons/done.png"));
         finishedEditingButton.setMnemonic(KeyEvent.VK_N);
         finishedEditingButton.setSize(50, 20);
         finishedEditingButton.setEnabled(true);
@@ -59,7 +57,7 @@ public class ToolboxPanelView extends JDialog {
         });
         finishedEditingButton.setToolTipText("Done");
 
-        JButton undoButton = new JButton(new ImageIcon("hci/icons/undo.png"));
+        undoButton = new JButton(new ImageIcon("hci/icons/undo.png"));
         undoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,7 +66,7 @@ public class ToolboxPanelView extends JDialog {
         });
         undoButton.setToolTipText("Undo");
 
-        JButton redoButton = new JButton(new ImageIcon("hci/icons/redo.png"));
+        redoButton = new JButton(new ImageIcon("hci/icons/redo.png"));
         redoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +75,7 @@ public class ToolboxPanelView extends JDialog {
         });
         redoButton.setToolTipText("Redo");
 
-        JButton cancelButton = new JButton(new ImageIcon("hci/icons/cancel.png"));
+        cancelButton = new JButton(new ImageIcon("hci/icons/cancel.png"));
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,14 +84,10 @@ public class ToolboxPanelView extends JDialog {
         });
         cancelButton.setToolTipText("Cancel");
 
-        setLayout(new GridLayout(2, 1));
-
         JLabel instructions = new JLabel(
                 "<html><center>"
                         + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + "Click on the image to add points to the label.<br />"
-                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + "Double click (or click \"Done\") to finish.</center></html>");
+                        + "Click on the image to add points to the label.<br /></center></html>");
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -109,51 +103,21 @@ public class ToolboxPanelView extends JDialog {
 
         add(instructions);
         add(buttonPane);
-
-        setFocusableWindowState(false);
-        setResizable(false);
-        setVisible(false);
-        pack();
+        
+        disableToolbox();
     }
 
-    /**
-     * Listener for the Toolbox, to allow the 'X' button to apply the same
-     * effect as "Cancel".
-     */
-    private static class ToolboxWindowListener implements WindowListener {
-        private final AppController controller;
+    public void enableToolbox() {
+        finishedEditingButton.setEnabled(true);
+        undoButton.setEnabled(true);
+        redoButton.setEnabled(true);
+        cancelButton.setEnabled(true);
+    }
 
-        public ToolboxWindowListener(AppController controller) {
-            this.controller = controller;
-        }
-
-        @Override
-        public void windowClosing(WindowEvent e) {
-            controller.cancelAddingPolygon();
-        }
-
-        @Override
-        public void windowOpened(WindowEvent e) {
-        }
-
-        @Override
-        public void windowIconified(WindowEvent e) {
-        }
-
-        @Override
-        public void windowDeiconified(WindowEvent e) {
-        }
-
-        @Override
-        public void windowDeactivated(WindowEvent e) {
-        }
-
-        @Override
-        public void windowClosed(WindowEvent e) {
-        }
-
-        @Override
-        public void windowActivated(WindowEvent e) {
-        }
+    public void disableToolbox() {
+        finishedEditingButton.setEnabled(false);
+        undoButton.setEnabled(false);
+        redoButton.setEnabled(false);
+        cancelButton.setEnabled(false);        
     }
 }
