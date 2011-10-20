@@ -3,6 +3,7 @@ package src.nonui;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -42,7 +43,12 @@ public class ImageController {
      * Returns a list of the points of the completed polygons.
      */
     public List<List<Point>> getCompletedPolygonsPoints() {
-        return appController.getCompletedPolygonsPoints();
+        Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();        
+        List<List<Point>> points = new ArrayList<List<Point>>(completedPolygons.size());
+        for (Polygon polygon : completedPolygons.values()) {
+            points.add(new ArrayList<Point>(polygon.getPoints()));
+        }
+        return points;
     }
 
     /**
@@ -230,7 +236,7 @@ public class ImageController {
             }
 
             name = name.trim();
-            if (appController.getLabel(name) != null) {
+            if (appController.getCompletedPolygons().containsKey(name)) {
                 JOptionPane.showMessageDialog(appFrame, "That name is already in use.", "Error",
                         JOptionPane.ERROR_MESSAGE);
             } else if (name.isEmpty()) {
@@ -246,10 +252,10 @@ public class ImageController {
         }
 
         polygonInCreation.setName(name);
-        appController.addLabel(polygonInCreation);
+        appController.getCompletedPolygons().put(name, polygonInCreation);
         polygonInCreation = new Polygon();
 
-        appController.finishedAddingLabel(name);
+        appController.finishedAddingPolygon(name);
 
         imagePanel.repaint();
         
@@ -312,11 +318,12 @@ public class ImageController {
      * Gets a list of the currently selected polygons.
      */
     private List<Polygon> getSelectedPolygons() {
+        Map<String, Polygon> completedPolygons = appController.getCompletedPolygons();
         List<String> selectedNames = appController.getSelectedNames();
         List<Polygon> selectedPolygons = new ArrayList<Polygon>(selectedNames.size());
 
         for (String name : selectedNames) {
-            selectedPolygons.add(appController.getLabel(name));
+            selectedPolygons.add(completedPolygons.get(name));
         }
         return selectedPolygons;
     }
@@ -334,7 +341,7 @@ public class ImageController {
 
         double smallestDistance = -1;
 
-        for (Polygon polygon : appController.getCompletedLabels()) {
+        for (Polygon polygon : appController.getCompletedPolygons().values()) {
             for (Point point : polygon.getPoints()) {
                 double distanceToTarget = targetPoint.distanceFrom(point);
                 if (distanceToTarget < smallestDistance || smallestDistance < 0) {

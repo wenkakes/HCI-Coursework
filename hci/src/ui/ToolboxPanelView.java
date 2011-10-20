@@ -86,7 +86,7 @@ public class ToolboxPanelView extends JPanel {
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.cancelAddingLabel();
+                controller.cancelAddingPolygon();
             }
         });
         cancelButton.setToolTipText("Cancel");

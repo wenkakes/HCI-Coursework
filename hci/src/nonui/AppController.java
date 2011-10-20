@@ -118,14 +118,13 @@ public class AppController {
     public void newCollection() {
         File collectionsDir = new File(MAIN_FOLDER + "/Collections");
         if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
-            JOptionPane.showMessageDialog(appFrame, "Error: Unable to open ImageLabeller folders. "
-                    + "The application will now exit.", "Error", JOptionPane.ERROR_MESSAGE);
-            System.err.println("Unable to open the ImageLabeller folders.");
-            System.err.println("\nExiting...");
-            System.exit(1);
+            // TODO: Error somehow. This is bad enough that we could crash out.
+            System.err.println("Cannot open Collections directory.");
+            return;
         }
         File directories[] = collectionsDir.listFiles(ApplicationIO.DIRECTORY_FILTER);
         
+
         // Get a name for the new collection.
         String newCollectionName = "";
         boolean hasName = false;
@@ -141,14 +140,10 @@ public class AppController {
             newCollectionName = newCollectionName.trim();
             hasName = true;
             
+            // TODO: Check for invalid characters.
             if (newCollectionName.isEmpty()) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
                         JOptionPane.ERROR_MESSAGE);
-                hasName = false;
-                continue;
-            } else if (!newCollectionName.matches("[a-zA-Z0-9 ]+")) {
-                JOptionPane.showMessageDialog(appFrame, "Only alphanumeric characters are allowed "
-                        + "in collection names.", "Error", JOptionPane.ERROR_MESSAGE);
                 hasName = false;
                 continue;
             }
@@ -156,6 +151,7 @@ public class AppController {
             // Check for duplicates.
             for (int i = 0; i < directories.length; i++) {
                 if (newCollectionName.equals(directories[i].getName())) {
+                    // TODO: Give the option to overwrite.
                     JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     hasName = false;
@@ -165,15 +161,14 @@ public class AppController {
         }
 
         // Create folders for new collection.
+        // TODO: Move to IO class?
         File newCollectionDir = new File(collectionsDir.getAbsolutePath() + "/" 
                 + newCollectionName);
         File imageFolder = new File(newCollectionDir.getAbsolutePath() + "/images");
         File labelsFolder = new File(newCollectionDir.getAbsolutePath() + "/labels");
         if (!newCollectionDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
-            JOptionPane.showMessageDialog(appFrame, "Error: Unable to create the collection \"" 
-                    + newCollectionName + "\".", "Error", JOptionPane.ERROR_MESSAGE);
-            System.err.println("Unable to create the necessary ImageLabeller folders for"
-                    + "a new collection.");
+            // TODO: Error
+            System.err.println("Unable to create director for new collection.");
             return;
         }
         
@@ -183,7 +178,7 @@ public class AppController {
         collectionImages = new LinkedHashMap<String, LabelledImage>();
         
         // Reset the interface.
-        cancelAddingLabel();
+        cancelAddingPolygon();
         imageController.setImage(null);
         labelPanel.disableLabelPanel();
         thumbnailPanel.clear();
@@ -207,7 +202,7 @@ public class AppController {
         
         imageController.setImage(null);
         thumbnailPanel.clear();
-        cancelAddingLabel();
+        cancelAddingPolygon();
         labelPanel.disableLabelPanel();
         
         setUIComponentsState();
@@ -221,11 +216,9 @@ public class AppController {
     public void openCollection() {
         File collectionsDir = new File(MAIN_FOLDER + "/Collections");
         if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
-            JOptionPane.showMessageDialog(appFrame, "Error: Unable to open ImageLabeller folders. "
-                    + "The application will now exit.", "Error", JOptionPane.ERROR_MESSAGE);
-            System.err.println("Unable to open the ImageLabeller Collections folder.");
-            System.err.println("\nExiting...");
-            System.exit(1);
+            // TODO: Error somehow. This is bad enough that we could crash out.
+            System.err.println("Cannot open Collections directory.");
+            return;
         }
 
         File collections[] = collectionsDir.listFiles(ApplicationIO.DIRECTORY_FILTER);
@@ -255,7 +248,7 @@ public class AppController {
         collectionImages = ApplicationIO.openCollection(
                 new File(MAIN_FOLDER + "/Collections/" + currentCollectionName));
         currentImage = (collectionImages.size() > 0) ? getLastCollectionImage() : null; 
-        cancelAddingLabel();
+        cancelAddingPolygon();
 
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         if (collectionImages.size() > 0) {
@@ -266,6 +259,7 @@ public class AppController {
         
         setUIComponentsState();
 
+        // TODO: Provide a way for user to open a default image?
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
 
@@ -353,14 +347,11 @@ public class AppController {
         File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
                 "/labels/" + removedImage.getName() + ".labels");
         if (!imageFile.delete() || !labelFile.delete()) {
-            JOptionPane.showMessageDialog(appFrame, "Error deleting \"" + removedImage.getName()
-                    +"\". You may encounter unexpected behaviour.", "Error", 
-                    JOptionPane.ERROR_MESSAGE);
-            System.err.println("Unable to delete the image or label file for " 
-                    + removedImage.getName());
+            // TODO: Warn user.
         }
         
         if (collectionImages.size() > 0) {
+            // TODO: Should probably select a smarter image than just "the last one".
             currentImage = getLastCollectionImage();
             setCurrentImage(currentImage.getName());
         } else {
@@ -368,7 +359,7 @@ public class AppController {
             imagePanel.setImage(null);
         }
         labelPanel.disableLabelPanel();
-        cancelAddingLabel();
+        cancelAddingPolygon();
         
         setUIComponentsState();
         
@@ -376,9 +367,9 @@ public class AppController {
     }
 
     /**
-     * Starts adding a new label.
+     * Starts adding a new polygon.
      */
-    public void startAddingNewLabel() {
+    public void startAddingNewPolygon() {
         applicationState = ApplicationState.ADDING_POLYGON;
 
         labelPanel.setAddButtonEnabled(false);
@@ -389,36 +380,36 @@ public class AppController {
     }
 
     /**
-     * Renames the currently selected label.
+     * Renames the currently selected polygon.
      */
-    public void renameSelectedLabel() {
-        labelPanel.renameSelectedLabel();
+    public void renameSelectedPolygon() {
+        labelPanel.renameSelectedPolygon();
     }
 
     
     /**
-     * Renames a label.
+     * Renames a polygon.
      * 
-     * @param oldName the old name for the label
-     * @param newName the new name for the label
+     * @param oldName the old name for the polygon
+     * @param newName the new name for the polygon
      */
-    public void renameLabel(String oldName, String newName) {
+    public void renamePolygon(String oldName, String newName) {
         currentImage.renameLabel(oldName, newName);
     }
 
     /**
-     * Deletes the currently selected labels.
+     * Deletes the currently selected polygons.
      */
-    public void deleteSelectedLabels() {
-        labelPanel.deleteSelectedLabels();
+    public void deleteSelectedPolygons() {
+        labelPanel.deleteSelectedPolygons();
         imagePanel.repaint();
     }
 
     /**
-     * Deletes all of the labels.
+     * Deletes all of the polygons.
      */
-    public void deleteAllLabels() {
-        labelPanel.deleteAllLabels();
+    public void deleteAllPolygons() {
+        labelPanel.deleteAllPolygons();
         imagePanel.repaint();
     }
     
@@ -463,24 +454,24 @@ public class AppController {
         imageController.setImage(currentImage.getImage());
         thumbnailPanel.setThumbnailImage(currentImage.getName());
         labelPanel.clear();
-        for (Polygon label : currentImage.getLabels()) {
-            labelPanel.addLabel(label.getName());
+        for (Polygon polygon : currentImage.getLabels()) {
+            labelPanel.addLabel(polygon.getName());
         }
 
-        cancelAddingLabel();
+        cancelAddingPolygon();
         setUIComponentsState();
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, 
                 currentImage.getName());
     }
 
     /**
-     * Removes a label from the image.
+     * Removes a polygon from the image.
      * 
-     * @param name the name of the label to remove
+     * @param name the name of the polygon to remove
      */
-    public void removeLabel(String name) {
-        Polygon removedLabel = currentImage.removeLabel(name);
-        if (removedLabel == imageController.getEditedPolygon()) {
+    public void removePolygon(String name) {
+        Polygon removedPolygon = currentImage.removeLabel(name);
+        if (removedPolygon == imageController.getEditedPolygon()) {
             applicationState = ApplicationState.DEFAULT;
         }
         imagePanel.repaint();
@@ -511,7 +502,7 @@ public class AppController {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
-        cancelAddingLabel();
+        cancelAddingPolygon();
 
         setUIComponentsState();
     }
@@ -522,13 +513,16 @@ public class AppController {
     public void toolboxDoneButtonClicked() {
         switch (applicationState) {
             case DEFAULT:
+                // TODO: Throw/show appropriate error, as this shouldn't happen.
                 break;
             case ADDING_POLYGON:
                 imageController.finishedAddingPolygon();
                 break;
             case EDITING_POLYGON:
+                // TODO: Implement explicit editing of polygons.
                 break;
             default:
+                // TODO: Throw/show appropriate error.
         }
     }
 
@@ -547,15 +541,15 @@ public class AppController {
     }
 
     /**
-     * Called when the user is finished adding the current label.
+     * Called when the user is finished adding the current polygon.
      * 
-     * @param newLabelName the name of the new label
+     * @param newPolygonName the name of the new polygon
      */
-    public void finishedAddingLabel(String newLabelName) {
+    public void finishedAddingPolygon(String newPolygonName) {
         applicationState = ApplicationState.DEFAULT;
 
         labelPanel.setAddButtonEnabled(true);
-        labelPanel.addLabel(newLabelName);
+        labelPanel.addLabel(newPolygonName);
 
         toolboxPanel.disableToolbox();
 
@@ -563,9 +557,9 @@ public class AppController {
     }
 
     /**
-     * Called when the user cancels the label that they are currently adding.
+     * Called when the user cancels the polygon that they are currently adding.
      */
-    public void cancelAddingLabel() {
+    public void cancelAddingPolygon() {
         applicationState = ApplicationState.DEFAULT;
 
         labelPanel.setAddButtonEnabled(true);
@@ -592,14 +586,22 @@ public class AppController {
     }
     
     /**
-     * Returns a list of the points of each completed label.
+     * Returns a list of the points of each completed polygon.
      */
     public List<List<Point>> getCompletedPolygonsPoints() {
         List<List<Point>> points = new ArrayList<List<Point>>(currentImage.getLabels().size());
-        for (Polygon label : currentImage.getLabels()) {
-            points.add(new ArrayList<Point>(label.getPoints()));
+        for (Polygon polygon : currentImage.getLabels()) {
+            points.add(new ArrayList<Point>(polygon.getPoints()));
         }
         return points;
+    }
+
+    // TODO: Remove the call to this.
+    /**
+     * Returns the map of the completed polygons.
+     */
+    public Map<String, Polygon> getCompletedPolygons() {
+        return (currentImage != null) ? currentImage.getLabelsMap() : null;
     }
 
     /**
@@ -654,37 +656,6 @@ public class AppController {
 		newLabelTip.setVisible(true);
 		newLabelTip.setTipSeen();
 	}
-
-    /**
-     * Adds a label to the current image. If there is no current image, does nothing.
-     * 
-     * @param label the label to add
-     */
-    public void addLabel(Polygon label) {
-        if (currentImage == null) {
-            return;
-        }
-        
-        currentImage.addLabel(label);
-    }
-
-    /**
-     * Returns the label with the given name, or null if no
-     * such label exists. Returns null if there is no current image.
-     * 
-     * @param name the name of the label to look for
-     */
-    public Polygon getLabel(String name) {
-        return (currentImage != null) ? currentImage.getLabel(name) : null;
-    }
-
-    /**
-     * Returns a list of all of the completed labels. If there is no current image open,
-     * returns null.
-     */
-    public List<Polygon> getCompletedLabels() {
-        return (currentImage != null) ? currentImage.getLabels() : null;
-    }
 	
     /**
      * Requests a name from the user, disallowing a set of "taken" names and
@@ -782,10 +753,9 @@ public class AppController {
         try {
             ApplicationIO.copyFile(imageFile, destFile);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(appFrame, "Error: Unable to import file.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            System.err.println("Unable to copy file\"" + imageFile.getAbsolutePath() 
-                    + "\" to file \"" + destFile.getAbsolutePath() + "\".");
+            // TODO: Error
+            e.printStackTrace();
+            System.err.println("Unable to import image.");
             return;
         }
         
@@ -796,13 +766,9 @@ public class AppController {
                 throw new IOException();
             }
         } catch (IOException e) {
-            // Make sure to clean up the bad file.
-            destFile.delete();
-            
-            JOptionPane.showMessageDialog(appFrame, "Error: Unable to import file.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            System.err.println("Unable to read image file \"" + destFile.getAbsolutePath() 
-                    + "\".");
+            // TODO: Error better.
+            e.printStackTrace();
+            System.err.println("Unable to import image.");
             return;
         }
         
@@ -813,7 +779,7 @@ public class AppController {
         thumbnailPanel.addImage(currentImage);
         imageController.setImage(currentImage.getImage());
         labelPanel.clear();
-        cancelAddingLabel();
+        cancelAddingPolygon();
 
         setUIComponentsState();
 
@@ -832,13 +798,9 @@ public class AppController {
             return;
         }
 
+        // TODO: Check collection exists.
         currentCollectionName = collectionInformation.get(0);
         File collectionRoot = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName);
-        if (!collectionRoot.exists()) {
-            // Failed to read settings file - just ignore it.
-            return;
-        }
-        
         collectionImages = ApplicationIO.openCollection(collectionRoot);
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         
@@ -852,8 +814,8 @@ public class AppController {
             setCurrentImage(currentImage.getName());
 
             labelPanel.clear();
-            for (Polygon label : currentImage.getLabels()) {
-                labelPanel.addLabel(label.getName());
+            for (Polygon polygon : currentImage.getLabels()) {
+                labelPanel.addLabel(polygon.getName());
             }
         }
     }

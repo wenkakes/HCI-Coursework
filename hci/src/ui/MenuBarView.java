@@ -182,7 +182,7 @@ public class MenuBarView extends JMenuBar {
         addPolygon.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.startAddingNewLabel();
+                controller.startAddingNewPolygon();
             }
         });
         
@@ -192,7 +192,7 @@ public class MenuBarView extends JMenuBar {
         renameSelected.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.renameSelectedLabel();
+                controller.renameSelectedPolygon();
             }
         });
 
@@ -202,7 +202,7 @@ public class MenuBarView extends JMenuBar {
         deleteSelected.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.deleteSelectedLabels();
+                controller.deleteSelectedPolygons();
             }
         });
 
@@ -213,7 +213,7 @@ public class MenuBarView extends JMenuBar {
         deleteAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.deleteAllLabels();
+                controller.deleteAllPolygons();
             }
         });
 
