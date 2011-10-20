@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ public class LabelPanelView extends JPanel {
         labelsList.setSelectedIndex(0);
         labelsList.setVisibleRowCount(5);
         labelsList.addMouseListener(new LabelListMouseListener());
+        labelsList.addKeyListener(new LabelListKeyListener());
 
         // Create the right click menu.
         rightClickMenu = createRightClickMenu();
@@ -437,6 +440,31 @@ public class LabelPanelView extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
+        }
+    }
+    
+    /**
+     * Class that monitors keyboard events on the label list.
+     */
+    private class LabelListKeyListener implements KeyListener {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            // Only allow renaming of single items at once.
+            editButton.setEnabled(labelsList.getSelectedIndices().length == 1);
+
+            controller.highlightSelected();
+            
+            if (controller.areTipsOn()) { 
+                controller.showSelectedLabelTip();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
         }
     }
 
