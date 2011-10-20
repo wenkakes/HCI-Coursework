@@ -119,7 +119,6 @@ public class ImageController {
                 }
             	imagePanel.repaint();
             default:
-                // TODO: Throw/show appropriate error.
         }
     }
 
@@ -150,7 +149,6 @@ public class ImageController {
                 }
                 break;
             default:
-                // TODO: Throw/show appropriate error.
         }
     }
 
@@ -173,7 +171,6 @@ public class ImageController {
                 polygonInCreation = new Polygon();
                 break;
             default:
-                // TODO: Throw/show appropriate error.
         }
     }
 
@@ -202,7 +199,6 @@ public class ImageController {
                 }
                 break;
             default:
-                // TODO: Throw/show appropriate error.
         }
     }
 
@@ -228,7 +224,6 @@ public class ImageController {
             String message = "Label Name";
             name = JOptionPane.showInputDialog(appFrame, message, name);
 
-            // TODO: Should this totally cancel, or only cancel the "done"?
             // Occurs if the user hits the cancel option.
             if (name == null) {
                 return;

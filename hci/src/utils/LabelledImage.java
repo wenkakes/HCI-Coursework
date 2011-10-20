@@ -43,7 +43,6 @@ public class LabelledImage {
     }
 
     public void setLabels(Map<String, Polygon> labels) {
-        // TODO: Deep copy?
         this.labels = labels;
     }
     
@@ -52,7 +51,6 @@ public class LabelledImage {
     }
     
     public void addLabel(Polygon label) {
-        // TODO: Deep copy?
         labels.put(label.getName(), label);
     }
 
@@ -69,7 +67,6 @@ public class LabelledImage {
     }
 
     public Polygon getLabel(String name) {
-        // TODO: Deep copy?
         return labels.get(name);
     }
     
@@ -92,11 +89,6 @@ public class LabelledImage {
             list.add(new Polygon(polygon.getName(), points));
         }
         return list;
-    }
-
-    public Map<String, Polygon> getLabelsMap() {
-        // TODO: Temporary method.
-        return labels;
     }
 
     public String getExtension() {

@@ -111,7 +111,6 @@ public final class ApplicationIO {
             String imageName) {
         File settingsFile = new File(rootDirectory + "/.settings");
         if (!settingsFile.canWrite()) {
-            // TODO: Log better.
             System.err.println("Cannot write to Settings file.");
             return false;
         }
@@ -129,8 +128,7 @@ public final class ApplicationIO {
             }
             out.close();
         } catch (IOException e) {
-            // TODO: Log better
-            e.printStackTrace();
+            System.err.println("Cannot write to Settings file.");
             return false;
         }
 

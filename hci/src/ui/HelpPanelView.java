@@ -1,17 +1,10 @@
 package src.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 /**
@@ -20,7 +13,7 @@ import javax.swing.JScrollPane;
  * Actually a subclass of JDialog, in order to get the right interaction with
  * the main frame.
  */
-public class HelpPanelView extends JDialog implements ActionListener {
+public class HelpPanelView extends JDialog {
     // JDialog is serializable, so we need some ID to avoid compiler warnings.
     private static final long serialVersionUID = 1L;
 
@@ -61,12 +54,4 @@ public class HelpPanelView extends JDialog implements ActionListener {
         setSize(700, 500);
         setVisible(true);
     }
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
 }

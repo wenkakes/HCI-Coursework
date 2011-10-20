@@ -269,7 +269,6 @@ public class LabelPanelView extends JPanel {
 
         clear();
 
-        // TODO: This call shouldnt be necessary.
         controller.highlightSelected();
     }
 

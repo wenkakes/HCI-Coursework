@@ -108,7 +108,6 @@ public class MenuBarView extends JMenuBar {
             }
         });
 
-        // TODO: Rename this? (it saves labels, not images).
         saveImage = new JMenuItem("Save Current Image");
         saveImage.setMnemonic(KeyEvent.VK_S);
         saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));

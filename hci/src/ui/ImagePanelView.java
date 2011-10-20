@@ -55,8 +55,6 @@ public class ImagePanelView extends JPanel implements MouseListener, MouseMotion
         setVisible(true);
     }
 
-    // TODO: This should probably not call into the controller. At any rate, it
-    // needs tidied.
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
