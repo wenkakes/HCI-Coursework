@@ -27,8 +27,11 @@ public class ImageLabeller {
         try {
             setupApplicationFolders();
         } catch (IOException e) {
-            // TODO: Bail.
-            System.err.println("IOException caught: " + e.getMessage());
+            System.err.println("Unable to create the necessary ImageLabeller folders.");
+            System.err.println("Error Message:");
+            System.err.println(e.getMessage());
+            System.err.println("\nExiting...");
+            return;
         }
 
         SwingUtilities.invokeLater(new Runnable() {

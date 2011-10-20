@@ -754,6 +754,7 @@ public class AppController {
             ApplicationIO.copyFile(imageFile, destFile);
         } catch (IOException e) {
             // TODO: Error
+            e.printStackTrace();
             System.err.println("Unable to import image.");
             return;
         }
@@ -766,6 +767,7 @@ public class AppController {
             }
         } catch (IOException e) {
             // TODO: Error better.
+            e.printStackTrace();
             System.err.println("Unable to import image.");
             return;
         }
