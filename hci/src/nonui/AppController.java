@@ -118,9 +118,11 @@ public class AppController {
     public void newCollection() {
         File collectionsDir = new File(MAIN_FOLDER + "/Collections");
         if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
-            // TODO: Error somehow. This is bad enough that we could crash out.
-            System.err.println("Cannot open Collections directory.");
-            return;
+            JOptionPane.showMessageDialog(appFrame, "Error: Unable to open ImageLabeller folders. "
+                    + "The application will now exit.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Unable to open the ImageLabeller folders.");
+            System.err.println("\nExiting...");
+            System.exit(1);
         }
         File directories[] = collectionsDir.listFiles(ApplicationIO.DIRECTORY_FILTER);
         
@@ -140,10 +142,14 @@ public class AppController {
             newCollectionName = newCollectionName.trim();
             hasName = true;
             
-            // TODO: Check for invalid characters.
             if (newCollectionName.isEmpty()) {
                 JOptionPane.showMessageDialog(appFrame, "Blank names are not allowed.", "Error",
                         JOptionPane.ERROR_MESSAGE);
+                hasName = false;
+                continue;
+            } else if (!newCollectionName.matches("[a-zA-Z0-9 ]+")) {
+                JOptionPane.showMessageDialog(appFrame, "Only alphanumeric characters are allowed "
+                        + "in collection names.", "Error", JOptionPane.ERROR_MESSAGE);
                 hasName = false;
                 continue;
             }
@@ -151,7 +157,6 @@ public class AppController {
             // Check for duplicates.
             for (int i = 0; i < directories.length; i++) {
                 if (newCollectionName.equals(directories[i].getName())) {
-                    // TODO: Give the option to overwrite.
                     JOptionPane.showMessageDialog(appFrame, "That name is already in use.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     hasName = false;
@@ -161,14 +166,15 @@ public class AppController {
         }
 
         // Create folders for new collection.
-        // TODO: Move to IO class?
         File newCollectionDir = new File(collectionsDir.getAbsolutePath() + "/" 
                 + newCollectionName);
         File imageFolder = new File(newCollectionDir.getAbsolutePath() + "/images");
         File labelsFolder = new File(newCollectionDir.getAbsolutePath() + "/labels");
         if (!newCollectionDir.mkdir() || !imageFolder.mkdir() || !labelsFolder.mkdir()) {
-            // TODO: Error
-            System.err.println("Unable to create director for new collection.");
+            JOptionPane.showMessageDialog(appFrame, "Error: Unable to create the collection \"" 
+                    + newCollectionName + "\".", "Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Unable to create the necessary ImageLabeller folders for"
+                    + "a new collection.");
             return;
         }
         
@@ -216,9 +222,11 @@ public class AppController {
     public void openCollection() {
         File collectionsDir = new File(MAIN_FOLDER + "/Collections");
         if (!collectionsDir.exists() && !collectionsDir.mkdir()) {
-            // TODO: Error somehow. This is bad enough that we could crash out.
-            System.err.println("Cannot open Collections directory.");
-            return;
+            JOptionPane.showMessageDialog(appFrame, "Error: Unable to open ImageLabeller folders. "
+                    + "The application will now exit.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Unable to open the ImageLabeller Collections folder.");
+            System.err.println("\nExiting...");
+            System.exit(1);
         }
 
         File collections[] = collectionsDir.listFiles(ApplicationIO.DIRECTORY_FILTER);
@@ -258,8 +266,7 @@ public class AppController {
         }
         
         setUIComponentsState();
-
-        // TODO: Provide a way for user to open a default image?
+        
         ApplicationIO.writeToSettingsFile(MAIN_FOLDER, currentCollectionName, "");
     }
 
@@ -347,11 +354,14 @@ public class AppController {
         File labelFile = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName + 
                 "/labels/" + removedImage.getName() + ".labels");
         if (!imageFile.delete() || !labelFile.delete()) {
-            // TODO: Warn user.
+            JOptionPane.showMessageDialog(appFrame, "Error deleting \"" + removedImage.getName()
+                    +"\". You may encounter unexpected behaviour.", "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            System.err.println("Unable to delete the image or label file for " 
+                    + removedImage.getName());
         }
         
         if (collectionImages.size() > 0) {
-            // TODO: Should probably select a smarter image than just "the last one".
             currentImage = getLastCollectionImage();
             setCurrentImage(currentImage.getName());
         } else {
@@ -513,16 +523,13 @@ public class AppController {
     public void toolboxDoneButtonClicked() {
         switch (applicationState) {
             case DEFAULT:
-                // TODO: Throw/show appropriate error, as this shouldn't happen.
                 break;
             case ADDING_POLYGON:
                 imageController.finishedAddingPolygon();
                 break;
             case EDITING_POLYGON:
-                // TODO: Implement explicit editing of polygons.
                 break;
             default:
-                // TODO: Throw/show appropriate error.
         }
     }
 
@@ -596,7 +603,6 @@ public class AppController {
         return points;
     }
 
-    // TODO: Remove the call to this.
     /**
      * Returns the map of the completed polygons.
      */
@@ -753,9 +759,10 @@ public class AppController {
         try {
             ApplicationIO.copyFile(imageFile, destFile);
         } catch (IOException e) {
-            // TODO: Error
-            e.printStackTrace();
-            System.err.println("Unable to import image.");
+            JOptionPane.showMessageDialog(appFrame, "Error: Unable to import file.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            System.err.println("Unable to copy file\"" + imageFile.getAbsolutePath()
+                    + "\" to file \"" + destFile.getAbsolutePath() + "\".");
             return;
         }
         
@@ -766,9 +773,13 @@ public class AppController {
                 throw new IOException();
             }
         } catch (IOException e) {
-            // TODO: Error better.
-            e.printStackTrace();
-            System.err.println("Unable to import image.");
+            // Make sure to clean up the bad file.
+            destFile.delete();
+
+            JOptionPane.showMessageDialog(appFrame, "Error: Unable to import file.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            System.err.println("Unable to read image file \"" + destFile.getAbsolutePath() 
+                    + "\".");
             return;
         }
         
@@ -798,9 +809,13 @@ public class AppController {
             return;
         }
 
-        // TODO: Check collection exists.
         currentCollectionName = collectionInformation.get(0);
         File collectionRoot = new File(MAIN_FOLDER + "/Collections/" + currentCollectionName);
+        if (!collectionRoot.exists()) {
+            // Failed to read settings file - just ignore it.
+            return;
+        }
+        
         collectionImages = ApplicationIO.openCollection(collectionRoot);
         thumbnailPanel.setImages(new ArrayList<LabelledImage>(collectionImages.values()));
         

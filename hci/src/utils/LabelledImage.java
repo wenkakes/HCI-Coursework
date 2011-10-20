@@ -94,4 +94,8 @@ public class LabelledImage {
     public String getExtension() {
         return imageExtension;
     }
+
+    public Map<String, Polygon> getLabelsMap() {
+        return labels;
+    }
 }
