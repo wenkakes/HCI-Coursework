@@ -180,7 +180,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Allows the user to rename the currently selected polygon.
      */
-    public void renameSelectedPolygon() {
+    public void renameSelectedLabel() {
         int index = labelsList.getSelectedIndex();
         if (index == -1) {
             JOptionPane.showMessageDialog(parentFrame, "No label selected", "Error",
@@ -219,14 +219,14 @@ public class LabelPanelView extends JPanel {
             listModel.remove(index);
             listModel.add(index, name);
 
-            controller.renamePolygon(currentName, name);
+            controller.renameLabel(currentName, name);
         }
     }
 
     /**
      * Deletes the currently selected polygons.
      */
-    public void deleteSelectedPolygons() {
+    public void deleteSelectedLabels() {
         int[] indices = labelsList.getSelectedIndices();
 
         if (indices.length == 0) {
@@ -236,7 +236,7 @@ public class LabelPanelView extends JPanel {
         }
 
         for (int i = indices.length - 1; i >= 0; i--) {
-            controller.removePolygon((String) listModel.get(indices[i]));
+            controller.removeLabel((String) listModel.get(indices[i]));
             listModel.remove(indices[i]);
         }
 
@@ -256,7 +256,7 @@ public class LabelPanelView extends JPanel {
     /**
      * Deletes all of the polygons.
      */
-    public void deleteAllPolygons() {
+    public void deleteAllLabels() {
         if (listModel.getSize() == 0) {
             JOptionPane.showMessageDialog(parentFrame, "There are no labels to delete", "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -264,7 +264,7 @@ public class LabelPanelView extends JPanel {
         }
 
         for (int i = 0; i < listModel.getSize(); i++) {
-            controller.removePolygon((String) listModel.get(i));
+            controller.removeLabel((String) listModel.get(i));
         }
 
         clear();
@@ -318,14 +318,14 @@ public class LabelPanelView extends JPanel {
         renameLabel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                renameSelectedPolygon();
+                renameSelectedLabel();
             }
         });
         JMenuItem deleteLabel = new JMenuItem("Delete");
         deleteLabel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                deleteSelectedPolygons();
+                deleteSelectedLabels();
             }
         });
         rightClickMenu.add(renameLabel);
@@ -369,7 +369,7 @@ public class LabelPanelView extends JPanel {
     private class AddListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            controller.startAddingNewPolygon();
+            controller.startAddingNewLabel();
         }
     }
 
@@ -379,7 +379,7 @@ public class LabelPanelView extends JPanel {
     private class EditListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            renameSelectedPolygon();
+            renameSelectedLabel();
         }
     }
 
@@ -390,7 +390,7 @@ public class LabelPanelView extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            deleteSelectedPolygons();
+            deleteSelectedLabels();
         }
     }
 
