@@ -1,4 +1,4 @@
-This is XeTeXk, Version 3.141592-2.2-0.996 (Web2C 7.5.6) (format=xelatex 2010.9.19)  18 NOV 2011 11:48
+This is XeTeXk, Version 3.141592-2.2-0.996 (Web2C 7.5.6) (format=xelatex 2010.9.19)  18 NOV 2011 12:02
 entering extended mode
  %&-line parsing enabled.
 **report.tex
@@ -171,74 +171,70 @@ Missing character: There is no ’ in font cmr10!
  [2] [3]
 Missing character: There is no ’ in font cmr10!
  [4]
-Underfull \hbox (badness 3158) in paragraph at lines 190--195
+Underfull \hbox (badness 3158) in paragraph at lines 192--197
 \OT1/cmr/m/n/10.95 We found that our hy-pothe-ses (based on
  []
 
 
-Underfull \hbox (badness 3291) in paragraph at lines 209--217
+Underfull \hbox (badness 3291) in paragraph at lines 211--219
 []\OT1/cmr/m/n/10.95 Lack of con-sis-tency did cause con-fu-sion
  []
 
 [5]
 Missing character: There is no ’ in font cmr10!
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 276.
+(Font)              <9> on input line 278.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 276.
+(Font)              <5> on input line 278.
 
-Underfull \hbox (badness 10000) in paragraph at lines 275--277
+Underfull \hbox (badness 10000) in paragraph at lines 277--279
 
  []
 
 [6]
 Missing character: There is no ’ in font cmr10!
 
-Underfull \hbox (badness 2680) in paragraph at lines 290--294
+Underfull \hbox (badness 2680) in paragraph at lines 292--296
 \OT1/cmr/m/n/10.95 of `Col-lec-tions' in \OT1/cmr/m/it/10.95 Im-age La-beller \
 OT1/cmr/m/n/10.95 may be
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 290--294
+Underfull \hbox (badness 10000) in paragraph at lines 292--296
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 303--306
+Underfull \hbox (badness 10000) in paragraph at lines 305--308
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 310--316
+Underfull \hbox (badness 10000) in paragraph at lines 312--318
 
  []
 
 
-Underfull \hbox (badness 5147) in paragraph at lines 322--323
+Underfull \hbox (badness 5147) in paragraph at lines 324--325
 \OT1/cmr/m/n/10.95 creased vis-i-bil-ity of se-lected la-bels would
  []
 
 
-Underfull \hbox (badness 1365) in paragraph at lines 322--323
+Underfull \hbox (badness 1365) in paragraph at lines 324--325
 \OT1/cmr/m/n/10.95 strengthen users' men-tal link be-tween la-bel
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [7]
-[8
+[7] [8
 
 ] [9
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 396--397
+Underfull \hbox (badness 10000) in paragraph at lines 398--399
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 398--399
+Underfull \hbox (badness 10000) in paragraph at lines 400--401
 
  []
 
@@ -246,7 +242,7 @@ Missing character: There is no ’ in font cmti10!
 Missing character: There is no ’ in font cmti10!
 Missing character: There is no ’ in font cmti10!
 [10]
-Underfull \hbox (badness 10000) in paragraph at lines 462--463
+Underfull \hbox (badness 10000) in paragraph at lines 464--465
 []$\OT1/cmtt/m/n/10.95 http : / / docs . google . com / spreadsheet / viewform 
 ? hl = en[]US&formkey =
  []
