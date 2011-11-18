@@ -79,7 +79,9 @@ Testing was carried out in small rooms in Appleton Tower on the University DICE 
 \item Closing the program
 \end{enumerate}
  
-After completing the tasks, users were given a short survey about their experience completing each task. The questions from this survey can be found in {\bf Appendix B: User Survey}.
+These six tasks covered all functionality in the program, except (1) undoing a point while creating a label, and (2) renaming a label. After each user completed Task 3, they were prompted by the experimenter to rename labels, through the use of simple scenarios (e.g. "What if a machine doesn't know that `Hut 1' and `Hut 2' are both the same kind of object?"). Not explicitly asking the users to carry out these tasks is in line with Molich's \cite{molich} testing guidelines, which states that users should be given goals, rather than steps or descriptions. The task sheet given to users can be found in {\bf Appendix B: User Tasks}.
+
+After completing the tasks, users were given a short survey about their experience completing each task. The questions from this survey can be found in {\bf Appendix C: User Survey}.
 
 \subsubsection{Natural Evaluation}
 
@@ -329,7 +331,6 @@ Labeller:
 
 Nielsen's usability heuristics was effective in helping us identify many of \emph{Tag App}'s limitations, as shown by the strong correlation between aspects we highlighted and issues faced by real users during testing. However, results from user evaluation were crucial in aiding our understanding of the extent of each problem. With this deeper knowledge of the impact of strengths and limitations in \emph{Tag App} on real users, it was possible to identify a set of improvements in \emph{Image Labeller} that would optimise user benefit while minimising the extra cost of development.
 
-\newpage
 \begin{thebibliography}{9}
 
 \bibitem{nielsen1994}
@@ -349,6 +350,12 @@ Nielsen's usability heuristics was effective in helping us identify many of \emp
   \emph{Usability Engineering}.
   Academic Press, pp. 156,
   1993
+
+\bibitem{molich}
+  Molich, R.,
+ \emph{230 Tips and Tricks for a Better Usability Test}.
+  Nielsen Norman Group,
+  2001
 
 \bibitem{furnas1987}
  Furnas, G. W., Landauer, T. K., Gomez, L. M., Dumais, S. T.,
@@ -370,8 +377,7 @@ Nielsen's usability heuristics was effective in helping us identify many of \emp
 \begin{itemize}
 \item User 1 is a 22 year old female and a 4th year Biology graduate.
 \item User 2 is a 20 year old female and a 2nd year undergraduate Law student. 
-\item User 3 is an 18 year old female and a 1st year undergraduate Politics
-with Geography student. 
+\item User 3 is an 18 year old female and a 1st year undergraduate Politics with Geography student. 
 \item User 4 is a 22 year old male and a postgraduate Linguistics student. 
 \item User 5 is a 22 year old female working in biomedical research. 
 \end{itemize}
@@ -379,15 +385,60 @@ with Geography student.
 \subsection{Natural Evaluation}
 
 \begin{itemize}
-\item User A is a 22 year old male and a 3rd year undergraduate Pharmacology
-student. Testing was carried out at a desk in a bedroom.
-\item User B is a 21 year old female and a 4th year undergraduate History
-student. Testing was carried at a sofa in an open area of Appleton Tower.
-\item User C is a 21 year old female and a 4th year undergraduate Spanish and
-English Literature student. Testing was carried out at a desk in room 5.07 of
-Appleton Tower.
-\item User D is a 22 year old male and a Biology graduate working in a watch
-store. Testing was carried out at a desk in his home. 
+\item User A is a 22 year old male and a 3rd year undergraduate Pharmacology student. Testing was carried out at a desk in a bedroom.
+\item User B is a 21 year old female and a 4th year undergraduate History student. Testing was carried at a sofa in an open area of Appleton Tower.
+\item User C is a 21 year old female and a 4th year undergraduate Spanish and English Literature student. Testing was carried out at a desk in room 5.07 of Appleton Tower.
+\item User D is a 22 year old male and a Biology graduate working in a watch store. Testing was carried out at a desk in his home. 
+\end{itemize}
+
+\newpage
+\section{User Tasks}
+\underline{\bf User Evaluation} \newline
+
+\noindent In this evaluation, you will be testing some software for labelling images (i.e. for indicating what region of an image contains what objects). You will be asked to label a few images, and afterwards will be asked a few general questions about your opinion on the software. \newline 
+
+\noindent {\bf Task \#1}
+
+You should see a picture of a Hut. 
+\begin{itemize}
+\item Please label the hut ``Hut".
+\item Save the image.
+\end{itemize}
+
+\noindent {\bf Task \#2} 
+\indent \indent \indent \indent \indent \indent  \indent \indent \indent  \indent \indent \indent \indent \indent \indent 
+\indent  \indent \indent \indent \indent  \indent \indent \indent 
+\emph{I’m a nut, that’s not a real hut!}
+
+You are currently in the folder {\bf /HCI/Eval/images}.
+\begin{itemize}
+\item Please open the image ``huts.jpg" from the folder {\bf /HCI/Images}.
+\end{itemize}
+
+\noindent {\bf Task \#3}
+\indent \indent \indent \indent \indent \indent 
+\indent  \indent \indent \indent \indent  \indent \indent \indent  \emph{A machine will need some luck to find these hut[s]...}
+\begin{itemize}
+\item Please label every hut in the image you have just loaded.
+\end{itemize}
+
+\noindent {\bf Task \#4} \indent \indent \indent \indent \indent \indent  \indent \indent \indent  \indent \indent \indent \indent
+\indent \indent \indent \indent \indent \indent \emph{One hut (or more) won’t make your cut.}
+\begin{itemize}
+\item Please delete the 2 huts you dislike the most.
+\end{itemize}
+
+\noindent {\bf Task \#5} \indent \indent
+\indent \indent \indent \indent \indent \indent  \indent \indent \indent  \indent \indent \indent \indent \indent \indent 
+\indent  \indent \indent \indent \indent  \indent \indent \indent  \emph{Did we forget a little jut?}
+\begin{itemize}
+\item Please reload the first image, ``hut.jpg" from the folder {\bf /HCI/Eval/images}.
+\item Ensure that your label covers the signboard outside the store.
+\end{itemize}
+
+\noindent {\bf Task \#6}
+\begin{itemize}
+\item Please close the program.
 \end{itemize}
 
 \newpage
