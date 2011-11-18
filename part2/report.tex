@@ -1,6 +1,9 @@
 \documentclass[11pt,twocolumn]{article}
+%\documentclass{article}
 
 \usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{hyperref}
 
 \def\thetitle{Human Computer Interaction 2011/2012 \\ Coursework 2}
 \def\theauthor{Stephen McGruer (s0840449) and Wenqi Yao(s0838969)}
@@ -17,92 +20,55 @@
 
 \section{Introduction}
 
-In this paper, we evaluate the application \emph{Tag App} against Nielsen’s
-usability heuristics and cooperative and natural user testing. We use these
-results, along with our previous evaluation of the MIT \emph{LabelMe}
-interface, to identify key strengths, weaknesses, and improvements for our own
-application \emph{Image Labeller}.
+In this paper, we evaluate the application \emph{Tag App} by comparing it against Nielsen's usability heuristics, as well as conducting cooperative and natural user testing. These results are combined with our previous evaluation of the MIT \emph{LabelMe} interface to identify key strengths, weaknesses, and improvements for our own application \emph{Image Labeller}.
 
 \section{Initial Evaluation}
 
-We first applied Nielsen’s usability heuristics\cite{nielsen1994} to
-determine \emph{Tag App}’s strong and weak areas, and to identify problems that
-subjects would likely come up against.
+We first applied Nielsen's usability heuristics\cite{nielsen1994} to determine \emph{Tag App}'s strong and weak areas, and to identify problems that users would likely come up against.
 
 \subsection{Key Strengths}
 
-One strength that we found was the visibility of changes in the system status -
-five out of the seven buttons gave clear visual feedback. The application also
-avoided using overly technical language, and supported recognition-based over
-recall-based interaction (avoiding hidden options or menus.) A help file was
-made available, with concrete steps for users to follow. Finally, it had a
-clean and minimalistic design with no unnecessary options, although the chosen
-colour scheme (orange and yellow) might not be appealing to all users. 
+One strength that we found was the visibility of changes in the system status - five out of the seven buttons gave clear visual feedback. The application also avoided using overly technical language, and supported recognition-based over recall-based interaction (avoiding hidden options or menus.) A help file was made available, with concrete steps for users to follow. Finally, it had a
+clean and minimalistic design with no unnecessary options, although the chosen colour scheme (orange and yellow) might not be appealing to all users. 
 
 \subsection{Key Limitations}
 
-The interaction between the functionality and placement of buttons and the rest
-of the interface was not ideal.
+\indent \indent Placement of and feedback from buttons was not ideal. In particular, clicking the `Save' button disabled it without confirmation of the system status (e.g. an `image saved' pop-up). The `Open' and 'Save' buttons, which affect the entire image, were mixed with buttons such as `New', which only affects a single label. This is illustrated in {\bf Figure 1}. Additionally, the `Help' button, which plays a key role in user guidance, was not in an eye-catching position.
 
-In particular, the system status after clicking `Save' was unclear, as this
-this merely disabled the `Save' button without confirmation (e.g. an `image
-saved' pop-up). With regard to the placement of buttons, `Open', which has
-global functionality, was placed with buttons such as `New', which are local to
-each image. Additionally the `Help' button, which plays a key role in user
-guidance, was not in an eye-catching position. 
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.8]{buttonpanel.png}
+\caption{Button panel, showcasing inconsistent grouping. `Help' is not on the button panel.}
+\end{figure}
 
-There was also a lack of consistency and accuracy in the use of language.
-Labels were referred to at different points as `objects' and `labels', while
-the act of adding a label was referred to as `adding an object', `creating a
-label', and `tagging an object'. One button was named `Edit' when its actual
-function was to rename the selected label.
+There was also a lack of consistency and accuracy in the use of language. Labels were referred to at different points as `objects' and `labels', while the act of adding a label was referred to as `adding an object', `creating a label', and `tagging an object'. The `Edit' button's actual function was to rename the selected label.
 
-There was poor support for user control. It was not possible to set keyboard
-shortcuts or any application preferences, even though letters in some names
-were underlined corresponding to the general standards for shortcuts (e.g.
-`Ope\underline{n}'). 
+There was poor support for user control. Keyboard shortcuts or application preferences could not be set, even though letters in some names were underlined corresponding to the general standards for shortcuts (e.g. `Ope\underline{n}'). The shortcut \emph{Alt-N} opened the Help file, but this was never documented, suggesting that it was unintentional.
 
-Finally, the application was inflexible towards many possible changes in users’
-decisions. Generally, there was a lack of undo/redo functionality. Also, there
-was no option to cancel label creation after providing a name, so the only way
-to stop creating a label was to finish it. Right clicking while drawing a label
-would undo the last point; however, this functionality was not intuitive. 
+Finally, the application was inflexible towards many possible changes in users' decisions. Global undo/redo functionality was not available. Also, there was no option to cancel label creation after providing a name, so the only way to stop creating a label was to finish it. Right clicking while drawing a label would undo the last point; however, this functionality was not intuitive. 
 
 \subsection{Bugs Found}
 
-We found two uncaught errors in the application. Firstly, if the `Delete'
-button was clicked while multiple labels were selected, only one label would be
-deleted. The `Delete' and `Edit' buttons would be left disabled, so no more
-labels could be deleted or renamed. Secondly, if the `Home' button in the `Open
-Image' dialogue was clicked, the `up' arrow would be disabled, leaving the
-dialogue stuck in the current folder.
+\begin{itemize}
+\item \emph{Clicking the `Delete' button while multiple labels were selected} would only delete one label. The `Delete' and `Edit' buttons would be left disabled, so other labels could not be deleted or renamed.
+\item \emph{Clicking the `Home' button in the `Open Image' dialogue} would disable the `up' arrow, leaving the dialogue stuck in the current folder.
+\end{itemize}
 
 \section{User Evaluation}
 
 \subsection{Methodology}
 
-We used two types of evaluation methods to test the software; Cooperative
-Evaluation and Natural Evaluation. Since Nielsen and Landauer suggest
-that using three to five subjects yields the maximum benefit to cost
-ratio\cite{nielsen1993}, we used five subjects for cooperative evaluation, and
-four for natural evaluation. We selected a mix of male and female users from a
-variety of backgrounds to represent the intended user base. A short description
-of each user can be found in Appendix A: User Descriptions.
+We used two types of evaluation methods to test the software; Cooperative Evaluation and Natural Evaluation. 
 
-Before testing the software, users were briefed on the aims of our project, as
-well as the rationale behind creating applications for labelling images. The
-`Thinking-Aloud' technique was explained in order to facilitate dialogue
-between the user and experimenter, and to disambiguate users’ actions. Users
-were also told about the experiment procedure, and informed that they might
-withdraw their participation at any time. The users’ speech and actions were
-noted by hand. After the evaluation, users were asked for feedback on aspects
-of the program that confused them, and for suggestions on improving the
-interface.
+\emph{ Selecting Subjects.} Nielsen and Landauer suggest that using three to five subjects yields the maximum benefit to cost ratio\cite{nielsen1993}. However, Nielsen also argues that when novices evaluate an application, around 14 subjects are needed to identify 75\% of problems \cite{nielsen19932}. As \emph{Tag App} has limited functionality, we decided that a smaller number of subjects would not affect results greatly, and it was more important to maximise our cost-benefit. Hence, we used five subjects for cooperative evaluation, and four for natural evaluation. We selected a mix of male and female users from a variety of backgrounds to represent the intended user base. A short description of each user can be found in {\bf Appendix A: User Descriptions}.
+
+\emph{Procedure.} Before testing the software, users were briefed on the aims of our project, as well as the rationale behind creating applications for labelling images. The `Thinking-Aloud' technique was explained in order to facilitate dialogue between the user and experimenter, and to disambiguate users’ actions. Users were also told about the experiment procedure, and informed that they might withdraw their participation at any time. After the evaluation, users were asked for feedback on aspects of the program that confused them, and for suggestions on improving the interface.
+
+\emph{Recording Results.} Subjects' actions and comments were noted by hand. As stated in our previous report, differences in subjects' reading speed and memory of the tasks given would affect the time taken for them to accomplish each task. These timings were therefore not recorded. Quantitative data was instead taken from subjects' rating of the application, as well as the number of subjects who performed each action.
 
 \subsubsection{Cooperative Evaluation}
 
-Testing was carried out in small rooms in Appleton Tower on the University DICE
-machines. Users were given a list of six tasks to complete in order:
+Testing was carried out in small rooms in Appleton Tower on the University DICE machines. Users were given a list of six tasks to complete in order: 
 
 \begin{enumerate}
 \item Labelling one object in a scene
@@ -113,149 +79,113 @@ machines. Users were given a list of six tasks to complete in order:
 \item Closing the program
 \end{enumerate}
  
-After completing the tasks, users were given a short survey about how easy they
-found each task to be. 
+After completing the tasks, users were given a short survey about their experience completing each task. The questions from this survey can be found in {\bf Appendix B: User Survey}.
 
 \subsubsection{Natural Evaluation}
 
-To make the evaluation setting resemble environments that a user would normally
-be in, the program was run on a Windows environment (rather than Linux) on
-laptops, in a range of different locations. Each user was provided with a
-sample image to label, but given free rein to import any images from other
-folders, as well as create any labels that they wanted to. 
+To make the evaluation setting resemble environments that a user would normally be in, the program was run on a Windows environment (rather than Linux) on laptops, in a range of different locations. Each user was provided with a sample image to label, but given free rein to import any images from other folders, as well as create any labels that they wanted to.  
 
 \subsection{Results}
 
 \subsubsection{Cooperative Evaluation}
 
-Subjects found it difficult to accomplish the given tasks, with one user
-describing the program as `very demanding on users'. The subjects scored each
-task out of 5, with 1 being the lowest and 5 being the highest. They found it
-easiest to select (4.6pts) and delete (4.4pts) labels; while opening an image
-(2.6pts) was deemed the hardest task, followed by label editing (3.0pts) and
-then creating a label (3.2pts).
+Subjects found it difficult to accomplish the given tasks, with one user describing the program as `very demanding on users'. The subjects scored each task out of 5, with 1 being the lowest and 5 being the highest. They found it easiest to select (4.6pts) and delete (4.4pts) labels; while opening an image (2.6pts) was deemed the hardest task, followed by label editing (3.0pts) and then creating a label (3.2pts).
 
-While all subjects were able to save and close the image, they ran into a
-multitude of other problems:
+While all subjects were able to save and close the image, they ran into a multitude of other problems:
  
-\textbf{Unintuitive Interface.} None of the subjects managed to create a label
-on their first try, or load an image without assistance. To create a label they
-attempted a variety of methods including clicking directly on the image (four
-subjects) and clicking the `Open' button (two subjects). To load an image each
-subject tried to click the location bar to change the directory, and three
-subjects tried to click the extension field. Additionally, one subject tried to
-click the `Home' button when opening a new image, locking the loading dialog in
-a state where buttons no longer worked. Finally, when creating more labels in
-Task 3, two subjects replicated mistakes that they had made earlier. 
+\textbf{Unintuitive Interface.} None of the subjects managed to create a label on their first try, or load an image without assistance. To create a label they attempted a variety of methods including clicking directly on the image (four subjects) and clicking the `Open' button (two subjects). To load an image, every subject tried to click the location bar to change the directory, and three subjects tried to click the `File Type' field. Additionally, one subject tried to click the `Home' button when opening a new image, locking the loading dialog in a state where buttons no longer worked. Finally, when creating more labels in Task 3, two subjects replicated mistakes that they had made earlier. 
 
-\textbf{Poor Documentation.} All subjects were prompted to check the help file
-when stuck, but this was not always useful. After reading the documentation,
-one subject tried to right-click to undo points, but was confused by the
-colours of the lines changing arbitrarily. Another subject did not understand
-the instruction `add vertices to the image panel', as she did not know what the
-image panel was. Subjects also did not always use the same language as the help
-documentation - for example, one subject searched the section titled `Delete
-Label' instead of looking for `undo' as they wanted to `delete the last line
-[they] drew'.
+\textbf{Poor Documentation.} All subjects were prompted to check the help file when stuck, but this was not always useful. After reading the documentation, one subject tried to right-click to undo points, but was confused by the colours of the lines changing arbitrarily. Another subject did not understand the instruction `add vertices to the image panel', as she did not know what the
+image panel was. Subjects also did not always use the same language as the help documentation - for example, one subject searched the section titled `Delete Label' instead of looking for `undo' as they wanted to `delete the last line [they] drew'.
 
-\textbf{Bugs \& Inflexibility.} One subject made a spelling error in naming a
-label. Since they could not cancel or rename the label within the label
-creation state, they decided to `make it and then delete it later'. Also, all
-of the subjects created multiple labels with the same name. Since all of these
-labels were highlighted when any were selected, two users accidentally deleted
-the wrong label.
+\textbf{Bugs \& Inflexibility.} One subject made a spelling error in naming a label. Since they could not cancel or rename the label within the label creation state, they decided to `make it and then delete it later'. Also, all of the subjects created multiple labels with the same name. Since all of these labels were highlighted when any were selected, two users accidentally deleted the wrong label.
 
 \subsubsection{Natural Evaluation}
 
-A ten minute time frame was suggested for subjects to explore the application.
-Subjects spent an average time of 13 minutes and 20 seconds, though this was
-skewed by one enthusiastic subject who spent 20 minutes and 3 seconds on the
-application.
+A 10 minute time frame was suggested for subjects to explore \emph{Tag App}. On average, subjects spent 13 minutes and 20 seconds using the application, though this was skewed by an enthusiastic subject who used it for 20 minutes and 3 seconds.
 
-Table \ref{features} shows each feature that we identified in the program, and
-the number of subjects who successfully used it.
+The table below shows each feature that we identified in the program, and the number of subjects who successfully used it.
 
-\begin{table*}
-\begin{tabular}{|c|c|}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|}
 \hline
-Feature & Number of subjects who successfully used it \\
+{\bf Feature } & {\bf \# } \\ 
 \hline
 Opening a new image & 3 \\
 Creating a new label & 4 \\
-Undoing points while creating a label & 0 \\
+Undoing points during label creation & 0 \\
 Renaming a label & 2 \\
 Deleting a label & 1 \\
 Saving an image & 4 \\
 Using the help file & 2 \\
 \hline
 \end{tabular}
-\caption{The number of subjects who used each feature during our Natural Evaluation.}
+\caption{\# of subjects who used each feature.}
 \label{features}
-\end{table*}
+\end{table}
  
-Subjects also made several errors due to misconceptions about the program.
-These are detailed in Table \ref{errors}.
+Subjects also made several errors, mostly due to misconceptions about the program. These are detailed in the next table:
 
-\begin{table*}
-\begin{tabular}{|c|c|}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|}
 \hline
-Error/Misconception & Number of subjects who encountered it \\
+{\bf Error/Misconception} & {\bf \#} \\
 \hline
-Clicked location bar / file type to open image & 4 \\
-Clicked home button when opening an image & 2 \\
-Clicked `Edit' to change points in a label & 2 \\
-Clicked `Open' to create a new label & 2 \\
-Dragged cursor instead of clicking & 1 \\
-Accidentally clicked `Delete' instead of `Edit' & 1 \\
+{\bf Changing folder to open image}: & \\
+\emph{Location/File Type} bars clicked & 4 \\
+\emph{`Home'} icon clicked & 2 \\
+\hline
+{\bf Create new label -} & \\
+\emph{Start New}: \ \ \ \ `Open' clicked & 2 \\
+\emph{Create Points}: Cursor dragged  instead & 1 \\
+\ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \ \ \ \ of clicked & \\
+\hline
+{\bf Edit label points:} `Edit' clicked & 2 \\
+\hline
+{\bf Accidents:} Clicked `Delete' for `Edit' & 1 \\
 \hline
 \end{tabular}
-\caption{Mistakes made by subjects during Natural Evaluation.}
+\caption{\# of subjects who made each error.}
 \label{errors}
-\end{table*}
+\end{table}
 
-Furthermore, subjects did not always understand the program output, as is 
-shown in Table \ref{confusion}.
+Furthermore, subjects did not always understand the program output, as shown below.
 
-\begin{table*}
-\begin{tabular}{|c|c|}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|}
 \hline
-Aspect causing confusion & Number of subjects who encountered it \\
+{\bf Aspect causing confusion} & {\bf \#} \\
 \hline
 Changing of label colours & 2 \\
 Highlighting of selected labels & 2 \\
-Usage of the word `vertices' in the error dialogue & 2 \\
+Vocabulary: `vertices' for points & 2 \\
 Multiple labels with the same name & 2 \\
 \hline
 \end{tabular}
-\caption{Aspects that caused subjects to be confused during Natural Evaluation.}
+\caption{\# of subjects confused by each aspect.}
 \label{confusion}
-\end{table*}
+\end{table}
 
-\subsubsection{Gaps in Analysis}
+{\bf Gaps in Analysis}. Even though we utilised the `Thinking-Aloud' method, it was not always possible to identify subjects’ intents. One subject commented `I want to draw a box around the lamp', and promptly clicked the `Open' button. It was unclear if two
+of the subjects meant to create a new label when they clicked `New', as they were clicking the buttons systematically from top to bottom.
 
-Even though we utilised the `Thinking-Aloud' method, it was not always possible
-to identify subjects’ intents. One subject commented `I want to draw a box
-around the lamp', and promptly clicked the `Open' button. It was unclear if two
-of the subjects meant to create a new label when they clicked `New', as they
-were clicking the buttons systematically from top to bottom.
-
-We were unable to test the usefulness of the help documentation during Natural
-Evaluation. Two subjects did not click the `Help' button, attributing this to
-`never us[ing] the help file' when working with other programs. One subject
-only noticed it halfway during the evaluation, and the final subject did not
-find extra functionality from reading it.
+We were unable to test the usefulness of the help documentation. Two subjects did not click the `Help' button, attributing this to `never us[ing] the help file' when working with other programs. One subject only noticed it halfway during the evaluation, and the final subject did not find extra functionality from reading it.
 
 \subsubsection{Bugs}
 
-While testing, two subjects found new bugs in the application. Clicking the
-close button on the `Save Image?' dialog acts as if you clicked `No' rather
-than `Cancel', so any subsequent dialogs (such as the Open Image dialog) appear
-anyway, confusing the subject who discovered the bug. The other new bug is that
-opening a non-image file crashes the application.
+Two subjects found new bugs in the application. 
+\begin{itemize}
+\item \emph{Clicking the 'X' button on the `Save Image?' dialog} acts as if you clicked `No' rather than `Cancel', so any subsequent dialogs (such as the Open Image dialog) appear
+anyway, without feedback about the state. 
+\item \emph{ Opening a non-image file }crashes the application.
+\end{itemize}
 
 \section{Discussion of Results}
 
-We found that our hypotheses (based on Nielsen’s heuristics) were generally
+We found that our hypotheses (based on Nielsen's heuristics) were generally
 mirrored by the actions and thoughts of the subjects involved in our two
 evaluations. However, there were some cases where feedback did not match our
 predictions. In this section we discuss these discrepancies between theory and
@@ -291,7 +221,7 @@ this problem.
  
 Contrary to our expectations, subjects struggled to use the help documentation.
 Problems included finding the section in the help file that was appropriate to
-their problem, and the general wording in the documentation. While three
+their problem, and the general wording of the documentation. While three
 subjects used the help documentation to learn about the undo functionality, two
 others mentioned wanting to undo points, but did not find the corresponding
 section in the documentation. The documentation might benefit from an FAQ list,
@@ -302,8 +232,8 @@ label that he had just started creating, but was unable to do so. This problem
 would be easily eliminated with the addition of a `Cancel' button. Four
 subjects locked the `Open Image' dialogue in a state where only the current
 folder could be accessed, since they could not understand many buttons and
-fields in the dialogue. While no subjects tripped the multiple-label-delete
-error, this could be due to the limited time spent and labels made.
+fields in the dialogue. No subjects triggered the multiple-label-delete
+error, possibly due to the limited time spent and labels made.
 
 \subsection{User Suggestions}
 
@@ -340,18 +270,13 @@ and we would continue to use it.
 
 \section{Comparative Evaluation}
 
-In order to identify key improvements we could make to our own application
-\emph{Image Labeller}, we compared it against both our new \emph{Tag App} discoveries and a
-previous analytical evaluation of MIT’s \emph{LabelMe}\footnote{See our previous
-coursework.}
+To identify key improvements for our application \emph{Image Labeller}, we compared it against both our new \emph{Tag App} discoveries and a previous analytical evaluation of MIT’s \emph{LabelMe}\footnote{See our previous
+report}.\\
 
-\emph{Image Labeller} was inferior to other the applications in three main areas:
+\noindent \emph{Image Labeller} was inferior to other the applications in three main areas:
 
-\textbf{Recognition-based Interfaces.} In \emph{Tag App} and \emph{LabelMe}, all
-available actions are contained on the screen (with the exception of \emph{Tag App}’s
-`Undo'). While the main actions within \emph{Image Labeller} are always visible, many
-others are hidden in the menu-bar and the user must remember which menu they
-are in. 
+\textbf{Recognition-based Interfaces.} In \emph{Tag App} and \emph{LabelMe}, all available actions are contained on the screen (with the exception of \emph{Tag App}’s `Undo'). While the main actions within \emph{Image Labeller} are always visible,
+others are hidden in the menu-bar and the user must remember which menu they are in. 
 
 \textbf{Visual Links and Indicators.} When a label is selected, \emph{Tag App}
 highlights it with a thick red line and \emph{LabelMe} shades the area contained by
@@ -363,10 +288,10 @@ added. Neither \emph{Tag App} nor \emph{Image Labeller} offer such a feature.
 \textbf{Use of Technical Language.} Most instructions in \emph{Tag App} and
 \emph{LabelMe} use simple, non-technical language. However, the concept of
 `Collections' in \emph{Image Labeller} may be considered too abstract for the novice
-user.
+user. \\
 
-Some problem areas within \emph{Tag App} and \emph{LabelMe} also revealed similar problems
-with \emph{Image Labeller}:
+\noindent Some problems in \emph{Tag App} and \emph{LabelMe} revealed similar issues
+in \emph{Image Labeller}:
 
 \textbf{Poor Help Documentation.} Both \emph{Tag App} and \emph{Image Labeller} have
 help functions that are often overlooked. \emph{LabelMe} uses its help documentation
@@ -375,9 +300,9 @@ find.
 
 \textbf{Ambiguous Buttons.} All three applications suffer from some
 ambiguity in their button names; \emph{Tag App} for almost all buttons, \emph{LabelMe} in the
-`Erase' button, and \emph{Image Labeller} in its icon-based buttons. 
+`Erase' button, and \emph{Image Labeller} in its icon-based buttons. \\
 
-Other problem areas in \emph{Tag App} and \emph{LabelMe} highlighted positive aspects of
+\noindent Other problems in \emph{Tag App} and \emph{LabelMe} highlighted positive aspects of
 \emph{Image Labeller}:
 
 \textbf{Display of Available Actions.} In \emph{Tag App}, one can click the
@@ -385,41 +310,26 @@ Other problem areas in \emph{Tag App} and \emph{LabelMe} highlighted positive as
 label will be deleted. The labels that remain cannot be selected for deletion.
 \emph{LabelMe} allows the user to click the `Erase' button even when nothing can be
 erased. On the other hand, actions that might lead to the user being trapped in
-a particular state have been disabled in \emph{Image Labeller}.
+a particular state have been disabled in \emph{Image Labeller}. \\
 
 Based on our comparison, we came up with five changes we would make to Image
 Labeller:
 
-\textbf{Implementation of an Icon-Bar.} We could improve
-recognition-based interaction with an icon-bar with shortcuts for actions such
-as `Save'.
+\textbf{Implementation of an Icon-Bar.} Icon-based shortcuts for actions such as `Save' would promote recognition-based interaction.
 
- \textbf{Shading of Selected Label Area.} This would improve the
-visibility of the selected label, so that users would be more likely to notice
-the results of their clicking on a label name. 
+ \textbf{Shading of Selected Label Area.} Increased visibility of selected labels would strengthen users' mental link between label names and corresponding areas.
 
-\textbf{Enlarged First Points in Label Creation.} The lack of this
-feature did not hinder subjects in our iterative development tests, but the
-increased clarity from having a larger first point would be well worth the
-small effort required to implement this.
+\textbf{Enlarged First Points in Label Creation.} The lack of this feature did not hinder subjects during iterative development tests. However, the increased clarity from a larger first point would be well worth the small cost of implementation.
 
-\textbf{Addition of a Tutorial.} As suggested by one of the subjects from
-our natural evaluation, users could be familiarised with the application with a
-tutorial that appeared on their first visit.
+\textbf{Addition of a Tutorial.} As suggested by one of the subjects from our natural evaluation, users could be familiarised with the application with a tutorial that appeared on their first visit.
 
-\textbf{Reducing Button Ambiguity.} To maximise the clarity of our button
-names and icons, we would like to run a study in which users could suggest text
-phrases and/or pictures to represent certain actions.
+\textbf{Reducing Button Ambiguity.} Studies have shown that \emph{user-preferred} names overlap by only 15-35\% \cite{furnas1987}. However, to maximise the clarity of our button names and icons, we would like to run a study to find the best \emph{user-understood} names and pictures, even if these would not be the first-choice names for most users.  
 
 \section{Conclusion}
 
-Using Nielsen’s usability heuristics was effective in finding many of \emph{Tag App}’s
-limitations. However, to optimise the benefit to users, it was crucial to also
-analyse the results from user evaluation. With our knowledge of the strengths
-and limitations in \emph{Tag App} that impacted real users, it was possible to
-identify a set of improvements in \emph{Image Labeller} that would maximise user
-experience while minimising the extra cost of development.
+Nielsen's usability heuristics was effective in helping us identify many of \emph{Tag App}'s limitations, as shown by the strong correlation between aspects we highlighted and issues faced by real users during testing. However, results from user evaluation were crucial in aiding our understanding of the extent of each problem. With this deeper knowledge of the impact of strengths and limitations in \emph{Tag App} on real users, it was possible to identify a set of improvements in \emph{Image Labeller} that would optimise user benefit while minimising the extra cost of development.
 
+\newpage
 \begin{thebibliography}{9}
 
 \bibitem{nielsen1994}
@@ -433,6 +343,18 @@ experience while minimising the extra cost of development.
   \emph{A mathematical model of the finding of usability problems}.
   Proceedings of ACM INTERCHI'93 Conference, pp. 206-213,
   1993
+
+\bibitem{nielsen19932}
+  Nielsen, J.,
+  \emph{Usability Engineering}.
+  Academic Press, pp. 156,
+  1993
+
+\bibitem{furnas1987}
+ Furnas, G. W., Landauer, T. K., Gomez, L. M., Dumais, S. T.,
+ \emph{The Vocabulary Problem in Human-System Communication}. 
+  Communications of the ACM, 30 (11), 964-971.,
+  1987
 
 \end{thebibliography}
 
@@ -468,4 +390,23 @@ Appleton Tower.
 store. Testing was carried out at a desk in his home. 
 \end{itemize}
 
+\newpage
+\section{User Survey}
+
+This survey was given as an online form. Users were asked to rate each aspect of the program on a scale of 1 to 5, where 5 was the best score (e.g. task was easiest to accomplish). 
+
+\subsection{Survey Questions}
+
+\begin{enumerate}
+\item How easy was it to OPEN an image? 
+\item How easy was it to CREATE a label?
+\item How easy was it to SELECT a label?
+\item How easy was it to EDIT a label? 
+\item How easy was it to DELETE a label?
+\item How AESTHETICALLY PLEASING was the software?
+\end{enumerate}
+
+\subsection{Online Survey}
+
+The online survey can be found on:\\ \url{http://docs.google.com/spreadsheet/viewform?hl=en_US&formkey=dG1PSWZQX1M0ZkFrNVJ4WXhHcm5CTEE6MQ#gid=0}
 \end{document}
