@@ -28,12 +28,12 @@ We first applied Nielsen's usability heuristics\cite{nielsen1994} to determine \
 
 \subsection{Key Strengths}
 
-One strength that we found was the visibility of changes in the system status - five out of the seven buttons gave clear visual feedback. The application also avoided using overly technical language, and supported recognition-based over recall-based interaction (avoiding hidden options or menus.) A help file was made available, with concrete steps for users to follow. Finally, it had a
+One strength that we found was the visibility of changes in the system status - five of the seven buttons gave clear visual feedback. The application also avoided using overly technical language, and supported recognition-based over recall-based interaction (avoiding hidden options or menus.) A help file was made available, with concrete steps for users to follow. Finally, it had a
 clean and minimalistic design with no unnecessary options, although the chosen colour scheme (orange and yellow) might not be appealing to all users. 
 
 \subsection{Key Limitations}
 
-\indent \indent Placement of and feedback from buttons was not ideal. In particular, clicking the `Save' button disabled it without confirmation of the system status (e.g. an `image saved' pop-up). The `Open' and 'Save' buttons, which affect the entire image, were mixed with buttons such as `New', which only affects a single label. This is illustrated in {\bf Figure 1}. Additionally, the `Help' button, which plays a key role in user guidance, was not in an eye-catching position.
+\indent \indent Placement of and feedback from buttons was not ideal. In particular, clicking the `Save' button disabled it without confirmation of the change in system status (e.g. an `image saved' pop-up). The `Open' and 'Save' buttons, which affect the entire image, were mixed with buttons such as `New', which only affects a single label. This is illustrated in {\bf Figure 1}. Additionally, the `Help' button, which plays a key role in user guidance, was not in an eye-catching position.
 
 \begin{figure}[h!]
 \centering
@@ -51,7 +51,7 @@ Finally, the application was inflexible towards many possible changes in users' 
 
 \begin{itemize}
 \item \emph{Clicking the `Delete' button while multiple labels were selected} would only delete one label. The `Delete' and `Edit' buttons would be left disabled, so other labels could not be deleted or renamed.
-\item \emph{Clicking the `Home' button in the `Open Image' dialogue} would disable the `up' arrow, leaving the dialogue stuck in the current folder.
+\item \emph{Clicking the `Home' button in the `Open Image' dialogue} would disable the `up' arrow, leaving the dialogue stuck in the `home' folder.
 \end{itemize}
 
 \section{User Evaluation}
@@ -135,14 +135,13 @@ Subjects also made several errors, mostly due to misconceptions about the progra
 \hline
 {\bf Error/Misconception} & {\bf \#} \\
 \hline
-{\bf Changing folder to open image}: & \\
+{\bf Changing folder to open image} - & \\
 \emph{Location/File Type} bars clicked & 4 \\
 \emph{`Home'} icon clicked & 2 \\
 \hline
-{\bf Create new label -} & \\
-\emph{Start New}: \ \ \ \ `Open' clicked & 2 \\
-\emph{Create Points}: Cursor dragged  instead & 1 \\
-\ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \ \ \ \ of clicked & \\
+{\bf Creating a new label} - & \\
+\emphe{`Open'} clicked to start new label & 2 \\
+\emph{Cursor dragged} instead of clicked to create points & 1 \\
 \hline
 {\bf Edit label points:} `Edit' clicked & 2 \\
 \hline
@@ -174,7 +173,7 @@ Multiple labels with the same name & 2 \\
 {\bf Gaps in Analysis}. Even though we utilised the `Thinking-Aloud' method, it was not always possible to identify subjects’ intents. One subject commented `I want to draw a box around the lamp', and promptly clicked the `Open' button. It was unclear if two
 of the subjects meant to create a new label when they clicked `New', as they were clicking the buttons systematically from top to bottom.
 
-We were unable to test the usefulness of the help documentation. Two subjects did not click the `Help' button, attributing this to `never us[ing] the help file' when working with other programs. One subject only noticed it halfway during the evaluation, and the final subject did not find extra functionality from reading it.
+We were unable to test the usefulness of the help documentation during natural evaluation. Two subjects did not click the `Help' button, attributing this to `never us[ing] the help file' when working with other programs. One subject only noticed it halfway during the evaluation, and the final subject did not find extra functionality from reading it.
 
 \subsubsection{Bugs}
 
@@ -182,7 +181,7 @@ Two subjects found new bugs in the application.
 \begin{itemize}
 \item \emph{Clicking the 'X' button on the `Save Image?' dialog} acts as if you clicked `No' rather than `Cancel', so any subsequent dialogs (such as the Open Image dialog) appear
 anyway, without feedback about the state. 
-\item \emph{ Opening a non-image file }crashes the application.
+\item \emph{ Opening a non-image file} crashes the application.
 \end{itemize}
 
 \section{Discussion of Results}
@@ -195,7 +194,7 @@ practice, and suggest corresponding improvements.
 
 As expected, subjects seemed to seek out and respond to changes in the system
 state. They saw and interacted with pop-up dialogues displayed after they
-clicked a button, and were confused by the lack of feedback from `Save'
+clicked a button, and were confused by the lack of feedback from the `Save'
 functionality, especially during the transition between the `Do you want to
 save?' and `Open Image' dialogues. 
 
@@ -239,8 +238,8 @@ error, possibly due to the limited time spent and labels made.
 
 \subsection{User Suggestions}
 
-Subjects in both evaluations made several suggestions, all of which could be a
-valuable addition to the application. However, due to development costs and
+Subjects in both evaluations made several suggestions, all of which could be
+valuable additions to the application. However, due to development costs and
 characteristics of the intended user base, we found some improvements to be
 more critical than others.
 
@@ -329,7 +328,7 @@ Labeller:
 
 \section{Conclusion}
 
-Nielsen's usability heuristics was effective in helping us identify many of \emph{Tag App}'s limitations, as shown by the strong correlation between aspects we highlighted and issues faced by real users during testing. However, results from user evaluation were crucial in aiding our understanding of the extent of each problem. With this deeper knowledge of the impact of strengths and limitations in \emph{Tag App} on real users, it was possible to identify a set of improvements in \emph{Image Labeller} that would optimise user benefit while minimising the extra cost of development.
+Nielsen's usability heuristics were effective in helping us identify many of \emph{Tag App}'s limitations, as shown by the strong correlation between the aspects we highlighted and the issues faced by real users during testing. However, results from user evaluation were crucial in aiding our understanding of the extent of each problem. With this deeper knowledge of the impact of strengths and limitations in \emph{Tag App} on real users, it was possible to identify a set of improvements in \emph{Image Labeller} that would optimise user benefit while minimising the extra cost of development.
 
 \begin{thebibliography}{9}
 
